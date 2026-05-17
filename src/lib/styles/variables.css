@@ -1,0 +1,161 @@
+/* ========================================
+   FIGMA DESIGN SYSTEM VARIABLES
+   ======================================== */
+
+:root {
+  /* ==================== COLORI NEUTRALI ==================== */
+  --neutral-50: #f3f3f3;
+  --neutral-100: #cfcfcf;
+  --neutral-200: #a8a8a8;
+  --neutral-300: #868686;
+  --neutral-400: #686868;
+  --neutral-500: #4e4e4e;
+  --neutral-600: #395959;
+  --neutral-700: #282828;
+  --neutral-800: #1d1d1d;
+  --neutral-900: #151515;
+
+  /* ==================== COLORI BRAND: SPORT INSOLITI ==================== */
+  --brand-sport-insoliti-100: #c9cffc;
+  --brand-sport-insoliti-200: #a8b0f9;
+  --brand-sport-insoliti-300: #8687f3;
+  --brand-sport-insoliti-400: #7069ec;
+  --brand-sport-insoliti-500: #533ddc;
+  --brand-sport-insoliti-600: #523dc5;
+  --brand-sport-insoliti-700: #433e9e;
+  --brand-sport-insoliti-800: #3a3e7e;
+  --brand-sport-insoliti-900: #232e48;
+
+  /* ==================== COLORI BRAND: VIP INASPETTATI ==================== */
+  --brand-vip-inaspettati-100: #fdeafd;
+  --brand-vip-inaspettati-200: #fbd4f8;
+  --brand-vip-inaspettati-300: #f5b2ef;
+  --brand-vip-inaspettati-400: #ee84e3;
+  --brand-vip-inaspettati-500: #dc3dcc;
+  --brand-vip-inaspettati-600: #c435b3;
+  --brand-vip-inaspettati-700: #a23e91;
+  --brand-vip-inaspettati-800: #862375;
+  --brand-vip-inaspettati-900: #6d2260;
+
+  /* ==================== COLORI BRAND: VILLAGGIO ==================== */
+  --brand-villaggio-100: #fdd1cd;
+  --brand-villaggio-200: #fbccb1;
+  --brand-villaggio-300: #f61675;
+  --brand-villaggio-400: #ec4848;
+  --brand-villaggio-500: #dc3e41;
+  --brand-villaggio-600: #b61e22;
+  --brand-villaggio-700: #961e20;
+  --brand-villaggio-800: #7d1f21;
+  --brand-villaggio-900: #440b0c;
+
+  /* ==================== COLORI BRAND: CIBO ==================== */
+  --brand-cibo-100: #fce9ee;
+  --brand-cibo-200: #f7e7cf;
+  --brand-cibo-300: #eccf9a;
+  --brand-cibo-400: #e3b166;
+  --brand-cibo-500: #dc963e;
+  --brand-cibo-600: #d3792c;
+  --brand-cibo-700: #bb5b24;
+  --brand-cibo-800: #9c4120;
+  --brand-cibo-900: #7f3420;
+
+  /* ==================== UNITÀ / SPACING ==================== */
+  --unit-0: 0;
+  --unit-4: 4px;
+  --unit-8: 8px;
+  --unit-12: 12px;
+  --unit-16: 16px;
+  --unit-24: 24px;
+  --unit-32: 32px;
+  --unit-40: 40px;
+  --unit-48: 48px;
+  --unit-51: 51px;
+  --unit-56: 56px;
+  --unit-64: 64px;
+  --unit-80: 80px;
+  --unit-160: 160px;
+  --unit-1000: 1000px;
+
+  /* ==================== TOKEN COLORI ==================== */
+  /* Sfondo */
+  --color-bg-primary: var(--neutral-900);
+  --color-bg-secondary: var(--neutral-800);
+  --color-bg-sport: var(--brand-sport-insoliti-500);
+
+  /* Testo */
+  --color-text-primary: var(--neutral-100);
+  --color-text-secondary: var(--neutral-300);
+
+  /* Link */
+  --color-link-normal: #ffffff;
+  --color-link-hover: #ffffff;
+
+  /* Filtri */
+  --color-filter-bg-selected: var(--brand-sport-insoliti-500);
+  --color-filter-bg-hover: var(--brand-sport-insoliti-100);
+  --color-filter-text-base: var(--neutral-900);
+  --color-filter-text-selected: var(--neutral-900);
+
+  /* ==================== RAGGIO / BORDER RADIUS ==================== */
+  --radius-none: 0;
+  --radius-xs: 2px;
+  --radius-s: 4px;
+  --radius-m: 8px;
+  --radius-l: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* ==================== SPACING ==================== */
+  --spacing-0: 0;
+  --spacing-1: 2px;
+  --spacing-2: 4px;
+  --spacing-3: 8px;
+  --spacing-4: 8px;
+  --spacing-5: 12px;
+  --spacing-6: 16px;
+  --spacing-7: 16px;
+  --spacing-8: 24px;
+  --spacing-9: 32px;
+  --spacing-10: 48px;
+  --spacing-11: 64px;
+
+  /* ==================== FONT ==================== */
+  --font-family: "dharma-gothic-e", sans-serif;
+  --font-family-text: "nexa-text", sans-serif;
+
+  /* ==================== LINEA ==================== */
+  --line-thickness: 51px;
+}
+
+/* ==================== UTILITY ALIASES ==================== */
+/* Questi alias rendono le variabili più facili da usare */
+
+/* Colori di base */
+:root {
+  --color-primary: var(--brand-sport-insoliti-500);
+  --color-secondary: var(--brand-vip-inaspettati-500);
+  --color-accent: var(--brand-cibo-500);
+  --color-success: var(--brand-villaggio-500);
+
+  /* Sfondo */
+  --bg-primary: var(--color-bg-primary);
+  --bg-secondary: var(--color-bg-secondary);
+
+  /* Testo */
+  --text-primary: var(--color-text-primary);
+  --text-secondary: var(--color-text-secondary);
+
+  /* Spacing comuni */
+  --spacing-xs: var(--unit-4);
+  --spacing-sm: var(--unit-8);
+  --spacing-md: var(--unit-16);
+  --spacing-lg: var(--unit-24);
+  --spacing-xl: var(--unit-32);
+  --spacing-2xl: var(--unit-48);
+
+  /* Border radius comuni */
+  --radius-sm: var(--radius-s);
+  --radius-md: var(--radius-m);
+  --radius-lg: var(--radius-l);
+  --radius-circle: var(--radius-full);
+}
