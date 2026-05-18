@@ -4,3 +4,13 @@
 </script>
 
 <SportInsoliti />
+
+<style>
+:global(.gsap-marker-end, .gsap-marker-start) {
+    display: none;
+}
+
+:global(body) {
+    overflow-x: hidden;
+}
+</style>

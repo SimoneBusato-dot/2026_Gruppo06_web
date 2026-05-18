@@ -57,6 +57,7 @@
                 end: "+=130%",
                 scrub: 1,
                 pin: true,
+                pinSpacing: true,
         
             }
     });

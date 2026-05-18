@@ -24,6 +24,7 @@
 	"dependencies": {
 		"d3": "^7.9.0",
 		"gsap": "^3.15.0",
+		"split-type": "^0.3.4",
 		"swiper": "^12.1.4"
 	}
 }
