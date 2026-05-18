@@ -16,14 +16,12 @@
     :global(body){
         margin: 0;
         padding: 0;
+        scrollbar-width: none; /* Firefox */
        
 
-    /* Per Internet Explorer, Edge e Firefox */
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-    }
+}
 
-	:global(body::-webkit-scrollbar) {
+:global(body::-webkit-scrollbar) {
     display: none; /* Chrome, Safari */
 }
 </style>

@@ -2,6 +2,7 @@
     import { onMount } from "svelte";
     import Swiper from "swiper/bundle";
     import "swiper/css/bundle";
+    import { Pagination } from "swiper/modules";
 
 
 
@@ -41,6 +42,11 @@
         const swiperConfig = {
             effect: "cards",
             grabCursor: true,
+            pagination: {
+                el: ".swiper-pagination",
+                clickable: true,
+                
+            },
             cardsEffect: {
                 perSlideOffset: 20,
                 perSlideRotate: -15,
@@ -60,6 +66,7 @@
                     videos[swiper.activeIndex]?.play();
                 }
             }
+            
         };
 
         const swiper = new Swiper(cardContainer, swiperConfig);
@@ -90,6 +97,7 @@
             <video src="/Sport_Insoliti/Video_introduzione/Sp_Intro5.mp4" muted loop></video>
         </div>
     </div>
+    <div class="swiper-pagination"></div>
 </div>
 
 <style>
@@ -123,4 +131,18 @@
         object-fit: cover;
         border-radius: 10px;
     }
+
+.swiper-pagination {
+  position: absolute;
+    bottom: -10%;
+}
+:global(.swiper-pagination-bullet){
+    transition: all 0.3s ease;
+}
+
+:global(.swiper-pagination-bullet-active) {
+    background: var(--brand-sport-insoliti-500);
+    width: 16px;
+    border-radius: 4px;
+}
 </style>

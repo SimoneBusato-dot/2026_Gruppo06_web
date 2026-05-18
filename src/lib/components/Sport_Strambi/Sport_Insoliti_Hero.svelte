@@ -18,8 +18,7 @@
     let sport;
     let insoliti;
 
-    onMount(async() => {
-         await tick();
+    onMount(() => {
        const moveBackground = (e) => {
             const xPercent = (e.clientX / window.innerWidth - 0.5) * 2;
             const yPercent = (e.clientY / window.innerHeight - 0.5) * 2;
@@ -27,15 +26,15 @@
 
             gsap.to(line, {
                 duration: 1.2,
-                rotateY: xPercent * 7,
-                rotateX: -yPercent * 5,
+                rotateY: xPercent * 5,
+                rotateX: -yPercent * 3,
                 scale: 1.15,
                 ease: "power2.out",
                 overwrite: "auto"
             });
             gsap.to(background, {
                 duration: 1.2,
-                rotateY: xPercent * 7,
+                rotateY: xPercent * 9,
                 rotateX: -yPercent * 2,
                 scale: 1.15,
                 ease: "power2.out",
