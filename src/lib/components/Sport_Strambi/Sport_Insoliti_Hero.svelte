@@ -70,7 +70,6 @@
                 end: "+=100%",
                 scrub: 1,
                 pin: true,  
-                anticipatePin: 1,
                 refreshPriority: 1,
                 markers: true,
                 pinSpacing: true,
