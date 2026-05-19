@@ -70,8 +70,7 @@
                 scrub: 1,
                 pin: true,  
                 refreshPriority: 1,
-                markers: true,
-                pinSpacing: true,
+                pinSpacing: false,
             }
         });
         tl.to(svgContainer, {

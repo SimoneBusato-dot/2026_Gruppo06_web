@@ -21,8 +21,8 @@
 
             gsap.to(perspective1, {
                 duration: 1.2,
-                rotateY: xPercent* 20,  
-                rotateX: -yPercent * 10,
+                rotateY: xPercent* 10,  
+                rotateX: -yPercent * 7,
                 scale: 1,
                 ease: "power2.out",
                 overwrite: true,
@@ -30,8 +30,8 @@
 
             gsap.to(perspective2, {
                 duration: 1.2,
-                rotateY: -xPercent* 20,  
-                rotateX: yPercent * 10,
+                rotateY: -xPercent* 10,  
+                rotateX: yPercent *7,
                 scale: 1,
                 ease: "power2.out",
                 overwrite: true,
@@ -152,16 +152,15 @@
 </main>
 
 <style>
-    #section3{
-        width: 100vw;
-        height: 100vh;
-        
+:global(.pin-spacer){
+        display: none;
     }
+  
 
     #background{
         position: relative;
-        width: 100%;
-        height: 100%;
+        width: 100vw;
+        height: 100vh;
         background-color: var(--brand-sport-insoliti-500);
 
     }

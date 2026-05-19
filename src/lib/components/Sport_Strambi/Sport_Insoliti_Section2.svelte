@@ -26,7 +26,7 @@
                 duration: 1.2,
                 rotateY: xPercent* 5,
                 rotateX: -yPercent * 3,
-                scale: 1.02,
+                scale: 1,
                 ease: "power2.out",
                 overwrite: "auto",
             })
@@ -37,7 +37,7 @@
 
         gsap.set(path, {
             strokeDasharray: length,
-            strokeDashoffset: length
+            strokeDashoffset: length + 2
         });
 
         // Nascondi i paragrafi all'inizio
@@ -119,6 +119,10 @@
         margin: 0;
         padding: 0;
        
+    }
+
+    :global(.pin-spacer){
+        display: none;
     }
 
     main{
