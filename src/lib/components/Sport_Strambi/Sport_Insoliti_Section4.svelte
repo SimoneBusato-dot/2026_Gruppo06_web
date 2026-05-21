@@ -135,10 +135,11 @@
                 trigger: section,
                 scroller: window,
                 start: "top top",
-                end: "+=130%",
+                end: "+=100%",
                 scrub: 1,
                 pin: true,
-                pinSpacing: true,
+                pinSpacing: false,
+                markers: true
             }
         })
         
@@ -182,6 +183,7 @@
 
     #section4{
         position: relative;
+        margin-block-start: 120dvh;
     }
 
 

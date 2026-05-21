@@ -56,10 +56,11 @@
                 trigger: "#section3",
                 scroller: window,
                 start: "top top",
-                end: "+=200%",
+                end: "+=120%",
                 scrub: 1,
                 pin: true,
-                pinSpacing: true,
+                pinSpacing: false,
+                markers: true
             }
         });
 
@@ -152,9 +153,11 @@
 </main>
 
 <style>
-:global(.pin-spacer){
-        display: none;
-    }
+
+
+#section3{
+    margin-block-start: 100dvh;
+}
   
 
     #background{

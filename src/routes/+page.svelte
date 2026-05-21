@@ -13,4 +13,9 @@
 :global(body) {
     overflow-x: hidden;
 }
+
+:global(::-webkit-scrollbar) {
+    display: none;
+}
+
 </style>
