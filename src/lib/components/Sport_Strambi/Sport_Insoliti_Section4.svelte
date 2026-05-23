@@ -139,7 +139,11 @@
                 scrub: 1,
                 pin: true,
                 pinSpacing: false,
-                markers: true
+                markers: true,
+                onEnter: () => gsap.set(section, { autoAlpha: 1 }),
+                onLeave: () => gsap.set(section, { autoAlpha: 0 }),
+                onEnterBack: () => gsap.set(section, { autoAlpha: 1 }),
+                onLeaveBack: () => gsap.set(section, { autoAlpha: 0 }),
             }
         })
         
@@ -183,7 +187,8 @@
 
     #section4{
         position: relative;
-        margin-block-start: 120dvh;
+        visibility: hidden;
+        margin-block-start: 100dvh;
     }
 
 

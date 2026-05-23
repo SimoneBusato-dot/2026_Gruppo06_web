@@ -56,11 +56,15 @@
                 trigger: "#section3",
                 scroller: window,
                 start: "top top",
-                end: "+=120%",
+                end: "+=200%",
                 scrub: 1,
                 pin: true,
                 pinSpacing: false,
-                markers: true
+                markers: true,
+                onEnter: () => gsap.set("#section3", { autoAlpha: 1 }),
+                onLeave: () => gsap.set("#section3", { autoAlpha: 0 }),
+                onEnterBack: () => gsap.set("#section3", { autoAlpha: 1 }),
+                onLeaveBack: () => gsap.set("#section3", { autoAlpha: 0 }),
             }
         });
 
@@ -156,6 +160,7 @@
 
 
 #section3{
+    visibility: hidden;
     margin-block-start: 100dvh;
 }
   

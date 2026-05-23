@@ -58,7 +58,11 @@
                 scrub: 1,
                 pin: true,
                 pinSpacing: false,
-                markers: true
+                markers: true,
+                onEnter: () => gsap.set(section, { autoAlpha: 1 }),
+                onLeave: () => gsap.set(section, { autoAlpha: 0 }),
+                onEnterBack: () => gsap.set(section, { autoAlpha: 1 }),
+                onLeaveBack: () => gsap.set(section, { autoAlpha: 0 }),
         
             }
     });
@@ -132,6 +136,7 @@
         justify-content: center;
         align-items: center;
         perspective: 1000px;
+        visibility: hidden;
        
     }
 

@@ -71,6 +71,8 @@
                 pin: true,  
                 refreshPriority: 1,
                 pinSpacing: false,
+                onLeave: () => gsap.set(hero, { autoAlpha: 0 }),
+                onEnterBack: () => gsap.set(hero, { autoAlpha: 1 }),
             }
         });
         tl.to(svgContainer, {

@@ -3,10 +3,25 @@
     import {gsap} from 'gsap';
     import {ScrollTrigger} from 'gsap/ScrollTrigger';
 
+
     let path;
+    let path2;
     let section;
 
     onMount(() => {
+
+        const length = path.getTotalLength()
+        const length2 = path2.getTotalLength()
+
+        gsap.set(path, {
+            strokeDasharray: length,
+            strokeDashoffset: length
+        })
+
+        gsap.set(path2, {
+            strokeDasharray: length2,
+            strokeDashoffset: length2
+        })
 
 
         let tl = gsap.timeline({
@@ -17,11 +32,26 @@
                 end: "+=100%",
                 scrub: 1,
                 pin: true,
-                pinSpacing: false,
-                markers: true
+                pinSpacing: true,
+                markers: true,
+                onEnter: () => tl2.play()
 
         }
     })
+
+    
+
+    const tl2 = gsap.timeline({
+       paused: true
+    })
+
+    tl.to(path, {strokeDashoffset: 0, duration: 2, ease: "power2.out"})
+        .to(path2, {strokeDashoffset: 0, duration: 2, ease: "power2.out"}, "<")
+
+    
+    
+
+
 
 
 
@@ -32,12 +62,12 @@
 <main id="section6" bind:this={section}>
     <div id="svgPerspective">
         <div id="svgContainer">
-            <svg id="path" bind:this={path} width="24vw" height="61vh" fill="none">
-                <path d="M6.52953 582.741C206.543 529.759 523.889 322.661 193.165 -81.879" stroke="#533EDC" stroke-width="51"/>
+            <svg id="path" width="24vw" height="61vh" fill="none">
+                <path bind:this={path} d="M6.52953 582.741C206.543 529.759 523.889 322.661 193.165 -81.879" stroke="#533EDC" stroke-width="51"/>
             </svg>
 
             <svg id="path2" width="37vw" height="27vh" fill="none">
-                <path d="M566.755 81.3008C396.755 81.3008 166.201 -155.726 24.5451 347.229" stroke="#533EDC" stroke-width="51"/>
+                <path bind:this={path2} d="M566.755 81.3008C396.755 81.3008 166.201 -155.726 24.5451 347.229" stroke="#533EDC" stroke-width="51"/>
             </svg>
 
         </div>
