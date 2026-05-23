@@ -161,7 +161,7 @@
 
 #section3{
     visibility: hidden;
-    margin-block-start: 100dvh;
+    
 }
   
 
