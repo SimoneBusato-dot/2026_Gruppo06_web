@@ -2,13 +2,18 @@
     import { onMount } from 'svelte';
     import {gsap} from 'gsap';
     import {ScrollTrigger} from 'gsap/ScrollTrigger';
+    import SplitType from 'split-type';
 
 
     let path;
     let path2;
     let section;
+    let text;
 
     onMount(() => {
+
+        const textSplitType = new SplitType(text, { types: 'lines', tagName: 'span' });
+        const textLines = textSplitType.lines;
 
         const length = path.getTotalLength()
         const length2 = path2.getTotalLength()
@@ -23,6 +28,8 @@
             strokeDashoffset: length2
         })
 
+        gsap.set(textLines, {opacity: 0, x: 200})
+
 
         let tl = gsap.timeline({
             scrollTrigger: {
@@ -34,19 +41,21 @@
                 pin: true,
                 pinSpacing: true,
                 markers: true,
-                onEnter: () => tl2.play()
+    
 
         }
     })
 
     
 
-    const tl2 = gsap.timeline({
-       paused: true
-    })
+    
 
-    tl.to(path, {strokeDashoffset: 0, duration: 2, ease: "power2.out"})
-        .to(path2, {strokeDashoffset: 0, duration: 2, ease: "power2.out"}, "<")
+tl.to(path, { strokeDashoffset: -length, duration: 5, ease: "power2.out" })
+  .to(path2, { strokeDashoffset: -length2, duration: 5, ease: "power2.out" }, "<")
+  .to(textLines, { opacity: 1, x: 0, stagger: 0.1, ease: "power2.out", duration: 1 }, 0)
+  .to(textLines, { opacity: 0, x: -200, stagger: 0.05, ease: "power2.in", duration: 0.8}, 4)
+
+  
 
     
     
@@ -74,7 +83,7 @@
     </div>
 
     <div id="text">
-        <p id="paragraph">Grazie all'ironia e alla condivisibilità dei contenuti social, il pubblico ha trovato un punto di contatto umano e quotidiano con la disciplina, distaccandosi dai canoni rigidi dello sport classico.</p>
+        <p bind:this={text} id="paragraph">Grazie all'ironia e alla condivisibilità dei contenuti social, il pubblico ha trovato un punto di contatto umano e quotidiano con la disciplina, distaccandosi dai canoni rigidi dello sport classico.</p>
     </div>
 
 </main>

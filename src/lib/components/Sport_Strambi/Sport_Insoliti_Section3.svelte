@@ -22,7 +22,7 @@
             gsap.to(perspective1, {
                 duration: 1.2,
                 rotateY: xPercent* 10,  
-                rotateX: -yPercent * 7,
+                rotateX: -yPercent * 10,
                 scale: 1,
                 ease: "power2.out",
                 overwrite: true,
@@ -31,7 +31,7 @@
             gsap.to(perspective2, {
                 duration: 1.2,
                 rotateY: -xPercent* 10,  
-                rotateX: yPercent *7,
+                rotateX: yPercent *10,
                 scale: 1,
                 ease: "power2.out",
                 overwrite: true,
@@ -56,7 +56,7 @@
                 trigger: "#section3",
                 scroller: window,
                 start: "top top",
-                end: "+=200%",
+                end: "+=200.1%",
                 scrub: 1,
                 pin: true,
                 pinSpacing: false,

@@ -54,7 +54,7 @@
                 trigger: section,
                 scroller: window,
                 start: "top top",
-                end: "+=100%",
+                end: "+=101%",
                 scrub: 1,
                 pin: true,
                 pinSpacing: false,
@@ -137,6 +137,7 @@
         align-items: center;
         perspective: 1000px;
         visibility: hidden;
+        
        
     }
 
