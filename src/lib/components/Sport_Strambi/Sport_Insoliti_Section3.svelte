@@ -162,6 +162,7 @@
 #section3{
     visibility: hidden;
     
+    
 }
   
 
@@ -187,7 +188,7 @@
     }
 
     #firstText{
-        color: var(--brand-sport-insoliti-300);
+        color: var(--brand-sport-insoliti-100);
         font-size: 13.25rem;
         font-family: var(--font-family);
         font-weight: 900;
@@ -206,7 +207,7 @@
     }
 
      #secondText{
-        color: var(--brand-sport-insoliti-300);
+        color: var(--brand-sport-insoliti-100);
         font-size: 31.25rem;
         font-family: var(--font-family);
         font-weight: 900;

@@ -1,110 +1,191 @@
 <script>
-    import { onMount } from "svelte";
-    import Swiper from "swiper/bundle";
-    import "swiper/css/bundle";
+   
+import { onMount } from "svelte";
+    let videos = $state([
+        "/Sport_Insoliti/Video_Meme/Curling_Meme1.mp4",
+        "/Sport_Insoliti/Video_Meme/Curling_Meme2.mp4",
+        "/Sport_Insoliti/Video_Meme/Curling_Meme3.mp4",
+        "/Sport_Insoliti/Video_Meme/Curling_Meme4.mp4",
+        "/Sport_Insoliti/Video_Meme/Curling_Meme5.mp4",
+        "/Sport_Insoliti/Video_Meme/Curling_Meme6.mp4",
+        "/Sport_Insoliti/Video_Meme/Curling_Meme7.mp4"
+    ]);
 
-    let cardContainer;
-    let { el = $bindable() } = $props();
+    let videoElements = $state([])
+    let currentIndex = $state(0);
+    let videoSlides = $state([]);
 
+    let {el = $bindable(), elActive = $bindable()} = $props()
+
+    // COSTANTI MATEMATICHE PER LO SPOSTAMENTO PERFETTO ANCORATO A SINISTRA
+    const slideWidth = 250; // Larghezza base della slide
+    const baseGap = 20;     // Gap del flexbox
+    const activeRightSpace = 180; // Lo spazio extra a destra della slide attiva per distanziare le successive
+
+    function updateVideos(newIndex) {
+        if (videoElements[currentIndex]) {
+            videoElements[currentIndex].pause();
+            videoElements[currentIndex].currentTime = 0;
+        }
+
+        currentIndex = newIndex;
+
+        setTimeout(() => {
+            if (videoElements[currentIndex]) {
+                videoElements[currentIndex].play().catch(err => console.log(err));
+            }
+        }, 50);
+    }
+
+    $effect(()=> {
+        if (videoSlides.length === 0) return;
+        elActive = videoSlides[currentIndex] ?? null;
+    })
+
+    function nextSlide() {
+        const nextIndex = (currentIndex + 1) % videos.length;
+        updateVideos(nextIndex);
+    }
+
+    function prevSlide() {
+        const prevIndex = (currentIndex - 1 + videos.length) % videos.length;
+        updateVideos(prevIndex);
+    }
+
+    
     onMount(() => {
-        el = cardContainer;
-
-        const swiperConfig = {
-            slidesPerView: "auto",
-            loop: true,
-            speed: 400,
-            spaceBetween: 30,
-            // Ricalcola gli spazi quando cambiano le classi attive
-            observer: true,
-            observeParents: true,
-            on: {
-                init(swiper) {
-                    // Avvia il video iniziale
-                    const activeSlide = swiper.el.querySelector('.swiper-slide-active');
-                    activeSlide?.querySelector('video')?.play().catch(() => {});
-                },
-                slideChangeTransitionEnd(swiper) {
-                    // Gestione video pulita
-                    const videos = cardContainer.querySelectorAll("video");
-                    videos.forEach(v => { v.pause(); v.currentTime = 0; });
-                    
-                    const activeSlide = swiper.el.querySelector('.swiper-slide-active');
-                    const video = activeSlide?.querySelector('video');
-                    video?.play().catch(err => console.log("Riproduzione fallita:", err));
-                }
-            },
-            navigation: {
-                nextEl: ".swiper-button-next",
-                prevEl: ".swiper-button-prev",
-            },
-        };
-
-        const swiper = new Swiper(cardContainer, swiperConfig);
-        return () => swiper.destroy();
+        el = videoSlides
+        if (videoElements[0]) videoElements[0].play().catch(() => {});
     });
 </script>
 
-<div class="swiper-outer">
-    <div class="swiper mySwiper" bind:this={cardContainer}>
-        <div class="swiper-wrapper">
-            <!-- Avvolgiamo il video in un .slide-inner per gestire l'ingrandimento in modo sicuro -->
-            <div class="swiper-slide"><div class="slide-inner"><video src="/Sport_Insoliti/Video_Meme/Curling_Meme1.mp4" muted loop playsinline></video></div></div>
-            <div class="swiper-slide"><div class="slide-inner"><video src="/Sport_Insoliti/Video_Meme/Curling_Meme2.mp4" muted loop playsinline></video></div></div>
-            <div class="swiper-slide"><div class="slide-inner"><video src="/Sport_Insoliti/Video_Meme/Curling_Meme3.mp4" muted loop playsinline></video></div></div>
-            <div class="swiper-slide"><div class="slide-inner"><video src="/Sport_Insoliti/Video_Meme/Curling_Meme4.mp4" muted loop playsinline></video></div></div>
-            <div class="swiper-slide"><div class="slide-inner"><video src="/Sport_Insoliti/Video_Meme/Curling_Meme5.mp4" muted loop playsinline></video></div></div>
-            <div class="swiper-slide"><div class="slide-inner"><video src="/Sport_Insoliti/Video_Meme/Curling_Meme6.mp4" muted loop playsinline></video></div></div>
-            <div class="swiper-slide"><div class="slide-inner"><video src="/Sport_Insoliti/Video_Meme/Curling_Meme7.mp4" muted loop playsinline></video></div></div>
-        </div>
+<div class="slider-outer">
+    <div 
+        class="slider-wrapper" 
+        style="transform: translateX(-{currentIndex * (slideWidth + baseGap)}px);"
+    >
+        {#each videos as src, index}
+            <div class="slider-slide" class:active={index === currentIndex} bind:this={videoSlides[index]}>
+                <div class="video-container">
+                    <video 
+                        bind:this={videoElements[index]}
+                        {src} 
+                        muted 
+                        loop 
+                        playsinline
+                    ></video>
+                </div>
+            </div>
+        {/each}
     </div>
-    <div class="swiper-button-next"></div>
-    <div class="swiper-button-prev"></div>
+
+    <div class="navigation-container">
+        <button class="nav-btn" onclick={prevSlide} aria-label="Previous slide">
+            <svg width="10" height="13" viewBox="0 0 10 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0.106547 6.06082L8.55519 0.146764C9.08542 -0.224391 9.81396 0.154931 9.81396 0.802149V11.7291C9.81396 12.3763 9.08542 12.7556 8.55519 12.3845L0.106548 6.47043C-0.0356315 6.37091 -0.0356319 6.16034 0.106547 6.06082Z" fill="#F3F3F3"/>
+            </svg>
+            </button>
+            <button class="nav-btn" onclick={nextSlide} aria-label="Next slide">
+                    <svg width="10" height="13" viewBox="0 0 10 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9.70742 6.06082L1.25877 0.146764C0.728548 -0.224391 0 0.154931 0 0.802149V11.7291C0 12.3763 0.728549 12.7556 1.25877 12.3845L9.70742 6.47043C9.8496 6.37091 9.8496 6.16034 9.70742 6.06082Z" fill="#F3F3F3"/>
+            </svg>
+
+        </button>
+    </div>
 </div>
 
 <style>
-    .swiper-outer {
+    :global(body) {
+        overflow-x: hidden;
+    }
+
+    .slider-outer {
         position: relative;
-        width: 90%;
-        overflow: hidden;
+        width: 100dvw;
+        padding: 40px 0;
     }
 
-    .swiper {
-        width: 100%; /* Allargato al 100% per vedere le slide laterali mentre si spostano */
-        height: 720px;
-    }
-
-    .swiper-wrapper {
-        align-items: center;
-    }
-
-    /* La slide di base ha la dimensione fissa, così Swiper calcola le posizioni matematicamente perfette */
-    .swiper-slide {
+    .slider-wrapper {
         display: flex;
-        justify-content: center;
         align-items: center;
-        width: 250px; /* Larghezza base delle slide non attive */
-        height: 440px; /* Altezza base delle slide non attive */
-        margin: 10px;
+        gap: 20px; /* baseGap dello script */
+        padding-left: 5%; /* Ancoraggio iniziale a sinistra di tutta la linea */
+        transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+        will-change: transform;
+        height: 750px;
     }
 
-    /* Il contenitore interno gestisce l'animazione fluida senza toccare il box model di Swiper */
-    .slide-inner {
+    .slider-slide {
+        flex-shrink: 0;
+        width: 250px; /* slideWidth dello script */
+        height: 444px;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        transition: margin 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    /* LA NUOVA SPAZIATURA ASIMMETRICA */
+    .slider-slide.active {
+        margin-left: 40px;   /* Margine sinistro leggero per dare respiro allo scale(1.5) */
+        margin-right: 20%; /* Spazio fisso generoso (activeRightSpace) per spingere le slide successive a destra */
+    }
+
+    /* Se la slide attiva è la prima, azzeriamo il margine sinistro per incollarla al padding-left: 5% */
+    .slider-slide.active:first-child {
+        margin-left: 40px; /* Mantiene lo spazio per l'effetto zoom iniziale */
+    }
+
+    .video-container {
         width: 100%;
         height: 100%;
-        transition: transform 0.4s ease;
+        overflow: hidden;
+        border-radius: 20px;
+        transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
         transform: scale(1);
     }
 
-    /* Quando la slide diventa attiva, scaliamo il contenuto interno per raggiungere le dimensioni desiderate (es. 400x711) */
-    :global(.swiper-slide-active .slide-inner) {
-        transform: scale(1.6); /* Ingrandisce la slide senza rompere il calcolo del loop di Swiper */
-        margin: 30px;
+    /* La slide attiva scala a 1.5, diventando enorme a sinistra */
+    .slider-slide.active .video-container {
+        transform: scale(1.7);
+        z-index: 2;
+        
     }
 
     video {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        border-radius: 10px;
+        border-radius: 20px;
+    }
+
+    /* Pulsanti */
+    .navigation-container {
+        position: absolute;
+        bottom: 40px;
+        right: 20%;
+        display: flex;
+        gap: 15px;
+        z-index: 10;
+    }
+
+    .nav-btn {
+        width: 50px;
+        height: 50px;
+        background: var(--brand-sport-insoliti-500);
+        border-radius: 8px;
+        color: #fff;
+        font-size: 20px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.3s, transform 0.1s;
+        border: none;
+    }
+
+
+    .nav-btn:active {
+        transform: scale(0.95);
     }
 </style>

@@ -60,9 +60,9 @@
                 pinSpacing: false,
                 markers: true,
                 onEnter: () => gsap.set(section, { autoAlpha: 1 }),
-                onLeave: () => gsap.set(section, { autoAlpha: 0 }),
-                onEnterBack: () => gsap.set(section, { autoAlpha: 1 }),
-                onLeaveBack: () => gsap.set(section, { autoAlpha: 0 }),
+                onLeave: () => gsap.set(section, { autoAlpha: 0}),
+                onEnterBack: () => gsap.set(section, { autoAlpha: 1}),
+                onLeaveBack: () => gsap.set(section, { autoAlpha: 0}),
         
             }
     });
@@ -91,18 +91,16 @@
 <main bind:this={section}>
     <div id="svgContainer" bind:this={line}>
         <svg width="95vw" height="555" viewBox="0 0 1399 555" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path bind:this={path} d="M25.4766 1.0918C32.8099 172.092 211.677 421.892 868.477 53.0918C831.977 256.758 885.577 631.892 1391.98 503.092"  stroke-width="51"/>
+        <path bind:this={path} d="M25.4766 1.0918C32.8099 172.092 211.677 421.892 868.477 53.0918C831.977 256.758 885.577 631.892 1391.98 503.092"  stroke-width="51" stroke-linecap="round"/>
         </svg>
     </div>
 
     <div id="content">
         <div id="text">
             <p id="1" bind:this={p1}>
-                Quali sono quegli sport di milano cortina che si potrebbero categorizzare come insoliti? come strambi? 
-            </p>
+                I feed su Milano Cortina si sono riempiti di discipline invernali insolite.</p>
             <p id="2" bind:this={p2}>
-                Magari quegli sport di paese, che di solito son nascosti nel proprio paese e quando esplodono ne son tutti entusiasti perché diversi da quelli normali.   
-            </p>
+                Tra le discese folli dello skeleton o l'assurdo mix sci-carabina del biathlon, le persone hanno scoperto una passione improvvisa per gli sport più di nicchia, divertenti e <mark>STRAMBI</mark></p>
         </div>
 
         <SportSlider bind:el = {sliderElement}/>
@@ -137,7 +135,6 @@
         align-items: center;
         perspective: 1000px;
         visibility: hidden;
-        
        
     }
 
@@ -172,14 +169,23 @@
 
     #text{
         position: relative;
-        z-index: 1;
+        z-index: -1;
         color: var(--neutral-900);
         font-size: 2rem;
-        max-width: 600px;
+        width: 600px;
         font-family: var(--font-family-text);
         display: flex;
         flex-direction: column;
-        gap: 1rem;
+        gap: 3rem;
+
+    }
+
+    mark{
+        color: var(--brand-sport-insoliti-500);
+        font-weight: 900;
+        font-size: 8.3rem;
+        font-family: var(--font-family);
+        background-color: transparent;
     }
 
     #transition{
@@ -191,6 +197,7 @@
         z-index: 2;
         width: 135vw;
         height: 178vh;
+        pointer-events: none;
     }
 
     #Circle{

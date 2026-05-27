@@ -39,8 +39,12 @@
                 end: "+=100%",
                 scrub: 1,
                 pin: true,
-                pinSpacing: true,
+                pinSpacing: false,
                 markers: true,
+                onEnter: () => gsap.set(section, { autoAlpha: 1 }),
+                onLeave: () => gsap.set(section, { autoAlpha: 0 }),
+                onEnterBack: () => gsap.set(section, { autoAlpha: 1 }),
+                onLeaveBack: () => gsap.set(section, { autoAlpha: 0 }),
     
 
         }
@@ -83,7 +87,7 @@ tl.to(path, { strokeDashoffset: -length, duration: 5, ease: "power2.out" })
     </div>
 
     <div id="text">
-        <p bind:this={text} id="paragraph">Grazie all'ironia e alla condivisibilità dei contenuti social, il pubblico ha trovato un punto di contatto umano e quotidiano con la disciplina, distaccandosi dai canoni rigidi dello sport classico.</p>
+        <p bind:this={text} id="paragraph">Niente canoni rigidi o gare asettiche: a suon di meme, i social ci hanno fatto innamorare dell'assurdità di questi strani sport, rendendoli incredibilmente più vicini a noi.</p>
     </div>
 
 </main>
@@ -96,6 +100,7 @@ tl.to(path, { strokeDashoffset: -length, duration: 5, ease: "power2.out" })
         display: flex;
         justify-content: center;
         align-items: center;
+        visibility: hidden;
     }
 
 

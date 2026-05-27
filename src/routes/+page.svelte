@@ -18,4 +18,12 @@
     display: none;
 }
 
+:global(.pin-spacer) {
+    pointer-events: none;
+}
+
+:global(.pin-spacer main) {
+    pointer-events: auto;
+}
+
 </style>
