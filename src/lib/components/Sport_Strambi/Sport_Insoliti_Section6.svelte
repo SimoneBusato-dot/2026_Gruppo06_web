@@ -101,6 +101,7 @@ tl.to(path, { strokeDashoffset: -length, duration: 5, ease: "power2.out" })
         justify-content: center;
         align-items: center;
         visibility: hidden;
+        margin-block-start: 100dvh;
     }
 
 
