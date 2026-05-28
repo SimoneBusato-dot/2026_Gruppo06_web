@@ -95,6 +95,30 @@
             borderRadius: 0
     });
 
+     const textAnimation = gsap.fromTo(textLines, {
+                        x: 200,
+                        opacity: 0
+                    }, {
+                        x: 0,
+                        opacity: 1,
+                        stagger: 0.05,
+                        paused: true,
+                        duration: 0.6,
+                        overwrite: "auto",
+                        
+                    })
+     const textExit = gsap.to(textLines, {
+                        x: -200,
+                        opacity: 0,
+                        stagger: 0.05,
+                        paused: true,
+                        duration: 0.6,
+                        overwrite: "auto",
+                        
+                    })
+    
+        
+
     const length2 = line2.getTotalLength()
 
     const lineAnimation = gsap.fromTo(line2, {
@@ -127,15 +151,28 @@
 
                 if(self.progress >= 0.1){
                     cardActiveAnimation.play()
+                    textAnimation.play()
+                   
                 } else{
                     cardActiveAnimation.reverse()
+                    textAnimation.reverse()
                 }
                 
-                if (self.progress >= 0.5) {
+                if (self.progress >= 0.4) {
+                    textExit.play(); 
+                    
+                } else {
+                    textExit.reverse(); 
+        
+            }
+
+            if (self.progress >= 0.5) {
                     cardBgAnimation.play(); // Parte e va da sola fino alla fine!
+                    
                     
                 } else {
                     cardBgAnimation.reverse(); // Se torni indietro sopra la metà, fa il reverse!
+                    
                     
                 }
                 if (self.progress >= 0.55) {
@@ -148,14 +185,9 @@
                     
                 }
 
-                
-
-        
-            }
-
 
             }
-        })
+        }})
 
         tl.to(line, {strokeDashoffset: 0, ease: "none", duration: 0.01})
             
@@ -187,7 +219,7 @@
                 <SportSlider2 bind:el={sliderVideoEL} bind:elActive={activeSliderEl}/>
             </div>
             <div id="text">
-                <p id="paragraph">Questo suo essere insolito e a prima vista inspiegabile ha spinto le persone a realizzare moltissimi contenuti a riguardo. Specialmente <br><mark>MEME</mark></p>
+                <p id="paragraph" bind:this={text}>Questo suo essere insolito e a prima vista inspiegabile ha spinto le persone a realizzare moltissimi contenuti a riguardo. Specialmente <br><mark>MEME</mark></p>
             </div>
     </div>
     <div class="card-bg"></div>
@@ -251,6 +283,7 @@
     height: fit-content;
     position: absolute;
     right: 5%;
+    pointer-events: none;
    }
 
    mark{
