@@ -12,7 +12,10 @@
     let video;
     let sliderVideoEL = $state([]);
     let activeSliderEl = $state(null);
+    let buttonsEl = $state(null)
     let line2;
+    let title;
+    let transition;
 
 
     const inactiveSlides = $derived(sliderVideoEL.filter(el => el !== activeSliderEl))
@@ -42,7 +45,12 @@
         const textSplit = new SplitType(text, {types: "lines", tagName: "span"})
         const textLines = textSplit.lines;
 
+        const titleSplit = new SplitType(title, {types: "chars", tagName: "span"})
+        const titleChars = titleSplit.chars
+
+
         
+       
 
         const cardActiveAnimation = gsap.fromTo(activeSliderEl, {
             x: 100,
@@ -63,13 +71,40 @@
         }, {
             x:0,
             opacity: 1,
-            stagger: 0.05,
+            stagger: 0.1,
             paused: true,
             duration: 0.5,
             overwrite: "auto",
             ease: "power2.out"
 
         })
+        const cardBgEnter = gsap.fromTo('#Section5 .card-bg',{
+            top: '15%',
+            left: '15%',
+            width: "425px",
+            height: "680px",
+            x: 100,
+            opacity: 0,
+            translateZ: 0,
+            rotateZ: "0deg",
+            zIndex: "-1",
+            borderRadius: 12,
+
+        }, {
+            top: '15%',
+            left: '15%',
+            width: "425px",
+            height: "680px",
+            x: 0,
+            opacity: 1,
+            translateZ: 0,
+            rotateZ: "20deg",
+            paused: true,
+            zIndex: "-1",
+            borderRadius: 12,
+            ease: "circ.out",
+            duration: 0.6
+    });
 
         const cardBgAnimation = gsap.fromTo('#Section5 .card-bg',{
             top: '15%',
@@ -87,13 +122,15 @@
             width: "100%",
             height: "100%",
             duration: 0.7,
-            paused: true, // Fondamentale!
+            paused: true, 
             overwrite: "auto",
             translateZ: 0,
             rotateZ: "0",
             zIndex: 1,
             borderRadius: 0
     });
+
+    if(!buttonsEl) return;
 
      const textAnimation = gsap.fromTo(textLines, {
                         x: 200,
@@ -117,6 +154,32 @@
                         
                     })
     
+
+    const titleEnter = gsap.fromTo(titleChars, {
+        x: 200,
+        opacity: 0,
+    }, {
+        x: 0, 
+        opacity: 1,
+        stagger: 0.1,
+        paused: true,
+        overwrite: "auto",
+        duration: 0.6,
+
+    })
+
+    const buttonsEnter = gsap.fromTo(buttonsEl, {
+        x: 100,
+        opacity: 0
+    }, {
+        x:0,
+        opacity: 1,
+        paused: true,
+        duration: 0.6,
+        overwrite: "auto",
+
+
+    })
         
 
     const length2 = line2.getTotalLength()
@@ -131,6 +194,15 @@
         paused: true,
         overwrite: "auto",
 
+    })
+
+    const transitionEnter = gsap.fromTo(transition, {
+        scaleX:0
+    }, {
+        scaleX: 1,
+        duration: 0.5,
+        paused: true,
+        overwrite: "auto",
     })
 
         const tl = gsap.timeline({
@@ -152,10 +224,12 @@
                 if(self.progress >= 0.1){
                     cardActiveAnimation.play()
                     textAnimation.play()
+                    cardBgEnter.play()
                    
                 } else{
                     cardActiveAnimation.reverse()
                     textAnimation.reverse()
+                    cardBgEnter.reverse()
                 }
                 
                 if (self.progress >= 0.4) {
@@ -168,11 +242,14 @@
 
             if (self.progress >= 0.5) {
                     cardBgAnimation.play(); // Parte e va da sola fino alla fine!
+                    titleEnter.play()
+                    buttonsEnter.play()
                     
                     
                 } else {
                     cardBgAnimation.reverse(); // Se torni indietro sopra la metà, fa il reverse!
-                    
+                    titleEnter.reverse()
+                     buttonsEnter.reverse()
                     
                 }
                 if (self.progress >= 0.55) {
@@ -183,6 +260,12 @@
                     cardInacativeAnimation.reverse(); 
                     lineAnimation.reverse()
                     
+                }
+
+                if(self.progress >= 0.9){
+                    transitionEnter.play()
+                } else {
+                    transitionEnter.reverse()
                 }
 
 
@@ -216,13 +299,24 @@
     <div class="content">
 
             <div id="videoContainer">
-                <SportSlider2 bind:el={sliderVideoEL} bind:elActive={activeSliderEl}/>
+                <SportSlider2 bind:el={sliderVideoEL} bind:elActive={activeSliderEl} bind:elButtons={buttonsEl}/>
             </div>
             <div id="text">
                 <p id="paragraph" bind:this={text}>Questo suo essere insolito e a prima vista inspiegabile ha spinto le persone a realizzare moltissimi contenuti a riguardo. Specialmente <br><mark>MEME</mark></p>
             </div>
+        
+            <div id="title">
+                <h1 id="memeTitle" bind:this={title}>MEME</h1>
+            </div>
     </div>
     <div class="card-bg"></div>
+
+    <svg id="transition" bind:this={transition}
+     viewBox="0 0 1512 982"
+     preserveAspectRatio="none"
+     fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse id="Circle" cx="756" cy="491" rx="756" ry="491"/>
+    </svg>
 </main>
 
 <style>
@@ -297,6 +391,18 @@
     
    }
 
+   #title{
+    font-family: var(--font-family);
+    font-size: 10rem;
+    font-style: normal;
+    font-weight: 900;
+    line-height: normal;
+    position: absolute;
+    right: 5%;
+    top: 1%;
+    color: var(--brand-sport-insoliti-500);
+   }
+
    #videoContainer {
     position: relative;
     width: 500px;
@@ -307,16 +413,33 @@
     z-index: 2;
 }
 
-.card-bg {
+#Section5 .card-bg {
     position: absolute;
     background-color: var(--brand-sport-insoliti-300);
     transform-style: preserve-3d;
 }
 
-   /* Opzionale: diamo una dimensione fissa al video se necessario */
    
+   
+ #transition{
+        position: absolute;
+        top: -35%;
+        right: -20%;
+        left: auto;
+        transform-origin: right center;
+        z-index: 2;
+        width: 135vw;
+        height: 178vh;
+        pointer-events: none;
+        z-index: 4;
+
+ }
 
 
-   
+    #Circle{
+        width: 130%;
+        height: 130%;
+        fill: var(--neutral-50);
+    }
 
 </style>

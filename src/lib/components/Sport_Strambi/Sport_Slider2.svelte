@@ -11,11 +11,13 @@ import { onMount } from "svelte";
         "/Sport_Insoliti/Video_Meme/Curling_Meme7.mp4"
     ]);
 
+    let buttons;
+
     let videoElements = $state([])
     let currentIndex = $state(0);
     let videoSlides = $state([]);
 
-    let {el = $bindable(), elActive = $bindable()} = $props()
+    let {el = $bindable(), elActive = $bindable(), elButtons = $bindable()} = $props()
 
     // COSTANTI MATEMATICHE PER LO SPOSTAMENTO PERFETTO ANCORATO A SINISTRA
     const slideWidth = 250; // Larghezza base della slide
@@ -54,6 +56,7 @@ import { onMount } from "svelte";
 
     
     onMount(() => {
+        elButtons = buttons
         el = videoSlides
         if (videoElements[0]) videoElements[0].play().catch(() => {});
     });
@@ -79,7 +82,7 @@ import { onMount } from "svelte";
         {/each}
     </div>
 
-    <div class="navigation-container">
+    <div class="navigation-container" bind:this={buttons}>
         <button class="nav-btn" onclick={prevSlide} aria-label="Previous slide">
             <svg width="10" height="13" viewBox="0 0 10 13" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M0.106547 6.06082L8.55519 0.146764C9.08542 -0.224391 9.81396 0.154931 9.81396 0.802149V11.7291C9.81396 12.3763 9.08542 12.7556 8.55519 12.3845L0.106548 6.47043C-0.0356315 6.37091 -0.0356319 6.16034 0.106547 6.06082Z" fill="#F3F3F3"/>
@@ -107,7 +110,7 @@ import { onMount } from "svelte";
 
     .slider-wrapper {
         display: flex;
-        align-items: center;
+        align-items: flex-end;
         gap: 20px; /* baseGap dello script */
         padding-left: 5%; /* Ancoraggio iniziale a sinistra di tutta la linea */
         transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
@@ -120,7 +123,7 @@ import { onMount } from "svelte";
         width: 250px; /* slideWidth dello script */
         height: 444px;
         display: flex;
-        align-items: flex-end;
+        align-items: center;
         justify-content: center;
         transition: margin 0.6s cubic-bezier(0.25, 1, 0.5, 1);
     }
@@ -148,6 +151,7 @@ import { onMount } from "svelte";
     /* La slide attiva scala a 1.5, diventando enorme a sinistra */
     .slider-slide.active .video-container {
         transform: scale(1.7);
+        transform-origin: bottom center;
         z-index: 2;
         
     }
@@ -162,8 +166,8 @@ import { onMount } from "svelte";
     /* Pulsanti */
     .navigation-container {
         position: absolute;
-        bottom: 40px;
-        right: 20%;
+        bottom: -5%;
+        right: 21%;
         display: flex;
         gap: 15px;
         z-index: 10;
