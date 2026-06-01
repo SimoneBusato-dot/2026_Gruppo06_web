@@ -60,7 +60,7 @@
         };
 
 
-
+        // Timeline per lo scroll orizzontale (riquadro bianco) //
         const tl = gsap.timeline({
             scrollTrigger: {
                 trigger: hero,
@@ -90,7 +90,6 @@
         // Importante: rimuoviamo l'evento quando il componente viene distrutto
         return () => {
             window.removeEventListener('mousemove', moveBackground);
-            ScrollTrigger.getAll().forEach(t => t.kill());
             if (tl) tl.kill();
     }
 });
@@ -107,15 +106,17 @@
 
 
             <div bind:this={background} style="width: 100%; height: 100%;">
-                <svg id="backgroud" width="100vw" height="100vh" viewBox="0 0 1512 977"  preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M1512 70.167L948.909 221.047C931.839 225.621 921.708 243.168 926.282 260.239L1119.68 982H0V0H1512V70.167Z" fill="#533EDC"/>
+                <svg id="background" width="100vw" height="100vh" viewBox="0 0 1178 870" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0 0H1178L922.365 483.23C911.141 504.446 910.75 529.753 921.313 551.306L1077.5 870H0V0Z" fill="#DC3ECC"/>
                 </svg>
+
             </div>
 
             <div bind:this={line} id="line-wrapper">
-                <svg id="lineasfondo" width="602" height="100vh" viewBox="0 0 602 890" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M511.984 1036.51C511.984 1036.51 409.686 444.499 156.666 832.464C-96.3545 1220.43 62.5 11.7666 62.5 11.7666" stroke="#8688F3" stroke-width="181"/>
+                <svg id="lineasfondo" width="1103" height="100vh" viewBox="0 0 1103 580" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M-89.533 563.584C-89.533 563.584 36.7279 -126.78 218.195 182.406C399.663 491.592 641.432 411.603 1039.91 34.1406" stroke="#EE84E3" stroke-width="181"/>
                 </svg>
+
             </div>
 
 
