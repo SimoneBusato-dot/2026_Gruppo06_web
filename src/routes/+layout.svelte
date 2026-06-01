@@ -24,11 +24,15 @@
 	
 </svelte:head>
 
-
+<div class="transition-separator"></div>
 
 {@render children()}
 
 <style>
+
+    :root{
+        background-color: var(--neutral-900);
+    }
     :global(body){
         margin: 0;
         padding: 0;
@@ -65,30 +69,35 @@
         border-radius: 0;
     }
     50% {
-        transform: translateY(0);
-        scale: 0.7;
-        border-radius: 10px;
+        transform: translateY(10%);
+        scale: 0.9;
+        border-radius: 20px;
     }
+
+    
     100% {
-        transform: translateY(100%);
-        scale: 0.7;
-        border-radius: 10px;
+        transform: translateY(130%);
+        scale: 0.9;
+        border-radius: 20px;
     }
 }
 
-@keyframes fstacked-slide-in {
+@keyframes stacked-slide-in {
     0% {
-        scale: 0.7;
-        transform: translateY(-10%);
+        scale: 1;
+        transform: translateY(0);
+        border-radius: 0;
 
     }
     50% {
-        scale: 0.7;
-        transform: translateY(-10%);
+        scale: 0.85;
+        transform: translateY(0);
+        border-radius: 20px;
     }
     100% {
         scale: 1;
         transform: translateY(0);
+        border-radius: 0;
     }
 }
 
@@ -104,14 +113,27 @@
 
 /* 2. Applica la tua animazione solo alla vecchia pagina */
 :root::view-transition-old(root) {
-    animation: 1s ease-in-out stacked-slide-out forwards;
+    animation: 1.7s stacked-slide-out forwards;
     transform-origin: center center;
+    animation-timing-function: cubic-bezier(0.83, 0, 0.17, 1);
     z-index: 2; /* Forza la vecchia pagina a stare SOPRA la nuova mentre si rimpicciolisce */
+    /* 🌟 FIX PER IL BORDER RADIUS 🌟 */
+    overflow: hidden;
+    /* In alcuni browser storici potrebbe servire anche questo per forzare il clip dell'hardware grafico */
+    isolation: isolate;
+    transition: all 0.1s ease;
 }
 
 /* 3. Assicurati che la nuova pagina sia già visibile sotto senza fare nulla */
 :root::view-transition-new(root) {
     z-index: 1;
-    animation: 1s ease-in-out fstacked-slide-in forwards;
+    animation: 1.7s stacked-slide-in forwards;
+    animation-timing-function: cubic-bezier(0.83, 0, 0.17, 1);
+    transition: all 0.1s ease;
+    
+    overflow: hidden;
+    /* In alcuni browser storici potrebbe servire anche questo per forzare il clip dell'hardware grafico */
+    isolation: isolate;
+    
 }
 </style>
