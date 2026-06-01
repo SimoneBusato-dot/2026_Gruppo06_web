@@ -90,9 +90,42 @@
     // ── Init ─────────────────────────────────────────────────────────────────
     onMount(() => {
         const slides = gsap.utils.toArray('.slider__slide');
+        const customCursor = document.querySelector('.cursor');
+        const cursorElements = [ '#left', '#center', '#right' ];
+
         if (!path || slides.length === 0) return;
 
-        // Crea un tween MotionPath paused per ogni slide
+        // ── Gestione Cursore Personalizzato ───────────────────────────────
+        gsap.set(customCursor, { xPercent: -50, yPercent: -50 });
+        let xTo = gsap.quickTo(customCursor, "x", { duration: 0.4, ease: "power3" });
+        let yTo = gsap.quickTo(customCursor, "y", { duration: 0.4, ease: "power3" });
+
+        const moveCursor = (e) => {
+            xTo(e.clientX);
+            yTo(e.clientY);
+        };
+        window.addEventListener("mousemove", moveCursor);
+
+        // Timeline per l'animazione degli elementi del cursore (Stagger + Rimbalzo)
+        const cursorTl = gsap.timeline({ paused: true });
+        cursorTl.to(customCursor, {
+            opacity: 1,
+            duration: 0.2
+        }).to(cursorElements, {
+            opacity: 1,
+            scale: 1,
+            duration: 0.4,
+            ease: "back.out(1.7)",
+            stagger: 0.08
+        }, "-=0.1");
+
+        // Eventi sul container per mostrare/nascondere il cursore
+        if (container) {
+            container.addEventListener("mouseenter", () => cursorTl.play());
+            container.addEventListener("mouseleave", () => cursorTl.reverse());
+        }
+
+        // ── Creazione MotionPath per le Card ──────────────────────────────
         tweens = slides.map((slide, i) => {
             return gsap.to(slide, {
                 motionPath: {
@@ -113,14 +146,13 @@
         globalOffset = 0.5 - 0 / TOTAL;   // porta card 0 a progress 0.5
         updateCards();
 
-        // ── Draggable con InertiaPlugin (come Osmo) ───────────────────────
-        // Proxy invisibile per catturare il gesto X
+        // ── Draggable con InertiaPlugin ───────────────────────────────────
         const proxy = document.createElement('div');
 
         Draggable.create(proxy, {
             type:    'x',
             trigger: container,
-            inertia: true,           // InertiaPlugin gestisce il throw
+            inertia: true,
 
             onDragStart() {
                 // Ferma eventuali snap in corso
@@ -128,8 +160,6 @@
             },
 
             onDrag() {
-                // deltaX → variazione di globalOffset
-                // Dividiamo per la larghezza del container per normalizzare
                 const w     = container.offsetWidth || window.innerWidth;
                 const delta = this.deltaX / w * 0.6;  // 0.6 = sensibilità
                 globalOffset = (globalOffset - delta % 1 + 1) % 1;
@@ -137,7 +167,6 @@
             },
 
             onThrowUpdate() {
-                // Durante l'inerzia, stessa logica
                 const w     = container.offsetWidth || window.innerWidth;
                 const delta = this.deltaX / w * 0.6;
                 globalOffset = (globalOffset - delta % 1 + 1) % 1;
@@ -145,18 +174,18 @@
             },
 
             onThrowComplete() {
-                // Alla fine dell'inerzia, snap alla card più vicina
                 snapToNearest();
             },
 
             onDragEnd() {
-                // Se non c'è throw (movimento lento), snap subito
                 if (!this.isThrowing) snapToNearest();
             }
         });
 
         return () => {
             tweens.forEach(tw => tw.kill());
+            cursorTl.kill();
+            window.removeEventListener("mousemove", moveCursor);
         };
     });
 
@@ -178,7 +207,7 @@
     }
 
     const variants = ['blue', 'yellow', 'red', 'purple'];
-    const labels   = ['Tecnologia', 'Design', 'Marketing', 'Finanza'];
+    
 </script>
 
 <main id="Selezione-Categorie">
@@ -220,6 +249,11 @@
         </div>
     </div>
 
+    <div class="cursor">
+        <div id="left"></div>
+        <div id="center">Drag</div>
+        <div id="right"></div>
+    </div>
 
 </main>
 
@@ -282,7 +316,6 @@
     }
 
     svg {
-    
         position: absolute;
         left: 50%;
         bottom: -35%;          /* ← questo è il valore da aggiustare */
@@ -301,5 +334,46 @@
         will-change: transform;
     }
 
-    
+    /* ── Cursore Personalizzato Aggiornato ── */
+    .cursor {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+        pointer-events: none; /* Non blocca i click e i drag sul carousel */
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        opacity: 0; /* Nasconde l'intero cursore all'inizio */
+    }
+
+    /* Stato di base degli elementi interni prima dell'ingresso */
+    #left, #center, #right {
+        opacity: 0;
+        transform: scale(0);
+    }
+
+    #left, #right {
+        width: 8px;
+        height: 14px;
+        border-radius: 2px;
+        background-color: var(--neutral-900);
+    }
+   
+    #center {
+        width: fit-content;
+        height: fit-content;
+        padding: 16px 8px;
+        font-family: var(--font-family);
+        font-size: 2rem;
+        color: var(--neutral-50);
+        text-transform: uppercase;
+        background-color: var(--neutral-900);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+    }
 </style>
