@@ -24,4 +24,21 @@
 :global(body::-webkit-scrollbar) {
     display: none; /* Chrome, Safari */
 }
+
+
+:global(body) {
+    overflow-x: hidden;
+}
+
+:global(::-webkit-scrollbar) {
+    display: none;
+}
+
+:global(.pin-spacer) {
+    pointer-events: none;
+}
+
+:global(.pin-spacer main) {
+    pointer-events: auto;
+}
 </style>
