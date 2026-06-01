@@ -2,7 +2,7 @@
     import gsap from "gsap";
     import { onMount } from "svelte";
     import { ScrollTrigger } from "gsap/ScrollTrigger";
-    import CucinaSlider from "./Cucina_Slider.svelte";
+    import SportSlider from "./Cucina_Slider.svelte";
     import SplitType from "split-type";
   
 
@@ -191,12 +191,12 @@
     <div id="content">
         <div id="text">
             <p id="1" bind:this={p1}>
-                Non c'è creator, atleta o turista a Milano Cortina che non abbia ripreso i piatti della cucina italiana. <br><br> I feed sono stati invasi da atleti di ogni nazione intenti a scoprire pizza, pasta, parmigiano e dolci tipici, in un trionfo di tradizione e puro food porn.</p>
+                I feed su Milano Cortina si sono riempiti di discipline invernali insolite.</p>
             <p id="2" bind:this={p2}>
-                Ogni pasto l'ha trasformato in un <mark>TREND DA <br> MILIONI DI <br> LIKE</mark></p>
+                Tra le discese folli dello skeleton o l'assurdo mix sci-carabina del biathlon, le persone hanno scoperto una passione improvvisa per gli sport più di nicchia, divertenti e <mark>STRAMBI</mark></p>
         </div>
 
-        <CucinaSlider bind:el = {sliderElement}/>
+        <SportSlider bind:el = {sliderElement}/>
     </div>
     
     <svg id="transition" bind:this={transitionElement} 
@@ -244,7 +244,7 @@
     svg{
         position: absolute;
         top: -30;
-        stroke: var(--brand-cibo-500);
+        stroke: var(--brand-sport-insoliti-500);
 
     }
 
@@ -274,7 +274,7 @@
     }
 
     mark{
-        color: var(--brand-cibo-500);
+        color: var(--brand-sport-insoliti-500);
         font-weight: 900;
         font-size: 8.3rem;
         font-family: var(--font-family);
@@ -296,7 +296,7 @@
     #Circle{
         width: 130%;
         height: 130%;
-        fill: var(--brand-cibo-500);
+        fill: var(--brand-sport-insoliti-500);
 
     }
 

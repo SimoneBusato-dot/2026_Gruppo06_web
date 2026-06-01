@@ -2,7 +2,7 @@
     import { onMount } from 'svelte';
     import { gsap } from 'gsap';
     import { ScrollTrigger } from 'gsap/ScrollTrigger';
-    import CucinaItalianaSlider2 from './Cucina_Italiana_Slider2.svelte';
+    import SportSlider2 from './Cucina_Italiana_Slider2.svelte';
     import SplitType from 'split-type';
 
     gsap.registerPlugin(ScrollTrigger);
@@ -292,17 +292,17 @@
 
     <div id="svgContainer2">
         <svg width="67vw" height="66wh" viewBox="0 0 1015 648" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path bind:this={line2} d="M-41 212.105L501 59.1046C501 59.1046 584.5 30.0156 709 78.8066C820 122.307 844 229.105 844 229.105L965.5 708.105" stroke="var(--brand-cibo-500)" stroke-width="101"/>
+            <path bind:this={line2} d="M-41 212.105L501 59.1046C501 59.1046 584.5 30.0156 709 78.8066C820 122.307 844 229.105 844 229.105L965.5 708.105" stroke="#533EDC" stroke-width="101"/>
         </svg>
     </div>
     
     <div class="content">
 
             <div id="videoContainer">
-                <CucinaItalianaSlider2 bind:el={sliderVideoEL} bind:elActive={activeSliderEl} bind:elButtons={buttonsEl}/>
+                <SportSlider2 bind:el={sliderVideoEL} bind:elActive={activeSliderEl} bind:elButtons={buttonsEl}/>
             </div>
             <div id="text">
-                <p id="paragraph" bind:this={text}>Questo suo essere virale e a prima vista irresistibile ha spinto le persone a realizzare moltissimi contenuti a riguardo. Specialmente <br><mark>MEME</mark></p>
+                <p id="paragraph" bind:this={text}>Questo suo essere insolito e a prima vista inspiegabile ha spinto le persone a realizzare moltissimi contenuti a riguardo. Specialmente <br><mark>MEME</mark></p>
             </div>
         
             <div id="title">
@@ -350,7 +350,7 @@
 
     #section5Path {
         fill: none;
-        stroke: var(--brand-cibo-500);
+        stroke: var(--brand-sport-insoliti-500);
         stroke-width: var(--line-thickness);
     }
 
@@ -386,7 +386,7 @@
     font-style: normal;
     font-weight: 900;
     background-color: transparent;
-    color: var(--brand-cibo-500);
+    color: var(--brand-sport-insoliti-500);
     line-height: 110%;
     
    }
@@ -400,7 +400,7 @@
     position: absolute;
     right: 5%;
     top: 1%;
-    color: var(--brand-cibo-500);
+    color: var(--brand-sport-insoliti-500);
    }
 
    #videoContainer {
@@ -415,7 +415,7 @@
 
 #Section5 .card-bg {
     position: absolute;
-    background-color: var(--brand-cibo-300);
+    background-color: var(--brand-sport-insoliti-300);
     transform-style: preserve-3d;
 }
 

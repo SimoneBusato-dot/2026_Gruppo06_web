@@ -106,21 +106,21 @@
 
             <div bind:this={background} style="width: 100%; height: 100%;">
                 <svg id="backgroud" width="100vw" height="100vh" viewBox="0 0 1512 977"  preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M1512 70.167L948.909 221.047C931.839 225.621 921.708 243.168 926.282 260.239L1119.68 982H0V0H1512V70.167Z" fill="var(--brand-cibo-500)"/>
+                <path d="M1512 70.167L948.909 221.047C931.839 225.621 921.708 243.168 926.282 260.239L1119.68 982H0V0H1512V70.167Z" fill="#533EDC"/>
                 </svg>
             </div>
 
             <div bind:this={line} id="line-wrapper">
                 <svg id="lineasfondo" width="602" height="100vh" viewBox="0 0 602 890" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M511.984 1036.51C511.984 1036.51 409.686 444.499 156.666 832.464C-96.3545 1220.43 62.5 11.7666 62.5 11.7666" stroke="var(--brand-cibo-300)" stroke-width="181"/>
+                <path d="M511.984 1036.51C511.984 1036.51 409.686 444.499 156.666 832.464C-96.3545 1220.43 62.5 11.7666 62.5 11.7666" stroke="#8688F3" stroke-width="181"/>
                 </svg>
             </div>
 
 
         </div>
         <div id="title">
-            <h1 id="sport" bind:this={sport}>CUCINA</h1>
-            <h1 id="insoliti" bind:this={insoliti}> ITALIANA</h1>
+            <h1 id="sport" bind:this={sport}>SPORT</h1>
+            <h1 id="insoliti" bind:this={insoliti}> INSOLITI</h1>
         </div>
     </div>
 </main>
