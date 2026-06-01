@@ -34,7 +34,7 @@
         </svg>
     </a>
 {:else if variant === 'purple'}
-    <a href="../routes/Sport_Insoliti" id="link">
+    <a href="/Vip_Inaspettati" id="link">
         <div id = 'content'>
             <svg id="logo" width="44" height="42" viewBox="0 0 44 42" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M27.6444 15.5879L22.1167 4.58789L16.9876 15.5879L4.49707 17.1106L13.4265 25.459L11.2207 37.5879L22.1167 31.6547L33.0924 37.5879L30.9663 25.459L39.4971 17.1106L27.6444 15.5879Z" stroke="#F3F3F3" stroke-width="4"/>
