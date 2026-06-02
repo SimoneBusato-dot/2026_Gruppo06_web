@@ -66,7 +66,7 @@
                 trigger: hero,
                 scroller: window,
                 start: "top top",       
-                end: "+=100%",
+                end: "+=200%",
                 scrub: 1,
                 pin: true,  
                 refreshPriority: 1,

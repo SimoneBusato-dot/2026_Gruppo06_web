@@ -162,6 +162,7 @@
     height: 100vh;
     visibility: hidden;
     margin-block-start: 2dvh ;
+    background-color: var(--neutral-50);
 }
 
 #perspective, #Content {

@@ -93,6 +93,7 @@ tl.to(path, { strokeDashoffset: -length, duration: 5, ease: "power2.out" })
 </main>
 
 <style>
+
     #section6{
         width: 100vw;
         height: 100vh;
@@ -102,6 +103,7 @@ tl.to(path, { strokeDashoffset: -length, duration: 5, ease: "power2.out" })
         align-items: center;
         visibility: hidden;
         margin-block-start: 100dvh;
+        background-color: var(--neutral-50);
     }
 
 

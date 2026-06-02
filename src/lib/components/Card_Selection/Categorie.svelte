@@ -266,6 +266,7 @@
         overflow: hidden;
         display: flex;
         flex-direction: column;
+        background-color: var(--neutral-50);
     }
 
     /* ── Testo ── */

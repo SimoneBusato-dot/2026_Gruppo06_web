@@ -161,7 +161,7 @@
 
 #section3{
     visibility: hidden;
-    
+    background-color: var(--neutral-50);
     
 }
   
