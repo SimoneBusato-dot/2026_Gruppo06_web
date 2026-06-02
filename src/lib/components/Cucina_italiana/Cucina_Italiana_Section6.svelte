@@ -4,130 +4,108 @@
     import {ScrollTrigger} from 'gsap/ScrollTrigger';
     import SplitType from 'split-type';
 
-
     let path;
     let path2;
     let section;
     let text;
 
     onMount(() => {
-
         const textSplitType = new SplitType(text, { types: 'lines', tagName: 'span' });
         const textLines = textSplitType.lines;
 
-        const length = path.getTotalLength()
-        const length2 = path2.getTotalLength()
+        const length = path.getTotalLength();
+        const length2 = path2.getTotalLength();
 
         gsap.set(path, {
             strokeDasharray: length,
             strokeDashoffset: length
-        })
+        });
 
         gsap.set(path2, {
             strokeDasharray: length2,
             strokeDashoffset: length2
-        })
+        });
 
-        gsap.set(textLines, {opacity: 0, x: 200})
-
+        gsap.set(textLines, { opacity: 0, x: 200 });
 
         let tl = gsap.timeline({
             scrollTrigger: {
                 trigger: section,
                 scroller: window,
                 start: "top top",
-                end: "+=100%",
+                end: "+=100%", // Fast snappy scroll speed to unpin quickly
                 scrub: 1,
                 pin: true,
-                pinSpacing: false,
-                markers: true,
-                onEnter: () => gsap.set(section, { autoAlpha: 1 }),
-                onLeave: () => gsap.set(section, { autoAlpha: 0 }),
-                onEnterBack: () => gsap.set(section, { autoAlpha: 1 }),
-                onLeaveBack: () => gsap.set(section, { autoAlpha: 0 }),
-    
+                pinSpacing: true
+            }
+        });
 
-        }
-    })
-
-    
-
-    
-
-tl.to(path, { strokeDashoffset: -length, duration: 5, ease: "power2.out" })
-  .to(path2, { strokeDashoffset: -length2, duration: 5, ease: "power2.out" }, "<")
-  .to(textLines, { opacity: 1, x: 0, stagger: 0.1, ease: "power2.out", duration: 1 }, 0)
-  .to(textLines, { opacity: 0, x: -200, stagger: 0.05, ease: "power2.in", duration: 0.8}, 4)
-
-  
-
-    
-    
-
-
-
-
-
-})
-
+        tl.to(path, { strokeDashoffset: -length, duration: 4.0, ease: "power2.out" }, 0)
+          .to(path2, { strokeDashoffset: -length2, duration: 4.0, ease: "power2.out" }, 1.0)
+          .to(textLines, { opacity: 1, x: 0, stagger: 0.1, ease: "power2.out", duration: 1.0 }, 0)
+          .to(textLines, { opacity: 0, x: -200, stagger: 0.05, ease: "power2.in", duration: 0.8 }, 3.0)
+          .to({}, { duration: 0.05 }, 3.85); // immediate unpin smooth-cut
+    });
 </script>
 
 <main id="section6" bind:this={section}>
-    <div id="svgPerspective">
-        <div id="svgContainer">
-            <svg id="path" width="24vw" height="61vh" fill="none">
-                <path bind:this={path} d="M6.52953 582.741C206.543 529.759 523.889 322.661 193.165 -81.879" stroke="var(--brand-cibo-500)" stroke-width="51"/>
-            </svg>
-
-            <svg id="path2" width="37vw" height="27vh" fill="none">
-                <path bind:this={path2} d="M566.755 81.3008C396.755 81.3008 166.201 -155.726 24.5451 347.229" stroke="var(--brand-cibo-500)" stroke-width="51"/>
-            </svg>
-
-        </div>
+    <!-- Fullscreen SVG containing non-specular edge-to-edge curves bleeding off-screen -->
+    <div id="svgContainer">
+        <svg viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Curve 1: Enters Left, Exits Top (Completely contained in X < 300) -->
+            <path bind:this={path} d="M -100 800 C 200 700 150 150 300 -100" stroke="var(--brand-cibo-500)" stroke-width="51" stroke-linecap="round"/>
+            
+            <!-- Curve 2: Enters Bottom, Exits Right (Completely contained in X > 1600) -->
+            <path bind:this={path2} d="M 1600 1180 C 1700 800 1650 600 2020 400" stroke="var(--brand-cibo-500)" stroke-width="51" stroke-linecap="round"/>
+        </svg>
     </div>
 
     <div id="text">
         <p bind:this={text} id="paragraph">Vederli godersi questi piatti con la nostra stessa voglia ha fatto crollare l'immagine dell'atleta distante, freddo e rigoroso.</p>
     </div>
-
 </main>
 
 <style>
-    #section6{
+    #section6 {
         width: 100vw;
         height: 100vh;
         position: relative;
         display: flex;
         justify-content: center;
         align-items: center;
-        visibility: hidden;
-        margin-block-start: 100dvh;
+        margin-block-start: 5dvh; /* Tiny gap to make quote appear almost immediately after the chart */
+        background-color: var(--neutral-50);
+        overflow: hidden;
     }
 
-
-
-    #path, #path2{
+    /* Pinned Fullscreen SVG Container keeping lines strictly at the left/right margins and bleeding off-screen */
+    #svgContainer {
         position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        pointer-events: none;
+        opacity: 1; /* Vibrant saffron yellow at 100% opacity */
     }
 
-    #path{
-        top: -10%;
-        left: -10%;
+    #svgContainer svg {
+        width: 100%;
+        height: 100%;
     }
 
-    #path2{
-        bottom: 0;
-        right: 0;
-    }
-
-    #text{
+    #text {
+        position: relative;
+        z-index: 10; /* Solidly above background lines */
         font-family: var(--font-family-text);
         color: var(--neutral-900);
-        font-size: 3.125rem;
+        font-size: 24pt; /* Maintained exactly at 24pt */
         font-style: normal;
         font-weight: 400;
-        line-height: 110%; /* 3.4375rem */
-        letter-spacing: -0.125rem;
+        line-height: 145%;
+        letter-spacing: -0.06rem;
         width: 72.625rem;
+        pointer-events: none;
     }
 </style>
