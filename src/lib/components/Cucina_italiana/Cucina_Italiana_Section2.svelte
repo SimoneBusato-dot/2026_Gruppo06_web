@@ -2,315 +2,942 @@
     import gsap from "gsap";
     import { onMount } from "svelte";
     import { ScrollTrigger } from "gsap/ScrollTrigger";
-    import SportSlider from "./Cucina_Slider.svelte";
-    import SplitType from "split-type";
-  
+    import Swiper from "swiper/bundle";
+    import "swiper/css/bundle";
+    import * as d3 from 'd3';
 
     gsap.registerPlugin(ScrollTrigger);
+
     let section;
+    let introTextsContainer;
+    let galleryContainer;
+    let intermediateContainer;
+    let pastaContainer;
+    let swiperDeckContainer;
+    let chartContainer;
+
+    // SVG elements
     let path;
+    let path2;
+    let pathIntermediate;
+    let pathIntermediate2;
+    let pathPasta;
+    let svgElement;
+
+    // Slide 1 elements
     let p1;
-    let p2;
-    let sliderElement = $state(null);
-    let transitionElement;
-    let line;
-    
-    
+    let p2Container;
 
-    onMount( () => {
+    // Slide 3 elements
+    let intermediateParagraphs;
 
-        if(!sliderElement)return;
+    // Slide 4 elements
+    let pastaTitle;
 
-        const p1SplitText = new SplitType(p1, {types: "lines", tagName: "span"} )
-        const p1Lines = p1SplitText.lines
-       
-        const p2SplitText = new SplitType(p2, {types: "lines", tagName: "span"} )
-        const p2Lines = p2SplitText.lines
+    // Slide 5 card deck elements
+    let textLeft;
+    let cardContainer;
+    let cinematicCard;
 
-        const moveElements = (e) => {
-            const xPercent = (e.clientX / window.innerWidth - 0.5) * 2;
-            const yPercent = (e.clientY/ window.innerHeight -0.5) *2;
+    // Slide 7 D3 elements
+    let chartText;
 
-            gsap.to(line, {
-                duration: 1.2,
-                rotateY: xPercent* 5,
-                rotateX: -yPercent * 3,
-                scale: 1,
-                ease: "power2.out",
-                overwrite: "auto",
-            })
-            
-        
-                gsap.to(sliderElement, {
-                    duration: 1.2,
-                    rotateY: xPercent * 15,   // puoi variare l'intensità
-                    rotateX: -yPercent * 7,
-                    ease: "power2.out",
-                    overwrite: "auto",
-                });
-            
-        }
+    // Swiper zafferano colors
+    const colors = [
+        null,           // active slide
+        "#dc963e",      // brand-cibo-500
+        "#d3792c",      // brand-cibo-600
+        "#bb5b24",      // brand-cibo-700
+        "#9c4120",      // brand-cibo-800
+        "#7f3420",      // brand-cibo-900
+    ];
 
-        
-        
-        const length = path.getTotalLength();
+    // Generate 30 video configurations representing the vertical gallery mosaic
+    const videos = [
+        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro1.mp4", height: "450px" },
+        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro2.mp4", height: "300px" },
+        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro3.mp4", height: "220px" },
+        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro4.mp4", height: "350px" },
+        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro5.mp4", height: "260px" },
+        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro1.mp4", height: "380px" },
+        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro2.mp4", height: "240px" },
+        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro3.mp4", height: "480px" },
+        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro4.mp4", height: "280px" },
+        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro5.mp4", height: "320px" },
+        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro1.mp4", height: "420px" },
+        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro2.mp4", height: "220px" },
+        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro3.mp4", height: "350px" },
+        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro4.mp4", height: "270px" },
+        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro5.mp4", height: "400px" },
+        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro1.mp4", height: "310px" },
+        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro2.mp4", height: "250px" },
+        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro3.mp4", height: "440px" },
+        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro4.mp4", height: "290px" },
+        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro5.mp4", height: "330px" },
+        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro1.mp4", height: "410px" },
+        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro2.mp4", height: "230px" },
+        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro3.mp4", height: "360px" },
+        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro4.mp4", height: "260px" },
+        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro5.mp4", height: "390px" },
+        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro1.mp4", height: "320px" },
+        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro2.mp4", height: "240px" },
+        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro3.mp4", height: "460px" },
+        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro4.mp4", height: "300px" },
+        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro5.mp4", height: "340px" }
+    ];
 
-        gsap.set(path, {
-            strokeDasharray: length,
-            strokeDashoffset: length 
+    const columns = [
+        videos.slice(0, 6),
+        videos.slice(6, 12),
+        videos.slice(12, 18),
+        videos.slice(18, 24),
+        videos.slice(24, 30)
+    ];
+
+    onMount(async () => {
+        // ==========================================
+        // D3.js Curling Trend Chart Initialization
+        // ==========================================
+        let svg = d3.select(svgElement);
+        const box = svgElement.getBoundingClientRect();
+        const width = box.width;
+        const height = box.height;
+
+        const renderChart = (chartData) => {
+            const xValue = d => d.Time;
+            const yValue = d => d.Curling;
+
+            const xScale = d3.scaleTime()
+                .domain(d3.extent(chartData, xValue))
+                .range([0, width])
+                .nice();
+
+            const yScale = d3.scaleLinear()
+                .domain(d3.extent(chartData, yValue))
+                .range([height, 0])
+                .nice();
+
+            const xAxis = d3.axisBottom(xScale).tickSize(-height);
+            const g = svg.append('g');
+            const xAxisG = g.append('g').call(xAxis).attr('transform', `translate(0, ${height})`);
+            xAxisG.selectAll('.domain').remove();
+
+            const areaGenerator = d3.area()
+                .x(d => xScale(xValue(d)))
+                .y0(height)
+                .y1(d => yScale(yValue(d)))
+                .curve(d3.curveBasis);
+
+            const curlingArea = g.append('path')
+                .attr('d', areaGenerator(chartData))
+                .attr('class', 'curlingArea');
+
+            const clip = svg.append('defs')
+                .append('clipPath')
+                .attr('id', 'clip-area-cibo-restored')
+                .append('rect')
+                .attr('width', 0)
+                .attr('height', height)
+                .attr('x', 0)
+                .attr('y', 0);
+
+            curlingArea.attr('clip-path', 'url(#clip-area-cibo-restored)');
+
+            const lineGenerator = d3.line()
+                .x(d => xScale(xValue(d)))
+                .y(d => yScale(yValue(d)))
+                .curve(d3.curveBasis);
+
+            const curlingLine = g.append('path')
+                .attr('d', lineGenerator(chartData))
+                .attr('class', 'curlingLine');
+
+            const firstRecord = chartData[0];
+            const lastRecord = chartData.at(-1);
+
+            g.append('circle')
+                .attr('cx', xScale(xValue(firstRecord)))
+                .attr('cy', yScale(yValue(firstRecord)))
+                .attr('r', 15)
+                .attr('fill', 'var(--neutral-50)')
+                .attr('id', 'firstCircle');
+
+            g.append('circle')
+                .attr('cx', xScale(xValue(lastRecord)))
+                .attr('cy', yScale(yValue(lastRecord)))
+                .attr('r', 15)
+                .attr('fill', 'var(--neutral-50)')
+                .attr('id', 'lastCircle');
+        };
+
+        const chartData = await d3.csv('/Sport_Insoliti/Sport_CSV/Olympics.csv', (d) => {
+            return {
+                ...d,
+                Curling: +d.Curling,
+                Time: new Date(d.Time)
+            };
         });
 
-        // Nascondi i paragrafi all'inizio
-        const p1Enter = gsap.fromTo(p1Lines, {
-            x:300,
-            opacity: 0
-        }, {
-            x: 100,
-            opacity: 1,
-            stagger: 0.1,
-            overwrite: "auto",
-            duration: 0.6,
-            paused: true,
-             ease: "powr2.out"
-        })
+        renderChart(chartData);
 
-        const sliderEnter = gsap.fromTo(sliderElement, {
-            x: 50,
-            opacity: 0
-        }, {
-            x:0,
-            opacity:1,
-            paused:true,
-            overwrite: "auto",
-            duration: 0.6,
-            ease: "power2.out"
-        })
-        
-        const p2Enter = gsap.fromTo(p2Lines, {
-            x:300,
-            opacity: 0
-        }, {
-            x: 200,
-            opacity: 1,
-            stagger: 0.05,
-            overwrite: "auto",
-            duration: 0.5,
-            paused: true,
-            ease: "power2.out"
-        })
+        let d3Path = svgElement.querySelector('.curlingLine');
+        const d3Length = d3Path.getTotalLength();
+        let d3Area = svgElement.querySelector('#clip-area-cibo-restored rect');
 
-        const p1Exit = gsap.to(p1Lines, {
-            x:"-200",
-            opacity: 0,
-            stagger: 0.1,
-            paused: true,
-            duration: 0.6,
-            overwrite: "auto",
-            ease: "power2.out"
-        })
-        
-        const transitionEnter = gsap.fromTo(transitionElement, {
-        scaleX:0
-    }, {
-        scaleX: 1,
-        duration: 0.5,
-        paused: true,
-        overwrite: "auto",
-        ease:"power2.out"
-    })
+        // Set Swiper color utilities
+        const applyColors = (swiper) => {
+            swiper.slides.forEach((slide, i) => {
+                const overlay = slide.querySelector(".overlay");
+                const distance = i - swiper.activeIndex;
 
-        
-    
+                if (distance === 0) {
+                    overlay.style.opacity = "0";
+                } else {
+                    const absDistance = Math.abs(distance);
+                    const color = colors[Math.min(absDistance, colors.length - 1)];
+                    overlay.style.backgroundColor = color;
+                    overlay.style.opacity = "1";
+                }
+            });
+        };
+
+        // Initialize Swiper with 1-slide-at-a-time touch limitation
+        const swiperConfig = {
+            effect: "cards",
+            grabCursor: true,
+            pagination: {
+                el: ".swiper-pagination",
+                clickable: true,
+            },
+            cardsEffect: {
+                perSlideOffset: 20,
+                perSlideRotate: -15,
+                rotate: true,
+                slideShadows: false,
+            },
+            on: {
+                init(swiper) {
+                    applyColors(swiper);
+                    const videos = cardContainer.querySelectorAll("video");
+                    videos[swiper.activeIndex]?.play().catch(() => {});
+                },
+                slideChange(swiper) {
+                    applyColors(swiper);
+                    const videos = cardContainer.querySelectorAll("video");
+                    videos.forEach(v => { v.pause(); v.currentTime = 0; });
+                    videos[swiper.activeIndex]?.play().catch(() => {});
+                    
+                    // Stop scrolling through multiple slides in a single gesture
+                    swiper.allowTouchMove = false;
+                },
+                touchEnd(swiper) {
+                    // Re-allow drag moves only after user lifts their finger
+                    setTimeout(() => {
+                        swiper.allowTouchMove = true;
+                    }, 50);
+                }
+            }
+        };
+
+        const swiper = new Swiper(cardContainer, swiperConfig);
+
+        // ==========================================
+        // GSAP ScrollTrigger timeline configuration
+        // ==========================================
+        const len1 = path.getTotalLength();
+        const len2 = path2.getTotalLength();
+        const lenIntermediate = pathIntermediate.getTotalLength();
+        const lenIntermediate2 = pathIntermediate2.getTotalLength();
+        const lenPasta = pathPasta.getTotalLength();
+
+        gsap.set(path, { strokeDasharray: len1, strokeDashoffset: len1 });
+        gsap.set(path2, { strokeDasharray: len2, strokeDashoffset: len2 });
+        gsap.set(pathIntermediate, { strokeDasharray: lenIntermediate, strokeDashoffset: lenIntermediate });
+        gsap.set(pathIntermediate2, { strokeDasharray: lenIntermediate2, strokeDashoffset: lenIntermediate2 });
+        gsap.set(pathPasta, { strokeDasharray: lenPasta, strokeDashoffset: lenPasta });
+        gsap.set(d3Path, { strokeDasharray: d3Length, strokeDashoffset: d3Length });
+
+        // Initialize states
+        gsap.set('.intro-grid .left-col, .intro-grid .right-col', { opacity: 0, y: 100 });
+        gsap.set(galleryContainer, { xPercent: 100 });
+        gsap.set(intermediateContainer, { xPercent: 100 });
+        gsap.set(pastaContainer, { xPercent: 100 });
+        gsap.set(swiperDeckContainer, { xPercent: 100 });
+        gsap.set(chartContainer, { xPercent: 100, opacity: 0 });
+        gsap.set('.gallery-col', { y: 0 });
+        gsap.set('#intermediateWrapper .para, .gusto-dharma', { opacity: 0, x: 100 });
+        gsap.set(pastaTitle, { xPercent: 100, opacity: 0 });
+        gsap.set(textLeft, { xPercent: 0, opacity: 1 });
+        gsap.set(cardContainer, { scale: 1.0, opacity: 1, y: 0 });
+        gsap.set(cinematicCard, { scale: 1.0, opacity: 0, rotate: 0, borderRadius: 20, zIndex: 100 });
+        gsap.set(chartText, { opacity: 0, x: 200 });
+        gsap.set('#firstCircle', { r: 0 });
+        gsap.set('#lastCircle', { r: 0 });
 
         const tl = gsap.timeline({
             scrollTrigger: {
                 trigger: section,
                 scroller: window,
                 start: "top top",
-                end: "+=101%",
+                end: "+=1350%", // Fast snappy scroll speed to dramatically cut transition times
                 scrub: 1,
                 pin: true,
-                pinSpacing: false,
-                markers: true,
+                pinSpacing: true,
                 onEnter: () => gsap.set(section, { autoAlpha: 1 }),
-                onLeave: () => gsap.set(section, { autoAlpha: 0}),
-                onEnterBack: () => gsap.set(section, { autoAlpha: 1}),
-                onLeaveBack: () => gsap.set(section, { autoAlpha: 0}),
-
-                onUpdate(self){
-                    if(self.progress >= 0.1){
-                        p1Enter.play()
-                        sliderEnter.play()
-                    } else{
-                        p1Enter.reverse()
-                        sliderEnter.reverse()
-                    }
-                    if(self.progress >= 0.5){
-                        p2Enter.play()
-                        p1Exit.play();
-                        
-                    } else{
-                        p2Enter.reverse()
-                        p1Exit.reverse()
-                    }
-
-                    if(self.progress >= 0.91){
-                        transitionEnter.play()
-                    } else{
-                        transitionEnter.reverse()
-                    }
-
-                }
-        
+                onLeave: () => gsap.set(section, { autoAlpha: 0 }),
+                onEnterBack: () => gsap.set(section, { autoAlpha: 1 }),
+                onLeaveBack: () => gsap.set(section, { autoAlpha: 0 }),
             }
-    });
+        });
 
-
-
-        tl.to(path, { strokeDashoffset: 0, ease: "none", duration: 1}, 0) // disegna la linea
+        // 1. PHASE 1: Slide 1 - Figma intro texts grid
+        tl.to(path, { strokeDashoffset: 0, ease: "none", duration: 1.5 }, 0)
+          .to(path2, { strokeDashoffset: 0, ease: "none", duration: 1.5 }, 0)
+          .to('.intro-grid .left-col, .intro-grid .right-col', { opacity: 1, y: 0, stagger: 0.15, duration: 1.2, ease: "power2.out" }, 0.2)
           
-        
-        
+          // 2. PHASE 2: Transition to Slide 2 - Fullscreen phone vertical gallery (slides left)
+          .to(introTextsContainer, { xPercent: -100, opacity: 0, duration: 1.5, ease: "power2.inOut" }, 2.0)
+          .to(galleryContainer, { xPercent: 0, duration: 1.5, ease: "power2.inOut" }, 2.0)
 
-        window.addEventListener("mousemove", moveElements);
+          // 3. PHASE 3: Portrait Video mosaic parallax scrolling
+          .to('.col-0', { y: -800, ease: "none", duration: 3.5 }, 3.5)
+          .to('.col-1', { y: 650, ease: "none", duration: 3.5 }, 3.5)
+          .to('.col-2', { y: -1000, ease: "none", duration: 3.5 }, 3.5)
+          .to('.col-3', { y: 550, ease: "none", duration: 3.5 }, 3.5)
+          .to('.col-4', { y: -750, ease: "none", duration: 3.5 }, 3.5)
+
+          // 4. PHASE 4: Transition to Slide 3 - Figma Intermediate Texts (slides left)
+          .to(galleryContainer, { xPercent: -100, duration: 1.5, ease: "power2.inOut" }, 7.0)
+          .to(intermediateContainer, { xPercent: 0, duration: 1.5, ease: "power2.inOut" }, 7.0)
+
+          // 5. PHASE 5: Draw intermediate curve & staggered text fade in
+          .to(pathIntermediate, { strokeDashoffset: 0, ease: "none", duration: 1.5 }, 8.5)
+          .to(pathIntermediate2, { strokeDashoffset: 0, ease: "none", duration: 1.5 }, 8.5)
+          .to('#intermediateWrapper .para, .gusto-dharma', { opacity: 1, x: 0, stagger: 0.15, duration: 1.2, ease: "power2.out" }, 8.7)
+
+          // 6. PHASE 6: Transition to Slide 4 - PASTA OLIMPICA push (Slides right-to-left)
+          .to(intermediateContainer, { xPercent: -100, duration: 1.5, ease: "power2.inOut" }, 10.2)
+          .to(pastaContainer, { xPercent: 0, duration: 1.5, ease: "power2.inOut" }, 10.2)
+          .to(pastaTitle, { xPercent: 0, opacity: 1, duration: 1.5, ease: "power2.out" }, 10.2)
+
+          // 7. PHASE 7: Transition to Slide 5 - Figma Cards Deck (left texts, right Swiper slider)
+          .to(pastaContainer, { xPercent: -100, duration: 1.5, ease: "power2.inOut" }, 12.0)
+          .to(swiperDeckContainer, { xPercent: 0, duration: 1.5, ease: "power2.inOut" }, 12.0)
+
+          // 8. PHASE 8: Cinematic Card Expansion (one card grows to cover the screen)
+          .to(textLeft, { xPercent: -150, opacity: 0, duration: 1.0, ease: "power2.in" }, 13.8)
+          .to(cardContainer, { scale: 0.8, xPercent: -100, opacity: 0, duration: 1.2, ease: "power2.in" }, 13.8)
+          .to(cinematicCard, { 
+              opacity: 1, 
+              scaleX: 5.5, 
+              scaleY: 3.5, 
+              rotate: 90, // Cinematic horizontal turn
+              borderRadius: 0, 
+              duration: 1.5, 
+              ease: "power2.inOut" 
+          }, 13.8)
+
+          // 9. PHASE 9: Slide 6 - Restored D3 Curling Trend Graph drawn over the yellow background
+          .to(chartContainer, { xPercent: 0, opacity: 1, duration: 0.1 }, 15.4)
+          .to('#firstCircle', { r: 15, ease: "power2.out", duration: 0.1 }, 15.5)
+          .to(d3Path, { strokeDashoffset: 0, ease: "none", duration: 1.5 }, 15.6)
+          .to(d3Area, { width: "100vw", ease: "none", duration: 1.5 }, 15.6)
+          .to(chartText, { opacity: 1, x: 0, ease: "power2.out", duration: 1.0 }, 15.6)
+          .to('#lastCircle', { r: 15, ease: "power2.out", duration: 0.1 }, 16.9)
+
+          // 10. PHASE 10: Bubble Zoom Exit (screen turns white) - Quick 0.6s exit zoom and 0.05s buffer to unpin immediately
+          .to('#lastCircle', { r: "120vw", ease: "power2.in", duration: 0.6 }, 17.0)
+          .to(chartText, { opacity: 0, y: -50, ease: "power2.out", duration: 0.5 }, 17.0)
+          .to('.tick line', { attr: { y2: 0 }, ease: "power2.out", duration: 0.5 }, 17.0)
+
+          // Tightened unpin buffer to complete transitions quickly
+          .to({}, { duration: 0.05 }, 17.65);
 
         return () => {
-            window.removeEventListener("mousemove", moveElements);
+            swiper.destroy();
             ScrollTrigger.getAll().forEach(t => t.kill());
         };
     });
 </script>
 
-<main bind:this={section}>
-    <div id="svgContainer" bind:this={line}>
-        <svg width="100vw" height="555" viewBox="0 0 1399 555" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path bind:this={path} d="M25.4766 1.0918C32.8099 172.092 211.677 421.892 868.477 53.0918C831.977 256.758 885.577 631.892 1391.98 503.092"  stroke-width="51" stroke-linecap="round"/>
-        </svg>
-    </div>
-
-    <div id="content">
-        <div id="text">
-            <p id="1" bind:this={p1}>
-                I feed su Milano Cortina si sono riempiti di discipline invernali insolite.</p>
-            <p id="2" bind:this={p2}>
-                Tra le discese folli dello skeleton o l'assurdo mix sci-carabina del biathlon, le persone hanno scoperto una passione improvvisa per gli sport più di nicchia, divertenti e <mark>STRAMBI</mark></p>
+<main id="section2" bind:this={section}>
+    <!-- ========================================================== -->
+    <!-- SLIDE 1: Figma Intro Grid side-by-side texts and curves     -->
+    <!-- ========================================================== -->
+    <div id="introTexts" class="slide-container" bind:this={introTextsContainer}>
+        <div id="svgContainerPart1" class="svg-bg-layer">
+            <svg class="deco-svg" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path bind:this={path} d="M -300 200 C 100 100 200 400 350 -200" stroke="var(--brand-cibo-500)" stroke-width="51" stroke-linecap="round"/>
+                <path bind:this={path2} d="M 1800 800 C 1500 700 1300 1000 1100 1200" stroke="var(--brand-cibo-500)" stroke-width="51" stroke-linecap="round"/>
+            </svg>
         </div>
 
-        <SportSlider bind:el = {sliderElement}/>
+        <div class="intro-grid">
+            <div class="left-col" bind:this={p1}>
+                <p class="para">
+                    Non c'è creator, atleta o turista a Milano Cortina che non abbia ripreso i piatti della cucina italiana. <br><br>
+                    I feed sono stati invasi da atleti di ogni nazione intenti a scoprire pizza, pasta, parmigiano e dolci tipici, in un trionfo di tradizione e puro food porn.
+                </p>
+            </div>
+            <div class="right-col" bind:this={p2Container}>
+                <p class="p2-sub">Ogni pasto l'ha trasformato in un</p>
+                <h1 class="p2-dharma">TREND DA <br> MILIONI DI <br> LIKE</h1>
+            </div>
+        </div>
     </div>
-    
-    <svg id="transition" bind:this={transitionElement} 
-     viewBox="0 0 1512 982"
-     preserveAspectRatio="none"
-     fill="none" xmlns="http://www.w3.org/2000/svg">
-    <ellipse id="Circle" cx="756" cy="491" rx="756" ry="491"/>
-</svg>
 
+    <!-- ========================================================== -->
+    <!-- SLIDE 2: Fullscreen Yellow Parallax Video Gallery Mosaic    -->
+    <!-- ========================================================== -->
+    <div id="videoGalleryContainer" class="slide-container" bind:this={galleryContainer}>
+        <div class="gallery-wrapper">
+            {#each columns as col, colIdx}
+                <div class="gallery-col col-{colIdx}">
+                    {#each col as video}
+                        <div class="video-card" style="height: {video.height}; aspect-ratio: 9/16;">
+                            <video src={video.src} autoplay muted loop playsinline></video>
+                        </div>
+                    {/each}
+                </div>
+            {/each}
+        </div>
+    </div>
+
+    <!-- ========================================================== -->
+    <!-- SLIDE 3: Figma Intermediate texts and curve (from image)    -->
+    <!-- ========================================================== -->
+    <div id="intermediateTextsContainer" class="slide-container" bind:this={intermediateContainer}>
+        <div id="svgContainerPart2" class="svg-bg-layer">
+            <svg class="deco-svg" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path bind:this={pathIntermediate} d="M -350 150 C -50 50 50 300 200 -250" stroke="var(--brand-cibo-500)" stroke-width="51" stroke-linecap="round"/>
+                <path bind:this={pathIntermediate2} d="M 1800 800 C 1500 700 1300 1000 1100 1200" stroke="var(--brand-cibo-500)" stroke-width="51" stroke-linecap="round"/>
+            </svg>
+        </div>
+
+        <div id="intermediateWrapper" bind:this={intermediateParagraphs}>
+            <div class="inter-grid">
+                <div class="inter-left">
+                    <p class="para para-olympic">
+                        Il cibo si è trasformato in un vero e proprio momento pop, un'esperienza non solo da assaggiare, ma da raccontare. Gli atleti hanno filmato tutto, ogni boccone diventava una mini-recensione social.
+                    </p>
+                    <div class="gusto-block">
+                        <p class="para para-olympic" style="margin-bottom: 0;">
+                            Le Olimpiadi non sono solo medaglie e rigore, ma anche condivisione, curiosità e
+                        </p>
+                        <h2 class="gusto-dharma">GUSTO</h2>
+                    </div>
+                </div>
+                <div class="inter-right">
+                    <p class="para para-olympic">
+                        Ma la vera mascotte gastronomica di Milano Cortina è stata...
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================== -->
+    <!-- SLIDE 4: Pasta Olimpica Pushed Section (2 lines, 500pt font)-->
+    <!-- ========================================================== -->
+    <div id="pastaOlimpicaContainer" class="slide-container" bind:this={pastaContainer}>
+        <!-- Saffron Wave background line exits at the top margin off-screen -->
+        <div id="svgContainerPart3" class="svg-bg-layer">
+            <svg class="deco-svg" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path bind:this={pathPasta} d="M -150 800 C 150 750 250 500 100 200 C 0 50 -100 -50 200 -100" stroke="var(--brand-cibo-500)" stroke-width="48" stroke-linecap="round"/>
+            </svg>
+        </div>
+
+        <h1 id="pastaTitle" bind:this={pastaTitle}>PASTA <br> OLIMPICA</h1>
+    </div>
+
+    <!-- ========================================================== -->
+    <!-- SLIDE 5: Figma 2-Column Cards deck (left text, right Swiper)-->
+    <!-- ========================================================== -->
+    <div id="swiperDeckContainer" class="slide-container" bind:this={swiperDeckContainer}>
+        <div id="deckWrapper">
+            <!-- Left Side: normal styled text (not Dharma, not Yellow) -->
+            <div id="leftColumn" bind:this={textLeft}>
+                <h2 id="pastaSub">o "pasta a cinque cerchi"...</h2>
+                <p id="pastaDesc">Lo strano formato di pasta, nato per queste Olimpiadi Invernali, ha conquistato atleti e turisti.</p>
+            </div>
+
+            <!-- Right Side: Card Deck Swiper on the right, no border outlines -->
+            <div id="rightColumn">
+                <div class="swiper" bind:this={cardContainer}>
+                    <div class="swiper-wrapper">
+                        <!-- Slide 1 -->
+                        <div class="swiper-slide">
+                            <div class="overlay"></div>
+                            <video src="/Cucina_Italiana/Video_introduzione/Sp_Intro1.mp4" muted loop playsinline></video>
+                            <div class="card-desc">Pasta taste test: gli atleti approvano il puro food porn!</div>
+                        </div>
+
+                        <!-- Slide 2 -->
+                        <div class="swiper-slide">
+                            <div class="overlay"></div>
+                            <video src="/Cucina_Italiana/Video_introduzione/Sp_Intro2.mp4" muted loop playsinline></video>
+                            <div class="card-desc">Bolognese in villaggio: il piatto più cercato e amato.</div>
+                        </div>
+
+                        <!-- Slide 3 -->
+                        <div class="swiper-slide">
+                            <div class="overlay"></div>
+                            <video src="/Cucina_Italiana/Video_introduzione/Sp_Intro3.mp4" muted loop playsinline></video>
+                            <div class="card-desc">Tiramisù mania: la ricarica dolce preferita dai campioni.</div>
+                        </div>
+
+                        <!-- Slide 4 -->
+                        <div class="swiper-slide">
+                            <div class="overlay"></div>
+                            <video src="/Cucina_Italiana/Video_introduzione/Sp_Intro4.mp4" muted loop playsinline></video>
+                            <div class="card-desc">Pizza party: la tradizione italiana conquista tutti.</div>
+                        </div>
+
+                        <!-- Slide 5 -->
+                        <div class="swiper-slide">
+                            <div class="overlay"></div>
+                            <video src="/Cucina_Italiana/Video_introduzione/Sp_Intro5.mp4" muted loop playsinline></video>
+                            <div class="card-desc">Caffè espresso e colazione: l'energia prima delle gare.</div>
+                        </div>
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Floating cinematic yellow card executing the fly-out grow transition -->
+        <div id="cinematicCard" bind:this={cinematicCard}></div>
+    </div>
+
+    <!-- ========================================================== -->
+    <!-- SLIDE 6: Restored D3 Curling trend vector graph section    -->
+    <!-- ========================================================== -->
+    <div id="d3ChartContainer" class="slide-container" bind:this={chartContainer}>
+        <div id="svgChartContainer">
+            <svg id="chartLine" width="100vw" height="100vh" bind:this={svgElement}></svg>
+        </div>
+
+        <div id="chartText" bind:this={chartText}>
+            <p id="chartParagraph">Il trend della pasta ha avuto picchi altissimi le prime settimane, per poi gradualmente attenuarsi in un entusiasmo a salti sporadici e ritorni improvvisi.</p>
+        </div>
+    </div>
 </main>
 
-
-
 <style>
-    :global(body){
-        margin: 0;
-        padding: 0;
-       
-    }
-
-    
-
-    main{
+    main {
         position: relative;
         width: 100vw;
         height: 100vh;
+        overflow: hidden;
+        background-color: var(--neutral-50);
+        visibility: hidden;
+    }
+
+    .slide-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        box-sizing: border-box;
+    }
+
+    /* Background SVG Graphic layers */
+    .svg-bg-layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1; /* Below content */
+        pointer-events: none;
+    }
+
+    .deco-svg {
+        width: 100%;
+        height: 100%;
+    }
+
+    /* Slide 1 Styles */
+    #introTexts {
+        z-index: 3;
+        justify-content: center;
+        background-color: var(--neutral-50);
+    }
+
+    .intro-grid {
+        position: relative;
+        z-index: 10;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        width: 90%;
+        max-width: 1400px;
+        margin: 0 auto;
+        gap: 8rem;
+    }
+
+    .left-col {
+        width: 48%;
+        text-align: left;
+    }
+
+    .right-col {
+        width: 48%;
+        text-align: left;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .para {
+        font-family: var(--font-family-text);
+        color: var(--neutral-900);
+        font-size: 2.1rem;
+        line-height: 145%;
+        margin: 0;
+    }
+
+    .p2-sub {
+        font-family: var(--font-family-text);
+        color: var(--neutral-900);
+        font-size: 2.1rem;
+        margin: 0 0 1rem 0;
+        font-weight: 300;
+        text-transform: uppercase;
+        letter-spacing: -0.05rem;
+    }
+
+    .p2-dharma {
+        font-family: var(--font-family);
+        color: var(--brand-cibo-500);
+        font-size: 8.3rem;
+        line-height: 0.85;
+        font-weight: 900;
+        margin: 0;
+    }
+
+    /* Slide 2 Styles - Fullscreen Yellow Parallax Video Gallery */
+    #videoGalleryContainer {
+        z-index: 4;
+        background-color: var(--brand-cibo-500);
+        box-shadow: -15px 0 35px rgba(0,0,0,0.25);
+    }
+
+    .gallery-wrapper {
+        display: flex;
+        flex-direction: row;
+        gap: 40px;
+        height: 100vh;
+        width: 100vw;
+        padding: 5vh 40px;
+        box-sizing: border-box;
+        align-items: flex-start;
+        justify-content: center;
+    }
+
+    .gallery-col {
+        display: flex;
+        flex-direction: column;
+        gap: 40px;
+        width: calc(20% - 32px);
+        flex-shrink: 0;
+    }
+
+    .col-0 { margin-top: 5vh; }
+    .col-1 { margin-top: -30vh; }
+    .col-2 { margin-top: 20vh; }
+    .col-3 { margin-top: -20vh; }
+    .col-4 { margin-top: 10vh; }
+
+    .video-card {
+        background: var(--neutral-900);
+        border-radius: 12px;
+        overflow: hidden;
+        position: relative;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+        border: none !important; /* No borders allowed */
+        outline: none !important;
+        width: 100%;
+    }
+
+    video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* Slide 3: Intermediate Texts (Figma layout) */
+    #intermediateTextsContainer {
+        z-index: 5;
+        background-color: var(--neutral-50);
+        box-shadow: -15px 0 35px rgba(0,0,0,0.25);
+        justify-content: center;
+    }
+
+    #intermediateWrapper {
+        width: 85%;
+        max-width: 1400px;
+        z-index: 10;
+        position: relative;
+        padding-left: 6rem; /* Shift text safe from the top-left curve! */
+    }
+
+    .inter-grid {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8rem;
+    }
+
+    .inter-left {
+        width: 48%;
+        display: flex;
+        flex-direction: column;
+        gap: 3.5rem;
+    }
+
+    .gusto-block {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .gusto-dharma {
+        font-family: var(--font-family);
+        font-size: 8rem;
+        font-weight: 900;
+        color: var(--brand-cibo-500);
+        line-height: 0.9;
+        margin: 1rem 0 0 0;
+    }
+
+    .inter-right {
+        width: 48%;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    .para-olympic {
+        font-size: 2.2rem;
+        line-height: 145%;
+    }
+
+    /* Slide 4: Pasta Olimpica Pushed Section (2 lines) */
+    #pastaOlimpicaContainer {
+        z-index: 6;
+        background-color: var(--neutral-50);
+        box-shadow: -15px 0 35px rgba(0,0,0,0.25);
+        justify-content: center;
+    }
+
+    #pastaTitle {
+        color: var(--brand-cibo-500);
+        font-family: var(--font-family);
+        font-size: clamp(8rem, 18vw, 24rem); /* Premium, responsive double-line scaling */
+        font-weight: 900;
+        line-height: 0.85;
+        text-align: center;
+        pointer-events: none;
+        margin: 0;
+        text-transform: uppercase;
+    }
+
+    /* Slide 5: Figma 2-Column Cards deck */
+    #swiperDeckContainer {
+        z-index: 7;
+        background-color: var(--neutral-50);
+        box-shadow: -15px 0 35px rgba(0,0,0,0.25);
+    }
+
+    #deckWrapper {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        width: 90%;
+        max-width: 1400px;
+        margin: 0 auto;
+        height: 100%;
+        gap: 6rem;
+        z-index: 10;
+        position: relative;
+    }
+
+    #leftColumn {
+        width: 45%;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        text-align: left;
+        gap: 1.5rem;
+    }
+
+    #pastaSub {
+        font-family: var(--font-family-text);
+        font-size: 3.5rem;
+        font-weight: 800;
+        color: var(--neutral-900);
+        margin: 0;
+        line-height: 1.1;
+        letter-spacing: -0.08rem;
+    }
+
+    #pastaDesc {
+        font-family: var(--font-family-text);
+        font-size: 1.6rem;
+        font-weight: 300;
+        color: var(--neutral-700);
+        margin: 0;
+        line-height: 140%;
+    }
+
+    #rightColumn {
+        width: 50%;
         display: flex;
         justify-content: center;
         align-items: center;
-        perspective: 1000px;
-        visibility: hidden;
-       
-    }
-
-    #svgContainer{
-        position: absolute;
-        top: -10%;
-        right: -10%;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        
-    }
-
-    svg{
-        position: absolute;
-        top: -30;
-        stroke: var(--brand-sport-insoliti-500);
-
-    }
-
-    #content {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 15vw;
-    width: 100%;
-   
-    box-sizing: border-box;
-}
-
-    #text{
         position: relative;
-        color: var(--neutral-900);
-        font-size: 2rem;
-        width: 600px;
-        font-family: var(--font-family-text);
-        display: flex;
-        flex-direction: column;
-        gap: 3rem;
-        pointer-events: none;
-
     }
 
-    mark{
-        color: var(--brand-sport-insoliti-500);
-        font-weight: 900;
-        font-size: 8.3rem;
-        font-family: var(--font-family);
-        background-color: transparent;
-    }
-
-    #transition{
-        position: absolute;
-        top: -35%;
-        right: -20%;
-        left: auto;
-        transform-origin: right center;
-        z-index: 2;
-        width: 135vw;
-        height: 178vh;
-        pointer-events: none;
-    }
-
-    #Circle{
-        width: 130%;
-        height: 130%;
-        fill: var(--brand-sport-insoliti-500);
-
-    }
-
-    :global(.swiper) {
+    .swiper {
+        width: 400px;
+        height: 711px;
         perspective: 1000px;
         transform-style: preserve-3d;
         pointer-events: auto !important;
+        z-index: 5;
+    }
+
+    .swiper-slide {
+        position: relative;
+        border-radius: 20px;
+        overflow: hidden;
+        border: none !important;
+        outline: none !important;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+        background: var(--neutral-900);
+    }
+
+    .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
+        border-radius: 20px;
+        opacity: 0;
+        transition: opacity 0.3s ease, background-color 0.3s ease;
+        pointer-events: none;
+    }
+
+    .swiper-slide video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 16px;
+    }
+
+    .card-desc {
+        position: absolute;
+        bottom: 16px;
+        left: 16px;
+        right: 16px;
+        background: rgba(0, 0, 0, 0.7);
+        color: var(--neutral-50);
+        padding: 10px 16px;
+        border-radius: 10px;
+        font-family: var(--font-family-text);
+        font-size: 1.15rem;
+        font-weight: 300;
+        z-index: 5;
+        line-height: 1.3;
+    }
+
+    .swiper-pagination {
+        position: absolute;
+        bottom: -8% !important;
     }
 
     :global(.swiper-pagination-bullet) {
         pointer-events: auto !important;
+        transition: all 0.3s ease;
     }
 
+    :global(.swiper-pagination-bullet-active) {
+        background: var(--brand-cibo-500) !important;
+        width: 18px !important;
+        border-radius: 4px !important;
+    }
 
-   
+    /* Cinematic card overlay flyout grow element */
+    #cinematicCard {
+        position: absolute;
+        top: 15%;
+        left: 60%;
+        width: 400px;
+        height: 711px;
+        border-radius: 20px;
+        background-color: var(--brand-cibo-500);
+        pointer-events: none;
+        opacity: 0;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        transform-origin: center center;
+        z-index: 100;
+    }
 
-    </style>
+    /* Slide 6: Restored Svelte D3 vector line curling graph - Transparent BG to see expanded card underneath */
+    #d3ChartContainer {
+        z-index: 8;
+        background-color: transparent !important; /* Transparent background to show cinematic grow card */
+        opacity: 0;
+    }
+
+    #svgChartContainer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+    }
+
+    :global(.tick line) {
+        stroke: rgba(255, 255, 255, 0.15) !important;
+    }
+
+    :global(.curlingLine) {
+        fill: none;
+        stroke: var(--neutral-50) !important;
+        stroke-width: 14px;
+    }
+
+    :global(.curlingArea) {
+        fill: rgba(255, 255, 255, 0.15) !important;
+    }
+
+    #chartText {
+        position: absolute;
+        top: 30%;
+        left: 45%;
+        width: 40%;
+        z-index: 5;
+        pointer-events: none;
+    }
+
+    #chartParagraph {
+        font-size: 2.2rem;
+        color: var(--neutral-50) !important;
+        font-weight: 300;
+        font-family: var(--font-family-text);
+        line-height: 140%;
+    }
+</style>
