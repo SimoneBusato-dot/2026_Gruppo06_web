@@ -108,16 +108,18 @@
 
 
             <div bind:this={background} style="width: 100%; height: 100%;">
-                <svg id="background" width="100vw" height="100vh" viewBox="0 0 1512 977" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M0 0H1178L922.365 483.23C911.141 504.446 910.75 529.753 921.313 551.306L1077.5 870H0V0Z" fill="#DC3ECC"/>
+                <svg id="background" width="100vw" height="100vh" viewBox="0 0 1263 982" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M-249 0H1263L934.347 546.331C920.496 569.356 920.021 598.032 933.102 621.503L1134.01 982H-249V0Z" fill="#DC3ECC"/>
                 </svg>
+
 
             </div>
 
             <div bind:this={line} id="line-wrapper">
-                <svg id="lineasfondo" width="1103" height="100vh" viewBox="0 0  890" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M-89.533 563.584C-89.533 563.584 36.7279 -126.78 218.195 182.406C399.663 491.592 641.432 411.603 1039.91 34.1406" stroke="#EE84E3" stroke-width="181"/>
+                <svg id="lineasfondo" width="1103" height="100vh" viewBox="0 0 1103 580" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M-89.533 563.584C-89.533 563.584 36.7279 -126.78 218.195 182.406C399.663 491.592 641.432 411.603 1039.91 34.1406" stroke="#EE84E3" stroke-width="181"/>
                 </svg>
+
 
             </div>
 
