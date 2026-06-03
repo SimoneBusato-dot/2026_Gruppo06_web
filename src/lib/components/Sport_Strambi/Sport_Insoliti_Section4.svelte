@@ -3,6 +3,7 @@
     import {gsap} from 'gsap';
     import * as d3 from 'd3';
     import {ScrollTrigger} from 'gsap/ScrollTrigger';
+    import SplitType from 'split-type';
 
     gsap.registerPlugin(ScrollTrigger);
     let data = [];
@@ -36,7 +37,8 @@
 
             const lineGenerator = d3.line()
                 .x(d => xScale(xValue(d))).y(d => yScale(yValue(d))).curve(d3.curveBasis);
-            g.append('path').attr('d', lineGenerator(data)).attr('class', 'curlingLine');
+            const curlingLine = g.append('path').attr('d', lineGenerator(data)).attr('class', 'curlingLine');
+            curlingLine.attr('clip-path', 'url(#clip-area1)');
 
             const firstRecord = data[0];
             const lastRecord = data.at(-1);
@@ -50,14 +52,20 @@
 
         render(data);
 
-        let path = svgElement.querySelector('.curlingLine');
-        const length = path.getTotalLength();
+
+    
         let area = svgElement.querySelector('#clip-area1 rect');
 
+        let textSlitType = new SplitType(text, { types: 'lines', tagName: 'span' });
+        let textLines = textSlitType.lines;
+
         gsap.set('#firstCircle', { r: "120vw" });
-        gsap.set(path, { strokeDasharray: length, strokeDashoffset: length });
-        gsap.set(text, { opacity: 0, x: 300 });
+
+      
         gsap.set('#lastCircle', { r: 0 });
+        let textEnter = gsap.fromTo(textLines, { opacity: 0, x: 300 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out", stagger: 0.1, paused: true });
+        let textExit= gsap.fromTo(textLines, { opacity: 1, x: 0 }, { opacity: 0, x: -300, duration: 0.5, ease: "power2.out", stagger: 0.1, paused: true });
+        const drawArea = gsap.to(area, { width: width, ease: "power2.out", duration: 0.2, paused: true });
 
         const tl = gsap.timeline({
             scrollTrigger: {
@@ -72,13 +80,18 @@
                 onLeave: () => gsap.set(section, { autoAlpha: 0 }),
                 onEnterBack: () => gsap.set(section, { autoAlpha: 1 }),
                 onLeaveBack: () => gsap.set(section, { autoAlpha: 0 }),
+
+                onUpdate: (self) => {
+                    const progress = self.progress;
+                    if (progress >= 0.3) { textEnter.play(); } else { textEnter.reverse(); }
+                    if (progress >= 0.7) { textExit.play(); } else { textExit.reverse(); }
+                }
             }
         });
 
         tl.to('#firstCircle', { duration: 0.1, r: 1, ease: "power2.out" }, 0)
           .to(path, { strokeDashoffset: 0, ease: "none", duration: 0.2 }, 0.1)
           .to(area, { width: width, ease: "none", duration: 0.2 }, 0.1)
-          .to(text, { opacity: 1, x: 0, ease: "power2.out", duration: 0.3 }, 0.05)
           .to('#lastCircle', { r: 15, ease: "power2.out", duration: 0.2 }, 0.2)
           .to(path, { strokeDashoffset: -length, ease: "none", duration: 0.2 }, 0.5)
           .to('#firstCircle', { r: 0, ease: "power2.out", duration: 0.2 }, 0.5)
