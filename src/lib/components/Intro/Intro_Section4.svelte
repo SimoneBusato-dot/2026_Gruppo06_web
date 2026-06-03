@@ -7,6 +7,37 @@
 
 <main id="Intro4">
     <section id="first">
-        
+        <div id="content1">
+            <div id="svg1">
+                <svg width="766" height="624" viewBox="0 0 766 624" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M33.3964 12.7461C33.3964 12.7461 -14.1036 94.7461 123.896 175.746C261.896 256.746 760.397 221.746 736.397 400.246C712.397 578.746 796.897 604.246 963.397 596.246" stroke="#533EDC" stroke-width="51" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div id="video1">
+               
+            </div>
+            <div id="text1">
+                <p id="paragraph1">
+                    Un'Olimpiade iper-condivisa, in cui il racconto social si è rivelato estremamente <mark>DECENTRALIZZATO DALLO SPORT</mark>
+                </p>
+            </div>
+        </div>
+    </section>
+    <section id="second">
+        <div id="content2">
+            <div id="svg2">
+                <svg width="766" height="624" viewBox="0 0 766 624" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M33.3964 12.7461C33.3964 12.7461 -14.1036 94.7461 123.896 175.746C261.896 256.746 760.397 221.746 736.397 400.246C712.397 578.746 796.897 604.246 963.397 596.246" stroke="#533EDC" stroke-width="51" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div id="video2">
+               
+            </div>
+            <div id="text2">
+                <p id="paragraph2">
+                    Persino chi non segue queste discipline si è sentito chiamato in causa a <mark>RECENSIRE QUESTO EVENTO</mark>
+                </p>
+            </div>
+        </div>
     </section>
 </main>
