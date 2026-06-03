@@ -116,9 +116,11 @@
             </div>
 
             <div bind:this={line} id="line-wrapper">
-                <svg id="lineasfondo" width="1103" height="100vh" viewBox="0 0 1103 580" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M-89.533 563.584C-89.533 563.584 36.7279 -126.78 218.195 182.406C399.663 491.592 641.432 411.603 1039.91 34.1406" stroke="#EE84E3" stroke-width="181"/>
+                <svg id="lineasfondo" width="1103" height="580" viewBox="0 0 1103 580" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M-89.533 563.584C-89.533 563.584 36.7279 -126.78 218.195 182.406C399.663 491.592 641.432 411.603 1039.91 34.1406" stroke="#EE84E3" stroke-width="181"/>
                 </svg>
+
+
 
 
             </div>
@@ -176,12 +178,12 @@
 
     #line-wrapper {
         position: absolute;
-        top: 0;
+        top: -5%;
         left: 7%;
         width: 100%;
         height: 100%;
         /* Spostiamo la linea un po' più avanti o indietro */
-        transform: translateZ(50px);
+        transform: translateZ(50px) ;
     }
     #title {
         position: absolute;
