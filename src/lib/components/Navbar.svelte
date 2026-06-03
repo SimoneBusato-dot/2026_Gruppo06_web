@@ -18,6 +18,12 @@
         document.body.style.overflow = '';
     }
 
+    function handleOverlayClick() {
+        if (!isOpen) {
+            toggleMenu();
+        }
+    }
+
     // Close menu on navigation
     $effect(() => {
         const path = $page.url.pathname;
@@ -55,7 +61,14 @@
 
 <!-- Morphing Menu Overlay Container (Single Unified Shape) -->
 <!-- Starts as the small hamburger capsule in closed state, expands to slanted overlay in open state -->
-<div class="menu-overlay" class:open={isOpen}>
+<div 
+    class="menu-overlay" 
+    class:open={isOpen} 
+    onclick={handleOverlayClick}
+    role="button"
+    tabindex={isOpen ? -1 : 0}
+    onkeydown={(e) => { if (!isOpen && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggleMenu(); } }}
+>
     <!-- Menu Navigation Links (hidden in closed state, staggered fade-in in open state) -->
     <nav class="menu-links">
         <div class="links-container">
@@ -270,6 +283,8 @@
         padding-top: calc(15vh + 35px); /* Shifted higher to prevent bottom diagonal clipping */
         box-sizing: border-box;
         pointer-events: auto;
+        cursor: pointer; /* Enable pointer when closed */
+        outline: none;
     }
 
     /* Open State of Overlay */
@@ -279,6 +294,7 @@
         border-bottom-left-radius: 28px; /* Rounded corner is identical in open state as requested */
         --skew-y: -4deg; /* Slices the bottom edge on a unified angle */
         --unskew-y: 4deg;
+        cursor: default; /* Reset pointer cursor when open */
     }
 
     /* Links container rules */

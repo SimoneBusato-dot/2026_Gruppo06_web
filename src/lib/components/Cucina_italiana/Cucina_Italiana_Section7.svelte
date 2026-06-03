@@ -57,6 +57,12 @@
                 scrub: 1,
                 pin: true,
                 pinSpacing: true, // Enables full scroll spacing for gliding horizontal comments
+                snap: {
+                    snapTo: [0, 1],
+                    duration: { min: 0.2, max: 0.5 },
+                    delay: 0.1,
+                    ease: "power1.inOut"
+                },
                 onEnter: () => {
                     gsap.set(videoScroll, { x: "100vw" });
                 },

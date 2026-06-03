@@ -266,7 +266,9 @@
         gsap.set(chartContainer, { xPercent: 100, opacity: 0 });
         gsap.set('.gallery-col', { y: 0 });
         gsap.set('#intermediateWrapper .para, .gusto-dharma', { opacity: 0, x: 100 });
-        gsap.set(pastaTitle, { xPercent: 100, opacity: 0 });
+        gsap.set(pastaTitle, { xPercent: 0, opacity: 1 });
+        const pastaTitleChars = pastaTitle.querySelectorAll('.char');
+        gsap.set(pastaTitleChars, { x: -1000, skewX: -30, opacity: 0 });
         gsap.set(textLeft, { xPercent: 0, opacity: 1 });
         gsap.set(cardContainer, { scale: 1.0, opacity: 1, y: 0 });
         gsap.set(cinematicCard, { scale: 1.0, opacity: 0, rotate: 0, borderRadius: 20, zIndex: 100 });
@@ -283,6 +285,12 @@
                 scrub: 1,
                 pin: true,
                 pinSpacing: true,
+                snap: {
+                    snapTo: [0, 2 / 17.65, 7 / 17.65, 10.2 / 17.65, 12 / 17.65, 15.4 / 17.65, 1],
+                    duration: { min: 0.2, max: 0.6 },
+                    delay: 0.15,
+                    ease: "power2.inOut"
+                },
                 onEnter: () => gsap.set(section, { autoAlpha: 1 }),
                 onLeave: () => gsap.set(section, { autoAlpha: 0 }),
                 onEnterBack: () => gsap.set(section, { autoAlpha: 1 }),
@@ -316,11 +324,13 @@
           .to('#intermediateWrapper .para, .gusto-dharma', { opacity: 1, x: 0, stagger: 0.15, duration: 1.2, ease: "power2.out" }, 8.7)
 
           // 6. PHASE 6: Transition to Slide 4 - PASTA OLIMPICA push (Slides right-to-left)
+          .set(intermediateContainer, { zIndex: 10 }, 10.2)
+          .to(pastaContainer, { xPercent: 0, duration: 0.1 }, 10.2)
           .to(intermediateContainer, { xPercent: -100, duration: 1.5, ease: "power2.inOut" }, 10.2)
-          .to(pastaContainer, { xPercent: 0, duration: 1.5, ease: "power2.inOut" }, 10.2)
-          .to(pastaTitle, { xPercent: 0, opacity: 1, duration: 1.5, ease: "power2.out" }, 10.2)
+          .to(pastaTitleChars, { x: 0, skewX: 0, opacity: 1, stagger: 0.08, duration: 1.4, ease: "power3.out" }, 10.3)
 
           // 7. PHASE 7: Transition to Slide 5 - Figma Cards Deck (left texts, right Swiper slider)
+          .set(intermediateContainer, { zIndex: 5 }, 12.0)
           .to(pastaContainer, { xPercent: -100, duration: 1.5, ease: "power2.inOut" }, 12.0)
           .to(swiperDeckContainer, { xPercent: 0, duration: 1.5, ease: "power2.inOut" }, 12.0)
 
@@ -447,7 +457,19 @@
             </svg>
         </div>
 
-        <h1 id="pastaTitle" bind:this={pastaTitle}>PASTA <br> OLIMPICA</h1>
+        <h1 id="pastaTitle" bind:this={pastaTitle}>
+            <span class="pasta-line">
+                {#each "PASTA".split("") as char}
+                    <span class="char">{char}</span>
+                {/each}
+            </span>
+            <br>
+            <span class="pasta-line">
+                {#each "OLIMPICA".split("") as char}
+                    <span class="char">{char}</span>
+                {/each}
+            </span>
+        </h1>
     </div>
 
     <!-- ========================================================== -->
@@ -625,7 +647,6 @@
     #videoGalleryContainer {
         z-index: 4;
         background-color: var(--brand-cibo-500);
-        box-shadow: -15px 0 35px rgba(0,0,0,0.25);
     }
 
     .gallery-wrapper {
@@ -675,7 +696,6 @@
     #intermediateTextsContainer {
         z-index: 5;
         background-color: var(--neutral-50);
-        box-shadow: -15px 0 35px rgba(0,0,0,0.25);
         justify-content: center;
     }
 
@@ -733,8 +753,17 @@
     #pastaOlimpicaContainer {
         z-index: 6;
         background-color: var(--neutral-50);
-        box-shadow: -15px 0 35px rgba(0,0,0,0.25);
         justify-content: center;
+    }
+
+    .char {
+        display: inline-block;
+        transform-origin: center bottom;
+        will-change: transform, opacity;
+    }
+
+    .pasta-line {
+        display: inline-block;
     }
 
     #pastaTitle {
@@ -753,7 +782,6 @@
     #swiperDeckContainer {
         z-index: 7;
         background-color: var(--neutral-50);
-        box-shadow: -15px 0 35px rgba(0,0,0,0.25);
     }
 
     #deckWrapper {
