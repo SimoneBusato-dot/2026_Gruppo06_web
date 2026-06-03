@@ -286,10 +286,50 @@
                 pin: true,
                 pinSpacing: true,
                 snap: {
-                    snapTo: [0, 2 / 17.65, 7 / 17.65, 10.2 / 17.65, 12 / 17.65, 15.4 / 17.65, 1],
-                    duration: { min: 0.2, max: 0.6 },
-                    delay: 0.15,
-                    ease: "power2.inOut"
+                    snapTo: (value) => {
+                        const points = [
+                            0,
+                            2.0 / 17.65,
+                            3.5 / 17.65,
+                            7.0 / 17.65,
+                            8.5 / 17.65,
+                            10.2 / 17.65,
+                            12.0 / 17.65,
+                            13.8 / 17.65,
+                            15.4 / 17.65,
+                            1
+                        ];
+
+                        // Free scroll ranges:
+                        // 1. Vertical video gallery: from 3.5 to 7.0 timeline progress
+                        const galleryStart = 3.5 / 17.65;
+                        const galleryEnd = 7.0 / 17.65;
+                        if (value > galleryStart && value < galleryEnd) {
+                            return value; // Return current position (no snap)
+                        }
+
+                        // 2. D3 chart drawing animation: from 15.4 to 17.0 timeline progress
+                        const chartStart = 15.4 / 17.65;
+                        const chartEnd = 17.0 / 17.65;
+                        if (value > chartStart && value < chartEnd) {
+                            return value; // Return current position (no snap)
+                        }
+
+                        // Otherwise snap to closest point
+                        let closest = points[0];
+                        let minDiff = Math.abs(value - closest);
+                        for (let i = 1; i < points.length; i++) {
+                            let diff = Math.abs(value - points[i]);
+                            if (diff < minDiff) {
+                                minDiff = diff;
+                                closest = points[i];
+                            }
+                        }
+                        return closest;
+                    },
+                    duration: { min: 0.4, max: 0.8 },
+                    delay: 0.25,
+                    ease: "power2.out"
                 },
                 onEnter: () => gsap.set(section, { autoAlpha: 1 }),
                 onLeave: () => gsap.set(section, { autoAlpha: 0 }),

@@ -69,12 +69,6 @@
                 pin: true,  
                 refreshPriority: 1,
                 pinSpacing: false,
-                snap: {
-                    snapTo: [0, 1],
-                    duration: { min: 0.2, max: 0.5 },
-                    delay: 0.1,
-                    ease: "power1.inOut"
-                },
                 onLeave: () => gsap.set(hero, { autoAlpha: 0 }),
                 onEnterBack: () => gsap.set(hero, { autoAlpha: 1 }),
             }
