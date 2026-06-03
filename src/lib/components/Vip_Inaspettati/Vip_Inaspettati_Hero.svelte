@@ -108,7 +108,7 @@
 
 
             <div bind:this={background} style="width: 100%; height: 100%;">
-                <svg id="background" width="100vw" height="100vh" viewBox="0 0 1512 977" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg id="background" width="100vw" height="100vh"  preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M0 0H1178L922.365 483.23C911.141 504.446 910.75 529.753 921.313 551.306L1077.5 870H0V0Z" fill="#DC3ECC"/>
                 </svg>
 
@@ -170,6 +170,13 @@
         z-index: 1;
         transform-origin: 90% 90%;
         perspective: 1000px;
+    }
+
+    #background {
+        width: 100%;
+        height: 100%;
+        /* Spostiamo lo sfondo un po' più indietro per creare profondità */
+
     }
 
     #line-wrapper {
