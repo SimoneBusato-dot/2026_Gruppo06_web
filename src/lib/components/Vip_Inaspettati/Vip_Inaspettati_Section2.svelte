@@ -52,11 +52,21 @@
         );
 
         const p1Exit = gsap.to(p1Lines, {
-            x: -200,
+            x: -500,
             opacity: 0,
             stagger: 0.1,
             paused: true,
-            duration: 0.8,
+            duration: 1,
+            overwrite: "auto",
+            ease: "power2.inOut",
+        });
+
+        const p2Exit = gsap.to(p2Lines, {
+            x: -500,
+            opacity: 0,
+            stagger: 0.1,
+            paused: true,
+            duration: 1,
             overwrite: "auto",
             ease: "power2.inOut",
         });
@@ -64,7 +74,7 @@
         const transitionEnter = gsap.fromTo(
             transitionElement,
             { scaleX: 0 },
-            { scaleX: 1, duration: 0.5, paused: true, overwrite: "auto", ease: "power2.out" }
+            { scaleX: 1, duration: 1.2, paused: true, overwrite: "auto", ease: "power2.out" }
         );
 
         const tl = gsap.timeline({
@@ -72,37 +82,51 @@
                 trigger: section,
                 scroller: window,
                 start: "top top",
-                end: "+=101%",
+                end: "+=150%",
                 scrub: 1,
                 pin: true,
                 pinSpacing: false,
+                markers: true,
                 onEnter: () => gsap.set(section, { autoAlpha: 1 }),
                 onLeave: () => gsap.set(section, { autoAlpha: 0 }),
                 onEnterBack: () => gsap.set(section, { autoAlpha: 1 }),
                 onLeaveBack: () => gsap.set(section, { autoAlpha: 0 }),
                 onUpdate(self) {
-                    if (self.progress >= 0.2) {
-                        p1Enter.play();
-                    } else {
-                        p1Enter.reverse();
-                    }
-                    if (self.progress >= 0.5) {
-                        p2Enter.play();
-                        p1Exit.play();
-                    } else {
-                        p2Enter.reverse();
-                        p1Exit.reverse();
-                    }
-                    if (self.progress >= 0.91) {
-                        transitionEnter.play();
-                    } else {
-                        transitionEnter.reverse();
-                    }
+    if (self.progress >= 0.1) {
+        p1Enter.play();
+    } else {
+        p1Enter.reverse();
+    }
+
+    if (self.progress >= 0.5) {
+        p1Exit.play();
+    } else {
+        p1Exit.reverse();
+    }
+
+    if (self.progress >= 0.55) {
+        p2Enter.play();
+    } else {
+        p2Enter.reverse();
+    }
+
+    if (self.progress >= 0.78) {
+        p2Exit.play();
+    } else {
+        p2Exit.reverse();
+    }
+
+    if (self.progress >= 0.86) {
+        transitionEnter.play();
+    } else {
+        transitionEnter.reverse();
+    }
                 },
             },
         });
 
         tl.to(path, { strokeDashoffset: 0, ease: "none", duration: 1 }, 0);
+        
 
         window.addEventListener("mousemove", moveElements);
 
@@ -225,7 +249,8 @@
         font-size: clamp(4rem, 9vw, 9rem);
         font-family: var(--font-family);
         background-color: transparent;
-        display: block;
+        display: inline;
+        white-space: nowrap;
         line-height: 0.85;
     }
 
