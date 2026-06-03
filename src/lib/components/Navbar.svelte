@@ -172,7 +172,7 @@
         left: -20px; /* Extend past screen edge to hide skew seam */
         width: calc(100% + 20px);
         height: 100%;
-        background-color: var(--neutral-900);
+        background-color: var(--neutral-800);
         border-bottom-right-radius: 28px;
         z-index: -1;
         transform: skewX(-10deg);

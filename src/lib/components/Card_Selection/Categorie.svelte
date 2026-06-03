@@ -271,6 +271,7 @@
         font-size: clamp(2.5rem, 6vw, 7.5rem);
         font-weight: 800;
         margin: 0;
+        color: var(--neutral-800);
     }
 
     #description {

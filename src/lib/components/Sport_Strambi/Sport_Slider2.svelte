@@ -86,7 +86,7 @@
         transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
         will-change: transform;
         /* altezza fluida invece di 750px fissi */
-        height: clamp(600px, 65vh, 750px);
+        height: clamp(650px, 65vh, 750px);
     }
 
     .slider-slide {

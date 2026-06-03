@@ -18,7 +18,8 @@
 
         gsap.set(path, { strokeDasharray: length, strokeDashoffset: length })
         gsap.set(path2, { strokeDasharray: length2, strokeDashoffset: length2 })
-        gsap.set(textLines, { opacity: 0, x: 200 })
+       const textEnter = gsap.fromTo(textLines, { opacity: 0, x: 300 }, { opacity: 1, x: 0, duration: 0.7, ease: "power2.out", stagger: 0.1, paused: true });
+       const textExit = gsap.fromTo(textLines, { opacity: 1, x: 0 }, { opacity: 0, x: -300, duration: 0.7, ease: "power2.in", stagger: 0.05, paused: true });
 
         let tl = gsap.timeline({
             scrollTrigger: {
@@ -33,13 +34,15 @@
                 onLeave: () => gsap.set(section, { autoAlpha: 0 }),
                 onEnterBack: () => gsap.set(section, { autoAlpha: 1 }),
                 onLeaveBack: () => gsap.set(section, { autoAlpha: 0 }),
+                onUpdate: (self) => {
+                    if (self.progress >= 0.1) { textEnter.play(); } else { textEnter.reverse(); }
+                    if (self.progress >= 0.7) { textExit.play(); } else { textExit.reverse(); }
+                }
             }
         })
 
         tl.to(path, { strokeDashoffset: -length, duration: 5, ease: "power2.out" })
           .to(path2, { strokeDashoffset: -length2, duration: 5, ease: "power2.out" }, "<")
-          .to(textLines, { opacity: 1, x: 0, stagger: 0.1, ease: "power2.out", duration: 1 }, 0)
-          .to(textLines, { opacity: 0, x: -200, stagger: 0.05, ease: "power2.in", duration: 0.8 }, 4)
 
         return () => { ScrollTrigger.getAll().forEach(t => t.kill()) }
     })
@@ -101,7 +104,7 @@
         font-family: var(--font-family-text);
         color: var(--neutral-900);
         /* da 3.125rem fisso a clamp: min 1.5rem, ideale 3.2vw, max 3.125rem */
-        font-size: clamp(1.5rem, 3.2vw, 3.125rem);
+        font-size: clamp(1rem, 3.2vw, 1.5rem);
         font-style: normal;
         font-weight: 400;
         line-height: 110%;
