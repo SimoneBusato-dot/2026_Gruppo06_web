@@ -26,7 +26,6 @@ import { onNavigate } from '$app/navigation';
 </svelte:head>
 
 <Navbar />
-<div class="transition-separator"></div>
 
 {@render children()}
 
