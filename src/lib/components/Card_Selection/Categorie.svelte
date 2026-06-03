@@ -6,34 +6,27 @@
 
     gsap.registerPlugin(MotionPathPlugin, Draggable, InertiaPlugin);
 
-    let container = $state(null);
-    let path      = $state(null);
+    let container  = $state(null);
+    let path       = $state(null);
+    let textBlock  = $state(null);
+    let carouselWrap = $state(null);
 
     let currentIndex = $state(0);
     const TOTAL = 4;
 
-    // Offset globale sul path (0..1), analogo alla "rotazione" di Osmo
-    // Ogni card i ha baseOffset = i / TOTAL, e si muove di `globalOffset` in più
     let globalOffset = 0;
-
-    // Tween paused per ogni slide
     let tweens = [];
 
-    // ── Helpers ──────────────────────────────────────────────────────────────
-
-    // Progresso sul path della card i, dato l'offset globale corrente
     function cardProgress(i) {
         return ((globalOffset + i / TOTAL) % 1 + 1) % 1;
     }
 
-    // Quanto è "frontale" la card (0 = bordo, 1 = cima del semicerchio, cioè progress ≈ 0.5)
     function frontness(i) {
         const pos  = cardProgress(i);
         const dist = Math.abs(pos - 0.5);
         return 1 - Math.min(dist, 1 - dist) / 0.5;
     }
 
-    // Indice della card più vicina al centro (progress 0.5)
     function nearestIndex() {
         let best = 0, bestF = -Infinity;
         for (let i = 0; i < TOTAL; i++) {
@@ -43,41 +36,30 @@
         return best;
     }
 
-    // Aggiorna position + scala + zIndex di tutte le card
     function updateCards() {
         tweens.forEach((tw, i) => {
-            const pos = cardProgress(i);
+            const pos   = cardProgress(i);
             tw.progress(pos);
-
-            // Profondità: cima del path (pos≈0.5) = grande e davanti
-            const depth  = 1 - Math.abs(pos - 0.5) * 2;   // 0..1
-            const scale  = 0.6 + depth * 0.55;              // 0.6..1.15
+            const depth  = 1 - Math.abs(pos - 0.5) * 2;
+            const scale  = 0.6 + depth * 0.55;
             const zIndex = Math.round(depth * 100);
-
             gsap.set(tw.targets()[0], { scale, zIndex, transformOrigin: '50% 50%' });
         });
         currentIndex = nearestIndex();
     }
 
-    // Snap alla card più vicina al centro
     function snapToNearest() {
-        const idx     = nearestIndex();
-        const pos     = cardProgress(idx);
-        // Quanto devo spostare globalOffset per portare la card idx a progress 0.5?
-        let delta = 0.5 - pos;
+        const idx   = nearestIndex();
+        const pos   = cardProgress(idx);
+        let delta   = 0.5 - pos;
         if (delta > 0.5)  delta -= 1;
         if (delta < -0.5) delta += 1;
-
         const startOffset = globalOffset;
         const target      = globalOffset + delta;
-
         gsap.to({ v: 0 }, {
-            v: 1,
-            duration: 0.55,
-            ease: 'power3.out',
+            v: 1, duration: 0.55, ease: 'power3.out',
             onUpdate() {
-                const t = this.targets()[0].v;
-                globalOffset = startOffset + delta * t;
+                globalOffset = startOffset + delta * this.targets()[0].v;
                 updateCards();
             },
             onComplete() {
@@ -87,105 +69,103 @@
         });
     }
 
-    // ── Init ─────────────────────────────────────────────────────────────────
+    // Scala l'intero carousel wrapper per adattarsi allo spazio disponibile
+    function scaleCarousel() {
+        if (!carouselWrap || !textBlock) return;
+
+        const textH     = textBlock.offsetHeight;
+        const totalH    = window.innerHeight;
+        const totalW    = window.innerWidth;
+
+        // Spazio verticale disponibile sotto il testo (con buffer)
+        const availableH = totalH - textH - 16;
+
+        // Il carousel al 100% è disegnato per 1512×(1512/2) = 1512×756
+        // (il path SVG ha aspect ratio 2027:1014 ≈ 2:1, e occupa tutta la larghezza)
+        const baseW = 1512;
+        const baseH = 756; // altezza del carousel alla larghezza base
+
+        const scaleByW = totalW  / baseW;
+        const scaleByH = availableH / baseH;
+        const scale    = Math.min(scaleByW, scaleByH, 1); // mai più grande del 100%
+
+        carouselWrap.style.transform       = `scale(${scale})`;
+        carouselWrap.style.transformOrigin = 'top center';
+        // Compensiamo lo spazio sottratto dallo scale per non lasciare vuoto
+        carouselWrap.style.marginBottom    = `${-(baseH * (1 - scale))}px`;
+    }
+
     onMount(() => {
-        const slides = gsap.utils.toArray('.slider__slide');
+        const slides       = gsap.utils.toArray('.slider__slide');
         const customCursor = document.querySelector('.cursor');
-        const cursorElements = [ '#left', '#center', '#right' ];
+        const cursorElements = ['#left', '#center', '#right'];
 
         if (!path || slides.length === 0) return;
 
-        // ── Gestione Cursore Personalizzato ───────────────────────────────
-        gsap.set(customCursor, { xPercent: -50, yPercent: -50 });
-        let xTo = gsap.quickTo(customCursor, "x", { duration: 0.4, ease: "power3" });
-        let yTo = gsap.quickTo(customCursor, "y", { duration: 0.4, ease: "power3" });
+        scaleCarousel();
+        window.addEventListener('resize', scaleCarousel);
 
-        const moveCursor = (e) => {
-            xTo(e.clientX);
-            yTo(e.clientY);
-        };
+        // Cursore
+        gsap.set(customCursor, { xPercent: -50, yPercent: -50 });
+        const xTo = gsap.quickTo(customCursor, "x", { duration: 0.4, ease: "power3" });
+        const yTo = gsap.quickTo(customCursor, "y", { duration: 0.4, ease: "power3" });
+        const moveCursor = (e) => { xTo(e.clientX); yTo(e.clientY); };
         window.addEventListener("mousemove", moveCursor);
 
-        // Timeline per l'animazione degli elementi del cursore (Stagger + Rimbalzo)
         const cursorTl = gsap.timeline({ paused: true });
-        cursorTl.to(customCursor, {
-            opacity: 1,
-            duration: 0.2
-        }).to(cursorElements, {
-            opacity: 1,
-            scale: 1,
-            duration: 0.4,
-            ease: "back.out(1.7)",
-            stagger: 0.08
-        }, "-=0.1");
+        cursorTl
+            .to(customCursor, { opacity: 1, duration: 0.2 })
+            .to(cursorElements, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.7)", stagger: 0.08 }, "-=0.1");
 
-        // Eventi sul container per mostrare/nascondere il cursore
         if (container) {
             container.addEventListener("mouseenter", () => cursorTl.play());
             container.addEventListener("mouseleave", () => cursorTl.reverse());
         }
 
-        // ── Creazione MotionPath per le Card ──────────────────────────────
-        tweens = slides.map((slide, i) => {
+        // MotionPath
+        tweens = slides.map((slide) => {
             return gsap.to(slide, {
                 motionPath: {
                     path,
                     align:       path,
                     alignOrigin: [0.5, 0.5],
-                    autoRotate:  false,   // ← card sempre dritte
-                    start:       0,
-                    end:         1,
+                    autoRotate:  false,
+                    start: 0,
+                    end:   1,
                 },
-                ease:     'none',
-                duration: 1,
-                paused:   true,
+                ease: 'none', duration: 1, paused: true,
             });
         });
 
-        // Posizione iniziale: card 0 al centro del path (progress 0.5)
-        globalOffset = 0.5 - 0 / TOTAL;   // porta card 0 a progress 0.5
+        globalOffset = 0.5 - 0 / TOTAL;
         updateCards();
 
-        // ── Draggable con InertiaPlugin ───────────────────────────────────
+        // Draggable
         const proxy = document.createElement('div');
-
         Draggable.create(proxy, {
-            type:    'x',
-            trigger: container,
-            inertia: true,
-
-            onDragStart() {
-                // Ferma eventuali snap in corso
-                gsap.killTweensOf({ v: 0 });
-            },
-
+            type: 'x', trigger: container, inertia: true,
+            onDragStart() { gsap.killTweensOf({ v: 0 }); },
             onDrag() {
                 const w     = container.offsetWidth || window.innerWidth;
-                const delta = this.deltaX / w * 0.6;  // 0.6 = sensibilità
+                const delta = this.deltaX / w * 0.6;
                 globalOffset = (globalOffset - delta % 1 + 1) % 1;
                 updateCards();
             },
-
             onThrowUpdate() {
                 const w     = container.offsetWidth || window.innerWidth;
                 const delta = this.deltaX / w * 0.6;
                 globalOffset = (globalOffset - delta % 1 + 1) % 1;
                 updateCards();
             },
-
-            onThrowComplete() {
-                snapToNearest();
-            },
-
-            onDragEnd() {
-                if (!this.isThrowing) snapToNearest();
-            }
+            onThrowComplete() { snapToNearest(); },
+            onDragEnd() { if (!this.isThrowing) snapToNearest(); }
         });
 
         return () => {
             tweens.forEach(tw => tw.kill());
             cursorTl.kill();
             window.removeEventListener("mousemove", moveCursor);
+            window.removeEventListener('resize', scaleCarousel);
         };
     });
 
@@ -196,9 +176,7 @@
         if (delta < -0.5) delta += 1;
         const start = globalOffset;
         gsap.to({ v: 0 }, {
-            v: 1,
-            duration: 0.55,
-            ease: 'power3.out',
+            v: 1, duration: 0.55, ease: 'power3.out',
             onUpdate() {
                 globalOffset = start + delta * this.targets()[0].v;
                 updateCards();
@@ -207,12 +185,11 @@
     }
 
     const variants = ['blue', 'yellow', 'red', 'purple'];
-    
 </script>
 
 <main id="Selezione-Categorie">
 
-    <div id="text">
+    <div id="text" bind:this={textBlock}>
         <h1 id="title">scegli un trend</h1>
         <p id="description">
             Dai un'occhiata alle categorie qui sotto e inizia da quella
@@ -220,32 +197,36 @@
         </p>
     </div>
 
-    <div id="carousel-container" bind:this={container}>
-        <div id="carousel">
+    <!--
+        carouselWrap è il layer che viene scalato via JS.
+        container è il trigger per Draggable — resta a dimensione piena
+        così il drag funziona su tutto lo schermo.
+    -->
+    <div id="carousel-outer" bind:this={container}>
+        <div id="carousel-wrap" bind:this={carouselWrap}>
+            <div id="carousel">
+                <svg
+                    viewBox="0 0 2027 1014"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                >
+                    <path
+                        bind:this={path}
+                        id="circle"
+                        d="M2014 1013.5C2014 460.939 1566.06 13 1013.5 13C460.939 13 13 460.939 13 1013.5"
+                        stroke="#A8A8A8"
+                        stroke-width="26"
+                        stroke-dasharray="8 12"
+                    />
+                </svg>
 
-            <svg
-                width="2027" height="1014"
-                viewBox="0 0 2027 1014"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
-            >
-                <path
-                    bind:this={path}
-                    id="circle"
-                    d="M2014 1013.5C2014 460.939 1566.06 13 1013.5 13C460.939 13 13 460.939 13 1013.5"
-                    stroke="#A8A8A8"
-                    stroke-width="26"
-                    stroke-dasharray="8 12"
-                />
-            </svg>
-
-            {#each variants as variant, i}
-                <div class="slider__slide">
-                    <Cards {variant} />
-                </div>
-            {/each}
-
+                {#each variants as variant}
+                    <div class="slider__slide">
+                        <Cards {variant} />
+                    </div>
+                {/each}
+            </div>
         </div>
     </div>
 
@@ -262,53 +243,69 @@
 
     #Selezione-Categorie {
         width: 100vw;
-        height: 140vh;
+        height: 100vh;
         overflow: hidden;
         display: flex;
         flex-direction: column;
         background-color: var(--neutral-50);
     }
 
-    /* ── Testo ── */
+    /* Testo: non si schiaccia mai, sta sempre sopra */
     #text {
         width: 100%;
         display: flex;
         flex-direction: column;
         text-align: center;
         align-items: center;
-        padding-top: 4rem;
-        gap: 20px;
+        padding-top: clamp(1.5rem, 3vh, 4rem);
+        padding-bottom: 1rem;
+        gap: clamp(8px, 1.2vh, 20px);
         flex-shrink: 0;
+        position: relative;
+        z-index: 10;
     }
 
     #title {
         font-family: var(--font-family);
         text-transform: uppercase;
-        font-size: clamp(3rem, 7.5vw, 7.5rem);
+        font-size: clamp(2.5rem, 6vw, 7.5rem);
         font-weight: 800;
         margin: 0;
     }
 
     #description {
         font-family: var(--font-family-text);
-        font-size: clamp(1rem, 2.2vw, 2.1875rem);
+        font-size: clamp(0.95rem, 1.5vw, 2.1875rem);
         font-weight: 300;
         line-height: 110%;
-        max-width: 55.875rem;
+        max-width: clamp(320px, 55vw, 55.875rem);
         text-align: center;
         margin: 0;
     }
 
-    /* ── Carousel ── */
-    #carousel-container {
-        position: relative;
+    /* Outer: occupa tutto lo spazio restante, è il trigger del drag */
+    #carousel-outer {
         flex: 1;
+        min-height: 0;
+        position: relative;
         cursor: grab;
         touch-action: none;
+        /* NO overflow hidden — le card non vengono tagliate */
     }
 
-    #carousel-container:active {
-        cursor: grabbing;
+    #carousel-outer:active { cursor: grabbing; }
+
+    /* Wrap: questo viene scalato da JS — dimensioni fisse uguali al design originale */
+    #carousel-wrap {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        /* altezza fissa: il carousel non scala il contenuto, scala se stesso */
+        height: 756px;
+        transform-origin: top center;
+        /* la transizione rende lo scale fluido al resize */
+        transition: transform 0.2s ease;
     }
 
     #carousel {
@@ -319,15 +316,14 @@
     svg {
         position: absolute;
         left: 50%;
-        bottom: -35%;          /* ← questo è il valore da aggiustare */
+        bottom: -45%;
         transform: translateX(-50%);
         width: 100%;
         height: auto;
         pointer-events: none;
-        opacity: 0.5; /* visibile ma sottile */
+        opacity: 0.5;
     }
 
-    /* Le card vengono posizionate da GSAP — devono essere absolute */
     .slider__slide {
         position: absolute;
         top: 0;
@@ -335,26 +331,20 @@
         will-change: transform;
     }
 
-    /* ── Cursore Personalizzato Aggiornato ── */
     .cursor {
         position: fixed;
-        top: 0;
-        left: 0;
+        top: 0; left: 0;
         z-index: 1000;
-        pointer-events: none; /* Non blocca i click e i drag sul carousel */
+        pointer-events: none;
         display: flex;
         flex-direction: row;
         justify-content: center;
         align-items: center;
         gap: 10px;
-        opacity: 0; /* Nasconde l'intero cursore all'inizio */
+        opacity: 0;
     }
 
-    /* Stato di base degli elementi interni prima dell'ingresso */
-    #left, #center, #right {
-        opacity: 0;
-        transform: scale(0);
-    }
+    #left, #center, #right { opacity: 0; transform: scale(0); }
 
     #left, #right {
         width: 8px;
@@ -362,13 +352,11 @@
         border-radius: 2px;
         background-color: var(--neutral-900);
     }
-   
+
     #center {
-        width: fit-content;
-        height: fit-content;
         padding: 16px 8px;
         font-family: var(--font-family);
-        font-size: 2rem;
+        font-size: clamp(1rem, 1.5vw, 2rem);
         color: var(--neutral-50);
         text-transform: uppercase;
         background-color: var(--neutral-900);
