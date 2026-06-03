@@ -262,7 +262,7 @@
 
     #Selezione-Categorie {
         width: 100vw;
-        height: 120vh;
+        height: 140vh;
         overflow: hidden;
         display: flex;
         flex-direction: column;

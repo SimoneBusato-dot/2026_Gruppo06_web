@@ -138,7 +138,7 @@
                 onLeaveBack: () => gsap.set(section, { autoAlpha: 0}),
 
                 onUpdate(self){
-                    if(self.progress >= 0.1){
+                    if(self.progress >= 0.2){
                         p1Enter.play()
                         sliderEnter.play()
                     } else{
@@ -236,7 +236,7 @@
 
     #svgContainer{
         position: absolute;
-        top: -10%;
+        top: -20%;
         right: -10%;
         width: 100%;
         height: 100%;
@@ -266,13 +266,14 @@
     #text{
         position: relative;
         color: var(--neutral-900);
-        font-size: 2rem;
-        width: 600px;
+        font-size: 1.5rem;
+        width: 500px;
         font-family: var(--font-family-text);
         display: flex;
         flex-direction: column;
         gap: 3rem;
         pointer-events: none;
+        font-weight: 400;
 
     }
 
