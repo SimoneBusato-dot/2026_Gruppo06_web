@@ -69,6 +69,17 @@
                 pin: true,  
                 refreshPriority: 1,
                 pinSpacing: false,
+                snap: {
+                    snapTo: (value) => {
+                        const threshold = 0.15;
+                        if (value < threshold) return 0;
+                        if (value > 1 - threshold) return 1;
+                        return value;
+                    },
+                    duration: { min: 0.3, max: 0.7 },
+                    delay: 0.2,
+                    ease: "power2.out"
+                },
                 onLeave: () => gsap.set(hero, { autoAlpha: 0 }),
                 onEnterBack: () => gsap.set(hero, { autoAlpha: 1 }),
             }

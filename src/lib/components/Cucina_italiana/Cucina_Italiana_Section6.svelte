@@ -36,7 +36,18 @@
                 end: "+=100%", // Fast snappy scroll speed to unpin quickly
                 scrub: 1,
                 pin: true,
-                pinSpacing: true
+                pinSpacing: true,
+                snap: {
+                    snapTo: (value) => {
+                        const threshold = 0.25;
+                        if (value < threshold) return 0;
+                        if (value > 1 - threshold) return 1;
+                        return value;
+                    },
+                    duration: { min: 0.3, max: 0.7 },
+                    delay: 0.2,
+                    ease: "power2.out"
+                }
             }
         });
 

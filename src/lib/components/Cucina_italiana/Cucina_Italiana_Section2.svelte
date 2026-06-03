@@ -315,7 +315,7 @@
                             return value; // Return current position (no snap)
                         }
 
-                        // Otherwise snap to closest point
+                        // Otherwise snap to closest point if within threshold
                         let closest = points[0];
                         let minDiff = Math.abs(value - closest);
                         for (let i = 1; i < points.length; i++) {
@@ -325,7 +325,12 @@
                                 closest = points[i];
                             }
                         }
-                        return closest;
+
+                        const threshold = 0.025; // Snaps only when within 2.5% of the transition points
+                        if (minDiff < threshold) {
+                            return closest;
+                        }
+                        return value; // Keep current scroll position in the middle of sections
                     },
                     duration: { min: 0.4, max: 0.8 },
                     delay: 0.25,

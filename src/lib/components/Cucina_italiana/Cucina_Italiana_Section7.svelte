@@ -57,6 +57,17 @@
                 scrub: 1,
                 pin: true,
                 pinSpacing: true, // Enables full scroll spacing for gliding horizontal comments
+                snap: {
+                    snapTo: (value) => {
+                        const threshold = 0.15;
+                        if (value < threshold) return 0;
+                        if (value > 1 - threshold) return 1;
+                        return value;
+                    },
+                    duration: { min: 0.3, max: 0.7 },
+                    delay: 0.2,
+                    ease: "power2.out"
+                },
                 onEnter: () => {
                     gsap.set(videoScroll, { x: "100vw" });
                 },
