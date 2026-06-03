@@ -320,6 +320,7 @@
 </main>
 
 <style>
+
     #Section5 {
         position: relative;
         width: 100vw;
@@ -328,6 +329,7 @@
         justify-content: flex-start;
         align-items: center;
         visibility: hidden;
+        background-color: var(--neutral-50);
 
     }
 

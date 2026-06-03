@@ -211,6 +211,8 @@
 
 
 <style>
+
+
     :global(body){
         margin: 0;
         padding: 0;
@@ -228,6 +230,7 @@
         align-items: center;
         perspective: 1000px;
         visibility: hidden;
+        background-color: var(--neutral-50);
        
     }
 

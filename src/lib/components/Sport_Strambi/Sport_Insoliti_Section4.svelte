@@ -185,10 +185,13 @@
 
 <style>
 
+
+
     #section4{
         position: relative;
         visibility: hidden;
         margin-block-start: 100dvh;
+        background-color: var(--neutral-50);
     }
 
 

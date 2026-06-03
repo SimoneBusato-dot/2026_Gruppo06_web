@@ -104,9 +104,6 @@
     .swiper {
         width: 400px;
         height: 711px;
-        perspective: 1000px;
-        transform-style: preserve-3d;
-        
     }
 
     .swiper-slide {
