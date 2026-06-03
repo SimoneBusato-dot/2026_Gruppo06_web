@@ -44,7 +44,7 @@
         width: 12.2rem;
         height: fit-content;
         color: var(--neutral-50);
-        font-family: var(--font-family-text);
+        font-family: "nexa-text", sans-serif;
         font-size: 1.25rem;
     }
 

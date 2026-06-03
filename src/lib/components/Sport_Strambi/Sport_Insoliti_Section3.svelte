@@ -3,54 +3,27 @@
     import {gsap} from 'gsap';
     import { ScrollTrigger } from 'gsap/ScrollTrigger';
     import SplitType from 'split-type';
-   
-    
+
     gsap.registerPlugin(ScrollTrigger);
 
-    let text1;
-    let text2;
-    let videoContainer1;
-    let videoContainer2;
-    let perspective1;
-    let perspective2;
+    let text1, text2, videoContainer1, videoContainer2, perspective1, perspective2;
 
     onMount(() => {
         const moveElements = (e) => {
             const xPercent = (e.clientX / window.innerWidth - 0.5) * 2;
-            const yPercent = (e.clientY/ window.innerHeight -0.5) *2;
+            const yPercent = (e.clientY / window.innerHeight - 0.5) * 2;
+            gsap.to(perspective1, { duration: 1.2, rotateY: xPercent * 10, rotateX: -yPercent * 10, scale: 1, ease: "power2.out", overwrite: true });
+            gsap.to(perspective2, { duration: 1.2, rotateY: -xPercent * 10, rotateX: yPercent * 10, scale: 1, ease: "power2.out", overwrite: true });
+        };
 
-            gsap.to(perspective1, {
-                duration: 1.2,
-                rotateY: xPercent* 10,  
-                rotateX: -yPercent * 10,
-                scale: 1,
-                ease: "power2.out",
-                overwrite: true,
-            })
-
-            gsap.to(perspective2, {
-                duration: 1.2,
-                rotateY: -xPercent* 10,  
-                rotateX: yPercent *10,
-                scale: 1,
-                ease: "power2.out",
-                overwrite: true,
-            })
-
-        }
-
-        const text1SplitType = new SplitType(text1, { types: 'words', tagName: 'span' });
-        const text2SplitType = new SplitType(text2, { types: 'words', tagName: 'span' });
-
-        const text1Words = text1SplitType.words;
-        const text2Words = text2SplitType.words;
+        const text1Words = new SplitType(text1, { types: 'words', tagName: 'span' }).words;
+        const text2Words = new SplitType(text2, { types: 'words', tagName: 'span' }).words;
 
         gsap.set(text1Words, { opacity: 0, y: 200 });
         gsap.set(text2Words, { opacity: 0, x: 200 });
-        gsap.set(videoContainer1, {opacity: 1, x: "-100%"})
-        gsap.set(videoContainer2, {opacity: 1, x: "100%"})
+        gsap.set(videoContainer1, { opacity: 1, x: "-110%" });
+        gsap.set(videoContainer2, { opacity: 1, x: "110%" });
 
-        
         const tl = gsap.timeline({
             scrollTrigger: {
                 trigger: "#section3",
@@ -60,7 +33,6 @@
                 scrub: 1,
                 pin: true,
                 pinSpacing: false,
-                markers: true,
                 onEnter: () => gsap.set("#section3", { autoAlpha: 1 }),
                 onLeave: () => gsap.set("#section3", { autoAlpha: 0 }),
                 onEnterBack: () => gsap.set("#section3", { autoAlpha: 1 }),
@@ -68,55 +40,19 @@
             }
         });
 
-        tl.to(text1Words, {
-            opacity: 1,
-            y: 0,
-            stagger: 0.05,
-            ease: "power2.out",
-            duration: 0.5,
-        }, 0)
-        .to(text1Words, {          // ← text1 esce a sinistra
-            opacity: 0,
-            x: -200,
-            stagger: 0.05,
-            ease: "power2.in",
-            duration: 0.5,
-        }, 0.5)
-        .to(text2Words, {          // ← text2 entra
-            opacity: 1,
-            x: 0,
-            stagger: 0.5,
-            ease: "power2.out",
-            duration: 0.5,
-        }, 0.8)
-        .to(text2Words, {          // ← text2 entra
-            opacity: 0,
-            ease: "power2.out",
-            duration: 1,
-        }, 2)
-        .to(videoContainer1, {     // ← video entra
-            opacity: 1,
-            x: "100%",
-            ease: "power2.out",
-            duration: 2,
-        }, 2)
-        .to(videoContainer2, {     // ← video entra
-            opacity: 1,
-            x: "-100%",
-            ease: "power2.out",
-            duration: 2,
-        }, 2)
+        tl.to(text1Words, { opacity: 1, y: 0, stagger: 0.05, ease: "power2.out", duration: 0.5 }, 0)
+          .to(text1Words, { opacity: 0, x: -200, stagger: 0.05, ease: "power2.in", duration: 0.5 }, 0.5)
+          .to(text2Words, { opacity: 1, x: 0, stagger: 0.5, ease: "power2.out", duration: 0.5 }, 0.8)
+          .to(text2Words, { opacity: 0, ease: "power2.out", duration: 1 }, 2)
+          .to(videoContainer1, { opacity: 1, x: "110%", ease: "power2.out", duration: 2 }, 2)
+          .to(videoContainer2, { opacity: 1, x: "-110%", ease: "power2.out", duration: 2 }, 2)
 
         window.addEventListener("mousemove", moveElements);
-
         return () => {
-        window.removeEventListener("mousemove", moveElements);
-        ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-    };
+            window.removeEventListener("mousemove", moveElements);
+            ScrollTrigger.getAll().forEach(t => t.kill());
+        };
     });
-
-    
-   
 </script>
 
 <main id="section3">
@@ -129,27 +65,17 @@
         </section>
         <section id="third">
             <div id="perspective1" bind:this={perspective1}>
-                <div id="videoWrapper">
-                    <div id="videocontainer1" bind:this={videoContainer1}>
-                        <video src="/Sport_Insoliti/Video_Carousel/Carousel-Curling1.mp4" autoplay muted loop></video>
-                        <video src="/Sport_Insoliti/Video_Carousel/Carousel-Curling2.mp4" autoplay muted loop></video>
-                        <video src="/Sport_Insoliti/Video_Carousel/Carousel-Curling3.mp4" autoplay muted loop></video>
-                        <video src="/Sport_Insoliti/Video_Carousel/Carousel-Curling4.mp4" autoplay muted loop></video>
-                        <video src="/Sport_Insoliti/Video_Carousel/Carousel-Curling5.mp4" autoplay muted loop></video>
-                        <video src="/Sport_Insoliti/Video_Carousel/Carousel-Curling6.mp4" autoplay muted loop></video>
-                    </div>
+                <div id="videocontainer1" bind:this={videoContainer1}>
+                    {#each [1,2,3,4,5,6] as n}
+                        <video src="/Sport_Insoliti/Video_Carousel/Carousel-Curling{n}.mp4" autoplay muted loop></video>
+                    {/each}
                 </div>
             </div>
-             <div id="perspective2" bind:this={perspective2}>
-                <div id="videoWrapper2">
-                    <div id="videocontainer2" bind:this={videoContainer2}>
-                        <video src="/Sport_Insoliti/Video_Carousel/Carousel-Curling7.mp4" autoplay muted loop></video>
-                        <video src="/Sport_Insoliti/Video_Carousel/Carousel-Curling8.mp4" autoplay muted loop></video>
-                        <video src="/Sport_Insoliti/Video_Carousel/Carousel-Curling9.mp4" autoplay muted loop></video>
-                        <video src="/Sport_Insoliti/Video_Carousel/Carousel-Curling10.mp4" autoplay muted loop></video>
-                        <video src="/Sport_Insoliti/Video_Carousel/Carousel-Curling11.mp4" autoplay muted loop></video>
-                        <video src="/Sport_Insoliti/Video_Carousel/Carousel-Curling12.mp4" autoplay muted loop></video>
-                    </div>
+            <div id="perspective2" bind:this={perspective2}>
+                <div id="videocontainer2" bind:this={videoContainer2}>
+                    {#each [7,8,9,10,11,12] as n}
+                        <video src="/Sport_Insoliti/Video_Carousel/Carousel-Curling{n}.mp4" autoplay muted loop></video>
+                    {/each}
                 </div>
             </div>
         </section>
@@ -157,93 +83,68 @@
 </main>
 
 <style>
+    #section3 { visibility: hidden; background-color: var(--neutral-50); }
 
-
-#section3{
-    visibility: hidden;
-    background-color: var(--neutral-50);
-    
-}
-  
-
-    #background{
+    #background {
         position: relative;
         width: 100vw;
         height: 100vh;
         background-color: var(--brand-sport-insoliti-500);
-
     }
 
-    #first{
+    #first, #second {
         position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+        inset: 0;
         display: flex;
         justify-content: center;
         align-items: center;
-        z-index: 1;
-
     }
+    #first { z-index: 1; }
+    #second { z-index: 2; }
 
-    #firstText{
+    #firstText {
         color: var(--brand-sport-insoliti-100);
-        font-size: 13.25rem;
+        /* da 13.25rem fisso → scala col viewport */
+        font-size: clamp(4rem, 10vw, 13.25rem);
         font-family: var(--font-family);
         font-weight: 900;
+        margin: 0;
     }
 
-    #second{
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 2;
-    }
-
-     #secondText{
+    #secondText {
         color: var(--brand-sport-insoliti-100);
-        font-size: 31.25rem;
+        /* da 31.25rem fisso → scala col viewport */
+        font-size: clamp(29rem, 22vw, 31.25rem);
         font-family: var(--font-family);
         font-weight: 900;
         line-height: 76%;
+        margin: 0;
+        text-align: left;
     }
 
-    #third{
+    #third {
         position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+        inset: 0;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        gap: 26px;
+        gap: clamp(12px, 2vh, 26px);
         z-index: 3;
         perspective: 1000px;
     }
-    #videocontainer1{
+
+    #videocontainer1, #videocontainer2 {
         display: flex;
         flex-direction: row;
-        gap: 28px;
+        gap: clamp(10px, 1.5vw, 28px);
     }
 
-    video{
-        width: 17.5rem;
-        height: 31.2rem;
+    video {
+        /* da 17.5rem × 31.2rem fissi → scala col viewport */
+        width: clamp(15rem, 13vw, 17.5rem);
+        height: clamp(26.6rem, 23vw, 31.2rem);
         object-fit: cover;
         border-radius: 10px;
-    }
-    
-    #videocontainer2{
-        display: flex;
-        flex-direction: row;
-        gap: 28px;
     }
 </style>
