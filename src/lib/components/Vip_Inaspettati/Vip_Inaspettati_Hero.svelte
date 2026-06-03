@@ -70,7 +70,7 @@
                 scrub: 1,
                 pin: true,  
                 refreshPriority: 1,
-                pinSpacing: false,
+                pinSpacing: true,
                 onLeave: () => gsap.set(hero, { autoAlpha: 0 }),
                 onEnterBack: () => gsap.set(hero, { autoAlpha: 1 }),
             }
@@ -81,7 +81,12 @@
             yPercent: -50, // Aggiunto per centrare meglio il varco bianco
             rotate: -60,
             ease: "power2.inOut"
-        });
+        }, 0)
+        .to('#title', {
+            xPercent: -150,
+            opacity: 0,
+            ease: "power2.inOut"
+        }, 0);
 
 
         // Aggiungiamo l'ascoltatore alla finestra
@@ -90,6 +95,7 @@
         // Importante: rimuoviamo l'evento quando il componente viene distrutto
         return () => {
             window.removeEventListener('mousemove', moveBackground);
+            ScrollTrigger.getAll().forEach(t => t.kill());
             if (tl) tl.kill();
     }
 });
