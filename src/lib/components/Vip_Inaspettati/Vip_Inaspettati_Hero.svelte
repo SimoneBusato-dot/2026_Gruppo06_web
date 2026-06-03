@@ -66,11 +66,11 @@
                 trigger: hero,
                 scroller: window,
                 start: "top top",       
-                end: "+=100%",
+                end: "+=50%",
                 scrub: 1,
                 pin: true,  
                 refreshPriority: 1,
-                pinSpacing: true,
+                pinSpacing: false,
                 onLeave: () => gsap.set(hero, { autoAlpha: 0 }),
                 onEnterBack: () => gsap.set(hero, { autoAlpha: 1 }),
             }
@@ -178,7 +178,7 @@
 
     #line-wrapper {
         position: absolute;
-        top: -5%;
+        top: -7%;
         left: 7%;
         width: 100%;
         height: 100%;
