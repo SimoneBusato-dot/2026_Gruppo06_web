@@ -1,7 +1,8 @@
 <script>
 	import favicon from '$lib/assets/favicon.svg';
 	import '$lib/styles/variables.css';
-    import { onNavigate } from '$app/navigation';
+	import Navbar from '$lib/components/Navbar.svelte';
+import { onNavigate } from '$app/navigation';
 
 	let { children } = $props();
 
@@ -24,6 +25,7 @@
 	
 </svelte:head>
 
+<Navbar />
 <div class="transition-separator"></div>
 
 {@render children()}
