@@ -84,15 +84,17 @@
         });
 
 
-        // Aggiungiamo l'ascoltatore alla finestra
-        window.addEventListener('mousemove', moveBackground);
+        document.addEventListener('mousemove', moveBackground);
+        moveBackground()
 
-        // Importante: rimuoviamo l'evento quando il componente viene distrutto
-        return () => {
+         // Pulizia dell'evento quando il componente viene distrutto
+         return () => {
             window.removeEventListener('mousemove', moveBackground);
             ScrollTrigger.getAll().forEach(t => t.kill());
             if (tl) tl.kill();
-    }
+        }
+
+        
 });
 
     
