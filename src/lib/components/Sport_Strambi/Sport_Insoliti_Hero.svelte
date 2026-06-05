@@ -84,8 +84,8 @@
         });
 
 
-        document.addEventListener('mousemove', moveBackground);
-        moveBackground()
+        // Aggiungiamo l'ascoltatore alla finestra
+        window.addEventListener('mousemove', moveBackground);
 
          // Pulizia dell'evento quando il componente viene distrutto
          return () => {
