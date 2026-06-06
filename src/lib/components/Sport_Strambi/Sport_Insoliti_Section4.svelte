@@ -63,9 +63,9 @@
 
       
         gsap.set('#lastCircle', { r: 0 });
-        let textEnter = gsap.fromTo(textLines, { opacity: 0, x: 300 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out", stagger: 0.1, paused: true });
-        let textExit= gsap.fromTo(textLines, { opacity: 1, x: 0 }, { opacity: 0, x: -300, duration: 0.5, ease: "power2.out", stagger: 0.1, paused: true });
-        const drawArea = gsap.to(area, { width: width, ease: "power2.out", duration: 0.2, paused: true });
+        let text4Enter = gsap.fromTo(textLines, { opacity: 0, x: 300 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out", stagger: 0.1, paused: true });
+        let text4Exit= gsap.fromTo(textLines, { opacity: 1, x: 0 }, { opacity: 0, x: -300, duration: 0.5, ease: "power2.out", stagger: 0.1, paused: true });
+        
 
         const tl = gsap.timeline({
             scrollTrigger: {
@@ -83,8 +83,8 @@
 
                 onUpdate: (self) => {
                     const progress = self.progress;
-                    if (progress >= 0.3) { textEnter.play(); } else { textEnter.reverse(); }
-                    if (progress >= 0.7) { textExit.play(); } else { textExit.reverse(); }
+                    if (progress >= 0.3) { text4Enter.play(); } else { text4Enter.reverse(); }
+                    if (progress >= 0.7) { text4Exit.play(); } else { text4Exit.reverse(); }
                 }
             }
         });
@@ -104,7 +104,7 @@
     });
 </script>
 
-<main id="section4" bind:this={section}>
+<main id="section4" bind:this={section} class="page_content">
     <div id="svgContainer">
         <svg id="line" width="100%" height="100%" bind:this={svgElement}></svg>
     </div>

@@ -137,4 +137,6 @@ import { onNavigate } from '$app/navigation';
     isolation: isolate;
     
 }
+
+
 </style>

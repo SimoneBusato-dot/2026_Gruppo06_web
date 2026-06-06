@@ -84,7 +84,7 @@
     });
 </script>
 
-<main id="section7" bind:this={section}>
+<main id="section7" bind:this={section} >
     <div id="perspective" bind:this={cards}>
         <div id="Content">
             <div id="videoContainer" bind:this={videoScroll}>

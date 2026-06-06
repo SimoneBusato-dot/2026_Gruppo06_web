@@ -113,7 +113,7 @@
     
 </script>
 
-<main id="hero_spi" bind:this={hero}>
+<main id="hero_spi" bind:this={hero} class="page_content">
 
     <div id="perspective-wrapper">
 

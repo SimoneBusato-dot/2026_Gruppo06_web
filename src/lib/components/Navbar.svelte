@@ -397,4 +397,9 @@
         border-radius: 50%;
         background-color: var(--neutral-50);
     }
+
+    .navbar-header,
+    .menu-overlay {
+        view-transition-name: none;
+    }
 </style>

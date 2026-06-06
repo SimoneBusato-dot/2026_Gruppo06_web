@@ -187,7 +187,7 @@
     const variants = ['blue', 'yellow', 'red', 'purple'];
 </script>
 
-<main id="Selezione-Categorie">
+<main id="Selezione-Categorie" class="page_content">
 
     <div id="text" bind:this={textBlock}>
         <h1 id="title">scegli un trend</h1>

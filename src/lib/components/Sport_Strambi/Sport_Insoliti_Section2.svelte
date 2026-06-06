@@ -64,7 +64,7 @@
                     if (self.progress >= 0.2) { p1Enter.play(); sliderEnter.play(); }
                     else { p1Enter.reverse(); sliderEnter.reverse(); }
                     if (self.progress >= 0.5) { p2Enter.play(); p1Exit.play(); }
-                    else { p2Enter.reverse(); p1Exit.reverse(); }
+                    else { p2Enter.reverse(); p1Exit.reverse(); if (self.progress >= 0.2) p1Enter.play();}
                     if (self.progress >= 0.91) { transitionEnter.play(); }
                     else { transitionEnter.reverse(); }
                 }
@@ -81,7 +81,7 @@
     });
 </script>
 
-<main bind:this={section}>
+<main bind:this={section} class="page_content">
     <div id="svgContainer" bind:this={line}>
         <svg width="100%" height="100%" viewBox="0 0 1399 555" preserveAspectRatio="xMidYMid meet" fill="none">
             <path bind:this={path} d="M25.4766 1.0918C32.8099 172.092 211.677 421.892 868.477 53.0918C831.977 256.758 885.577 631.892 1391.98 503.092" stroke-width="51" stroke-linecap="round"/>
@@ -145,6 +145,12 @@
         box-sizing: border-box;
         padding: 0 clamp(1rem, 3vw, 4rem);
         transform: translateX(5%);
+
+        max-height: 100vh;
+        padding-top: clamp(1rem, 4vh, 3rem);
+        padding-bottom: clamp(2rem, 6vh, 4rem); /* spazio per non tagliare */
+        align-items: center;
+        box-sizing: border-box;
     }
 
     #text {

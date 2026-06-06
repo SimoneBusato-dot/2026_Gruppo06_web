@@ -59,9 +59,11 @@
 <style>
     .swiper {
         /* scala con il viewport: su MBP14 1512px → 26.4vw ≈ 400px */
-        width: clamp(240px, 26.4vw, 400px);
+        width: clamp(100px, 26.4vw, 400px);
         /* rapporto 400:711 = 0.5626 → height = width / 0.5626 */
-        height: clamp(426px, 47vw, 711px);
+        height: clamp(177px, 47vw, 711px);
+        padding-bottom: clamp(3.5rem, 3vh, 5rem); /* spazio per la pagination */
+        box-sizing: content-box;
     }
 
     .swiper-slide {
@@ -82,7 +84,7 @@
 
     video { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
 
-    .swiper-pagination { position: absolute; bottom: -10%; }
+    .swiper-pagination { position: absolute; bottom: 0; }
 
     :global(.swiper-pagination-bullet) { transition: all 0.3s ease; }
     :global(.swiper-pagination-bullet-active) {
