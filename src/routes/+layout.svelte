@@ -116,7 +116,7 @@ import { onNavigate } from '$app/navigation';
 
 /* 2. Applica la tua animazione solo alla vecchia pagina */
 :root::view-transition-old(root) {
-    animation: 1.7s stacked-slide-out forwards 0.5s;
+    animation: 1.7s stacked-slide-out forwards 0.3s;
     transform-origin: center center;
     animation-timing-function: cubic-bezier(0.83, 0, 0.17, 1);
     z-index: 2; /* Forza la vecchia pagina a stare SOPRA la nuova mentre si rimpicciolisce */
@@ -130,7 +130,7 @@ import { onNavigate } from '$app/navigation';
 /* 3. Assicurati che la nuova pagina sia già visibile sotto senza fare nulla */
 :root::view-transition-new(root) {
     z-index: 1;
-    animation: 1.7s stacked-slide-in forwards 0.5s;
+    animation: 1.7s stacked-slide-in forwards 0.3s;
     animation-timing-function: cubic-bezier(0.83, 0, 0.17, 1);
     transition: all 0.1s ease;
     
