@@ -55,7 +55,7 @@
     });
 </script>
 
-<main id="section3" class="page_content">
+<main id="section3" >
     <div id="background">
         <section id="first">
             <h2 id="firstText" bind:this={text1}>Primo fra tutti</h2>

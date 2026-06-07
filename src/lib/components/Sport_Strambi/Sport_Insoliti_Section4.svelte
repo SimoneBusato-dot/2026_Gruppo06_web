@@ -104,7 +104,7 @@
     });
 </script>
 
-<main id="section4" bind:this={section} class="page_content">
+<main id="section4" bind:this={section} >
     <div id="svgContainer">
         <svg id="line" width="100%" height="100%" bind:this={svgElement}></svg>
     </div>

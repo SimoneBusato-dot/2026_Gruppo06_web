@@ -81,7 +81,7 @@
     });
 </script>
 
-<main bind:this={section} class="page_content">
+<main bind:this={section}>
     <div id="svgContainer" bind:this={line}>
         <svg width="100%" height="100%" viewBox="0 0 1399 555" preserveAspectRatio="xMidYMid meet" fill="none">
             <path bind:this={path} d="M25.4766 1.0918C32.8099 172.092 211.677 421.892 868.477 53.0918C831.977 256.758 885.577 631.892 1391.98 503.092" stroke-width="51" stroke-linecap="round"/>
