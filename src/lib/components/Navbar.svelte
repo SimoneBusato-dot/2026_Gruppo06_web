@@ -303,7 +303,7 @@
         padding-left: 14vw; /* Moved texts further right to create breathing room and alignment */
         box-sizing: border-box;
         pointer-events: none;
-        z-index: 1;
+        z-index: 7;
         /* Un-skew the links container so all text renders perfectly horizontal */
         transform: skewX(10deg) skewY(var(--unskew-y));
         transform-origin: top left;
@@ -398,8 +398,11 @@
         background-color: var(--neutral-50);
     }
 
-    .navbar-header,
+    .navbar-header {
+    view-transition-name: navbar;
+    }
+
     .menu-overlay {
-        view-transition-name: none;
+        view-transition-name: menu-overlay;
     }
 </style>

@@ -31,9 +31,11 @@ import { onNavigate } from '$app/navigation';
 
 <style>
 
-    :root{
-        background-color: var(--neutral-900);
-    }
+:root{
+    background-color: var(--neutral-900);
+}
+
+
     :global(body){
         margin: 0;
         padding: 0;
@@ -114,7 +116,7 @@ import { onNavigate } from '$app/navigation';
 
 /* 2. Applica la tua animazione solo alla vecchia pagina */
 :root::view-transition-old(root) {
-    animation: 1.7s stacked-slide-out forwards;
+    animation: 1.7s stacked-slide-out forwards 0.5s;
     transform-origin: center center;
     animation-timing-function: cubic-bezier(0.83, 0, 0.17, 1);
     z-index: 2; /* Forza la vecchia pagina a stare SOPRA la nuova mentre si rimpicciolisce */
@@ -128,7 +130,7 @@ import { onNavigate } from '$app/navigation';
 /* 3. Assicurati che la nuova pagina sia già visibile sotto senza fare nulla */
 :root::view-transition-new(root) {
     z-index: 1;
-    animation: 1.7s stacked-slide-in forwards;
+    animation: 1.7s stacked-slide-in forwards 0.5s;
     animation-timing-function: cubic-bezier(0.83, 0, 0.17, 1);
     transition: all 0.1s ease;
     
@@ -139,4 +141,17 @@ import { onNavigate } from '$app/navigation';
 }
 
 
+/* La navbar rimane sempre sopra durante la transizione */
+:root::view-transition-group(navbar),
+:root::view-transition-group(menu-overlay) {
+    z-index: 9999;
+}
+
+/* Nessuna animazione per la navbar, rimane ferma */
+:root::view-transition-old(navbar),
+:root::view-transition-new(navbar),
+:root::view-transition-old(menu-overlay),
+:root::view-transition-new(menu-overlay) {
+    animation: none;
+}
 </style>
