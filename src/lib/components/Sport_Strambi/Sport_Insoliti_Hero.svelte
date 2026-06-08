@@ -101,7 +101,7 @@
     
 </script>
 
-<main id="hero_spi" bind:this={hero}>
+<main id="hero_spi" bind:this={hero} >
 
     <div id="perspective-wrapper">
 
