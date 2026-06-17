@@ -63,6 +63,8 @@
 
       
         gsap.set('#lastCircle', { r: 0 });
+        gsap.set(textLines, { opacity: 0, x: 300 });
+        gsap.set('#text4', { opacity: 0 });
         let text4Enter = gsap.fromTo(textLines, { opacity: 0, x: 300 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out", stagger: 0.1, paused: true });
         let text4Exit= gsap.fromTo(textLines, { opacity: 1, x: 0 }, { opacity: 0, x: -300, duration: 0.5, ease: "power2.out", stagger: 0.1, paused: true });
         
@@ -83,7 +85,8 @@
 
                 onUpdate: (self) => {
                     const progress = self.progress;
-                    if (progress >= 0.3) { text4Enter.play(); } else { text4Enter.reverse(); }
+                    if (progress >= 0.3) { text4Enter.play(); } else { text4Enter.reverse();}
+                    if (progress >= 0.35) { gsap.to('#text4', { opacity: 1, duration: 0.5, ease: "power2.out" }); }
                     if (progress >= 0.7) { text4Exit.play(); } else { text4Exit.reverse(); }
                 }
             }
@@ -108,7 +111,7 @@
     <div id="svgContainer">
         <svg id="line" width="100%" height="100%" bind:this={svgElement}></svg>
     </div>
-    <div id="text">
+    <div id="text4">
         <p id="paragraph" bind:this={text}>Infatti, ha generato forti picchi di interesse appena è entrato in scena all'interno dei giochi olimpici 2026</p>
     </div>
 </main>

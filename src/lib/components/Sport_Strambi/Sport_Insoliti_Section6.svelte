@@ -18,6 +18,7 @@
 
         gsap.set(path, { strokeDasharray: length, strokeDashoffset: length })
         gsap.set(path2, { strokeDasharray: length2, strokeDashoffset: length2 })
+        gsap.set('#text6', { opacity: 0})
        const text6Enter = gsap.fromTo(textLines, { opacity: 0, x: 300 }, { opacity: 1, x: 0, duration: 0.7, ease: "power2.out", stagger: 0.1, paused: true });
        const text6Exit = gsap.fromTo(textLines, { opacity: 1, x: 0 }, { opacity: 0, x: -300, duration: 0.7, ease: "power2.in", stagger: 0.05, paused: true });
 
@@ -36,6 +37,7 @@
                 onLeaveBack: () => gsap.set(section, { autoAlpha: 0 }),
                 onUpdate: (self) => {
                     if (self.progress >= 0.1) { text6Enter.play(); } else { text6Enter.reverse(); }
+                    if (self.progress >= 0.17) { gsap.to('#text6', { opacity: 1, duration: 0.5, ease: "power2.out" }); }
                     if (self.progress >= 0.7) { text6Exit.play(); } else { text6Exit.reverse(); }
                 }
             }
@@ -58,7 +60,7 @@
         </svg>
     </div>
 
-    <div id="text">
+    <div id="text6">
         <p bind:this={text} id="paragraph">Niente canoni rigidi o gare asettiche: a suon di meme, i social ci hanno fatto innamorare dell'assurdità di questi strani sport, rendendoli incredibilmente più vicini a noi.</p>
     </div>
 </main>
@@ -100,7 +102,7 @@
         height: 27vh;
     }
 
-    #text {
+    #text6 {
         font-family: var(--font-family-text);
         color: var(--neutral-900);
         /* da 3.125rem fisso a clamp: min 1.5rem, ideale 3.2vw, max 3.125rem */
