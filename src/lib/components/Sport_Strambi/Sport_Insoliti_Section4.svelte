@@ -141,7 +141,7 @@
     :global(.curlingLine) { fill: none; stroke: var(--brand-sport-insoliti-500); stroke-width: clamp(6px, 0.9vw, 14px); }
     :global(.curlingArea) { fill: var(--brand-sport-insoliti-200); }
 
-    #text {
+    #text4 {
         position: absolute;
         /* posizione relativa al viewport invece di px fissi */
         top: 30%;

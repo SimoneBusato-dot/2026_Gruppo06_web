@@ -14,14 +14,19 @@
     let activeSliderEl = $state(null);
     let buttonsEl      = $state(null);
 
-    let gsapReady = false;
+    let gsapReady       = false;
+    let isSlideChanging = false;
     let ctx;
 
-    // Riferimenti alle tween delle slide, aggiornabili senza ricreare lo ScrollTrigger
-    let cardActiveTween    = null;
-    let cardInactiveTween  = null;
+    // Tween paused pilotate da onUpdate. Lette dinamicamente ad ogni scroll.
+    // Vengono ricostruite al cambio slide ma senza toccare lo stato visivo corrente.
+    let cardActiveTween   = null;
+    let cardInactiveTween = null;
 
-    // ── INIT: gira una volta sola quando tutti gli elementi sono pronti ──────
+    // Progresso scroll corrente, aggiornato da onUpdate
+    let scrollProgress = 0;
+
+    // ── INIT ────────────────────────────────────────────────────────────────
     $effect(() => {
         const slidesReady = sliderVideoEL.length > 0 && sliderVideoEL.every(Boolean);
         if (!slidesReady || !activeSliderEl || !buttonsEl || gsapReady) return;
@@ -29,115 +34,129 @@
         initGSAP();
     });
 
-    // ── SLIDE CHANGE: gira ogni volta che la slide attiva cambia ─────────────
-    // Separato dall'init: non tocca ScrollTrigger, aggiorna solo i target delle tween.
+    // ── SLIDE CHANGE ─────────────────────────────────────────────────────────
     $effect(() => {
-        // Dipendenza esplicita da activeSliderEl
         const current = activeSliderEl;
-        if (!gsapReady || !current) return;
+        if (!gsapReady || !current || isSlideChanging) return;
 
         const inactives = sliderVideoEL.filter(el => el !== current);
 
-        // Passo 1: pulisce le proprietà inline GSAP su tutti i nodi slide.
-        // clearProps lascia che sia lo ScrollTrigger a rideterminarle al prossimo onUpdate.
-        gsap.set(sliderVideoEL, { clearProps: "x,opacity" });
+        // 1. ANIMAZIONE VISIVA AL CLICK — fluida, invariata rispetto alla versione perfetta
+        gsap.fromTo(
+            current,
+            { x: 50, opacity: 0 },
+            { x: 0, opacity: 1, duration: 0.45, ease: 'power2.out', overwrite: 'auto' }
+        );
+        gsap.to(inactives, {
+            x: 0,
+            opacity: 1,
+            duration: 0.3,
+            ease: 'power2.out',
+            overwrite: 'auto'
+        });
 
-        // Passo 2: invalida e redirige le tween esistenti verso i nuovi target.
-        // invalidate() cancella i valori memorizzati (from/to snapshot) senza
-        // distruggere la tween — GSAP li ri-campionerà al prossimo play().
+        // 2. AGGIORNAMENTO TWEEN SCROLLTRIGGER
+        // Prima del kill catturiamo lo stato visivo corrente degli elementi
+        // con gsap.set, così il kill non provoca alcun reset visibile.
+        // La nuova tween parte dallo stato "già a destinazione" (progress = 1 se p >= soglia,
+        // progress = 0 se p < soglia) così onUpdate può play()/reverse() senza scatti.
+        const atRest = scrollProgress >= 0.1; // la slide è già visibile?
+
         if (cardActiveTween) {
-            cardActiveTween.targets()[0] !== current && cardActiveTween.invalidate();
-            // Riassegna il target — GSAP permette di cambiarlo via .targets() solo
-            // indirettamente: il modo corretto è ricreare SOLO questa tween, non tutto il contesto.
+            // Congela lo stato corrente prima di killare
+            gsap.set(current, { x: gsap.getProperty(current, 'x'), opacity: gsap.getProperty(current, 'opacity') });
             cardActiveTween.kill();
-            cardActiveTween = gsap.fromTo(
-                current,
-                { x: 100, opacity: 0 },
-                { x: 0, opacity: 1, duration: 0.5, paused: true, overwrite: "auto", ease: "power2.out" }
-            );
         }
+        cardActiveTween = gsap.fromTo(
+            current,
+            { x: 100, opacity: 0 },
+            { x: 0, opacity: 1, duration: 0.5, paused: true, ease: 'power2.out' }
+        );
+        // Porta la tween allo stato corrispondente al progresso scroll attuale
+        // così il prossimo play()/reverse() di onUpdate parte dal punto giusto
+        if (atRest) cardActiveTween.progress(1);
 
         if (cardInactiveTween) {
             cardInactiveTween.kill();
-            cardInactiveTween = gsap.fromTo(
-                inactives,
-                { x: 100, opacity: 0 },
-                { x: 0, opacity: 1, stagger: 0.1, paused: true, duration: 0.5, overwrite: "auto", ease: "power2.out" }
-            );
         }
-
-        // Passo 3: forza ScrollTrigger a ricalcolare il proprio progresso e
-        // richiamare onUpdate immediatamente, così le nuove tween vengono
-        // portate allo stato corretto per la posizione di scroll attuale.
-        ScrollTrigger.refresh();
+        cardInactiveTween = gsap.fromTo(
+            inactives,
+            { x: 100, opacity: 0 },
+            { x: 0, opacity: 1, stagger: 0.1, paused: true, duration: 0.5, ease: 'power2.out' }
+        );
+        // progress(1) = visibili. Va settato solo se p >= 0.55,
+        // cioè quando le inattive sono già apparse. Sotto quella soglia
+        // partono da progress(0) e onUpdate le terrà nascoste con .reverse().
+        const inactivesVisible = scrollProgress >= 0.55;
+        if (inactivesVisible) cardInactiveTween.progress(1);
     });
 
     function initGSAP() {
+        isSlideChanging = true;
+
         const inactives = sliderVideoEL.filter(el => el !== activeSliderEl);
 
         ctx = gsap.context(() => {
             const length = line.getTotalLength();
             gsap.set(line, { strokeDasharray: length, strokeDashoffset: length });
 
-            const textLines  = new SplitType(text,  { types: "lines", tagName: "span" }).lines;
-            const titleChars = new SplitType(title, { types: "chars", tagName: "span" }).chars;
+            const textLines  = new SplitType(text,  { types: 'lines', tagName: 'span' }).lines;
+            const titleChars = new SplitType(title, { types: 'chars', tagName: 'span' }).chars;
 
-            // Queste tween vengono salvate fuori dal context per poterle aggiornare
-            // nel $effect separato senza distruggere l'intero contesto GSAP.
             cardActiveTween = gsap.fromTo(
                 activeSliderEl,
                 { x: 100, opacity: 0 },
-                { x: 0, opacity: 1, duration: 0.5, paused: true, overwrite: "auto", ease: "power2.out" }
+                { x: 0, opacity: 1, duration: 0.5, paused: true, ease: 'power2.out' }
             );
             cardInactiveTween = gsap.fromTo(
                 inactives,
                 { x: 100, opacity: 0 },
-                { x: 0, opacity: 1, stagger: 0.1, paused: true, duration: 0.5, overwrite: "auto", ease: "power2.out" }
+                { x: 0, opacity: 1, stagger: 0.1, paused: true, duration: 0.5, ease: 'power2.out' }
             );
 
             const cardW = Math.min(window.innerWidth * 0.28, 425);
             const cardH = cardW * (680 / 425);
 
             const cardBgEnter = gsap.fromTo('#Section5 .card-bg',
-                { top: '15vh', left: '12vw', width: cardW, height: cardH, x: 100, opacity: 0, rotateZ: "0deg", zIndex: -1, borderRadius: 12 },
-                { top: '15vh', left: '12vw', width: cardW, height: cardH, x: 0, opacity: 1, rotateZ: "20deg", paused: true, zIndex: -1, borderRadius: 12, ease: "circ.out", duration: 0.6 }
+                { top: '15vh', left: '12vw', width: cardW, height: cardH, x: 100, opacity: 0, rotateZ: '0deg', zIndex: -1, borderRadius: 12 },
+                { top: '15vh', left: '12vw', width: cardW, height: cardH, x: 0, opacity: 1, rotateZ: '20deg', paused: true, zIndex: -1, borderRadius: 12, ease: 'circ.out', duration: 0.6 }
             );
             const cardBgAnimation = gsap.fromTo('#Section5 .card-bg',
-                { top: '15vh', left: '12vw', width: cardW, height: cardH, rotateZ: "20deg", zIndex: -1, borderRadius: 12 },
-                { top: '0%', left: '0%', width: "100%", height: "100%", duration: 0.7, paused: true, overwrite: "auto", rotateZ: "0", zIndex: 1, borderRadius: 0 }
+                { top: '15vh', left: '12vw', width: cardW, height: cardH, rotateZ: '20deg', zIndex: -1, borderRadius: 12 },
+                { top: '0%', left: '0%', width: '100%', height: '100%', duration: 0.7, paused: true, rotateZ: '0', zIndex: 1, borderRadius: 0 }
             );
 
             const textAnimation = gsap.fromTo(textLines,
                 { x: 200, opacity: 0 },
-                { x: 0, opacity: 1, stagger: 0.05, paused: true, duration: 0.6, overwrite: "auto" }
+                { x: 0, opacity: 1, stagger: 0.05, paused: true, duration: 0.6 }
             );
             const textExit = gsap.to(textLines,
-                { x: -200, opacity: 0, stagger: 0.05, paused: true, duration: 0.6, overwrite: "auto" }
+                { x: -200, opacity: 0, stagger: 0.05, paused: true, duration: 0.6 }
             );
             const titleEnter = gsap.fromTo(titleChars,
                 { x: 200, opacity: 0 },
-                { x: 0, opacity: 1, stagger: 0.1, paused: true, overwrite: "auto", duration: 0.6 }
+                { x: 0, opacity: 1, stagger: 0.1, paused: true, duration: 0.6 }
             );
             const buttonsEnter = gsap.fromTo(buttonsEl,
                 { x: 100, opacity: 0 },
-                { x: 0, opacity: 1, paused: true, duration: 0.6, overwrite: "auto" }
+                { x: 0, opacity: 1, paused: true, duration: 0.6 }
             );
 
             const length2 = line2.getTotalLength();
             const lineAnimation = gsap.fromTo(line2,
                 { strokeDasharray: length2, strokeDashoffset: length2 },
-                { strokeDashoffset: 0, ease: "power2.out", duration: 0.7, paused: true, overwrite: "auto" }
+                { strokeDashoffset: 0, ease: 'power2.out', duration: 0.7, paused: true }
             );
             const transitionEnter = gsap.fromTo(transition,
                 { scaleX: 0 },
-                { scaleX: 1, duration: 0.5, paused: true, overwrite: "auto" }
+                { scaleX: 1, duration: 0.5, paused: true }
             );
 
             gsap.timeline({
                 scrollTrigger: {
                     trigger: section,
-                    start: "top top",
-                    end: "+=200%",
+                    start: 'top top',
+                    end: '+=200%',
                     scrub: 1,
                     pin: true,
                     pinSpacing: false,
@@ -146,9 +165,9 @@
                     onEnterBack: () => gsap.set(section, { autoAlpha: 1 }),
                     onLeaveBack: () => gsap.set(section, { autoAlpha: 0 }),
                     onUpdate: (self) => {
+                        scrollProgress = self.progress;
                         const p = self.progress;
 
-                        // Tween statiche: target fissi, nessun problema
                         if (p >= 0.1) { textAnimation.play(); cardBgEnter.play(); }
                         else          { textAnimation.reverse(); cardBgEnter.reverse(); }
 
@@ -164,8 +183,8 @@
                         if (p >= 0.9) { transitionEnter.play(); }
                         else          { transitionEnter.reverse(); }
 
-                        // Tween dinamiche: usano i riferimenti aggiornati dal $effect
-                        // Non vengono ricreate qui — vengono solo pilotate
+                        // Usa i riferimenti aggiornati dal $effect: puntano sempre
+                        // alla slide attiva corrente. Nessuna tween volante creata qui.
                         if (p >= 0.1) { cardActiveTween?.play(); }
                         else          { cardActiveTween?.reverse(); }
 
@@ -173,9 +192,15 @@
                         else           { cardInactiveTween?.reverse(); }
                     }
                 }
-            }).to(line, { strokeDashoffset: 0, ease: "none", duration: 0.01 });
+            }).to(line, { strokeDashoffset: 0, ease: 'none', duration: 0.01 });
 
         }, section);
+
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                isSlideChanging = false;
+            });
+        });
     }
 
     onDestroy(() => {
@@ -206,7 +231,7 @@
                 bind:elButtons={buttonsEl}
             />
         </div>
-        <div id="text">
+        <div id="text5">
             <p bind:this={text}>Questo suo essere insolito e a prima vista inspiegabile ha spinto le persone a realizzare moltissimi contenuti a riguardo. Specialmente <br><mark>MEME</mark></p>
         </div>
         <div id="title">
@@ -252,7 +277,7 @@
         width: 100%; align-items: center;
         gap: clamp(4rem, 10vw, 15rem); z-index: 3;
     }
-    #text {
+    #text5 {
         width: clamp(18rem, 30vw, 37.75rem);
         font-family: var(--font-family-text);
         font-size: clamp(1rem, 1.6vw, 2rem);
