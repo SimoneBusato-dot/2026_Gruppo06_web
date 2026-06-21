@@ -192,7 +192,20 @@
                         else           { cardInactiveTween?.reverse(); }
                     }
                 }
-            }).to(line, { strokeDashoffset: 0, ease: 'none', duration: 0.01 });
+            })
+        
+        const tl2 = gsap.timeline({
+            scrollTrigger: {
+                trigger: section,
+                scroller: window,
+                start: "top top",       // parte insieme alla prima
+                end: "+=54%",           // finisce all'80% della prima (81% di 101%)
+                scrub: 1,
+                // NO pin — il pin lo gestisce già tl
+            }
+        });
+        
+            tl2.to(line, { strokeDashoffset: 0, ease: 'none', duration: 5 });
 
         }, section);
 
@@ -213,12 +226,12 @@
 <main id="Section5" bind:this={section}>
     <div id="svgContainer">
         <svg id="section5Path" width="100%" height="100%" viewBox="0 0 1560 1000" preserveAspectRatio="xMidYMin meet">
-            <path bind:this={line} d="M16.9741 982C208.307 811.333 679.374 733.6 880.974 966C1016.12 1121.79 1082.97 504.5 1346.97 663C1610.97 821.5 1574.93 -5.81252 1551.97 -13"/>
+            <path bind:this={line} d="M16.9741 982C208.307 811.333 679.374 733.6 880.974 966C1016.12 1121.79 1082.97 504.5 1346.97 663C1610.97 821.5 1574.93 -5.81252 1551.97 -13" stroke-linecap="round"/>
         </svg>
     </div>
 
     <div id="svgContainer2">
-        <svg width="100%" height="100%" viewBox="0 0 1015 648" preserveAspectRatio="xMidYMid meet" fill="none">
+        <svg width="100%" height="110%" viewBox="0 0 1015 648" preserveAspectRatio="xMidYMid meet" fill="none">
             <path bind:this={line2} d="M-41 212.105L501 59.1046C501 59.1046 584.5 30.0156 709 78.8066C820 122.307 844 229.105 844 229.105L965.5 708.105" stroke="#533EDC" stroke-width="101"/>
         </svg>
     </div>
@@ -258,8 +271,8 @@
         overflow: hidden;
     }
     #svgContainer {
-        position: absolute; top: 10%; left: 0;
-        width: 100%; height: 100%;
+        position: absolute; top: 2%; left: 0;
+        width: 100%; height: 110%;
         z-index: -1; pointer-events: none;
     }
     #svgContainer2 {
@@ -284,7 +297,7 @@
         font-weight: 400; line-height: 110%;
         letter-spacing: -0.08rem;
         color: var(--neutral-900);
-        position: absolute; right: 5%; pointer-events: none;
+        position: absolute; right: 15%; pointer-events: none;
     }
     mark {
         font-family: var(--font-family);

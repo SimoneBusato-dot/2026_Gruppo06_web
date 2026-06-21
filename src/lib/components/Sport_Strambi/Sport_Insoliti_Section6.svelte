@@ -53,10 +53,10 @@
 <main id="section6" bind:this={section} >
     <div id="svgContainer">
         <svg id="path" fill="none">
-            <path bind:this={path} d="M6.52953 582.741C206.543 529.759 523.889 322.661 193.165 -81.879" stroke="#533EDC" stroke-width="51"/>
+            <path bind:this={path} d="M6.52953 582.741C206.543 529.759 523.889 322.661 193.165 -81.879" stroke="#533EDC" stroke-width="51" stroke-linecap="round"/>
         </svg>
         <svg id="path2" fill="none">
-            <path bind:this={path2} d="M566.755 81.3008C396.755 81.3008 166.201 -155.726 24.5451 347.229" stroke="#533EDC" stroke-width="51"/>
+            <path bind:this={path2} d="M566.755 81.3008C396.755 81.3008 166.201 -155.726 24.5451 347.229" stroke="#533EDC" stroke-width="51" stroke-linecap="round"/>
         </svg>
     </div>
 
