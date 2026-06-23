@@ -112,7 +112,7 @@
         <svg id="line" width="100%" height="100%" bind:this={svgElement}></svg>
     </div>
     <div id="text4">
-        <p id="paragraph" bind:this={text}>Infatti, ha generato forti picchi di interesse appena è entrato in scena all'interno dei giochi olimpici 2026</p>
+        <p id="paragraph" bind:this={text}>Il curling ha generato <mark class="highlight">forti picchi</mark> di interesse appena è entrato in scena all’interno dei giochi olimpici 2026</p>
     </div>
 </main>
 
@@ -155,5 +155,10 @@
         color: var(--neutral-900);
         font-weight: 400;
         font-family: var(--font-family-text);
+    }
+
+    .highlight{
+        color: var(--brand-sport-insoliti-500);
+        background-color: transparent;
     }
 </style>

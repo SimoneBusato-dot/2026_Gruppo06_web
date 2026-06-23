@@ -245,7 +245,7 @@
             />
         </div>
         <div id="text5">
-            <p bind:this={text}>Questo suo essere insolito e a prima vista inspiegabile ha spinto le persone a realizzare moltissimi contenuti a riguardo. Specialmente <br><mark>MEME</mark></p>
+            <p bind:this={text}>Questo suo essere <mark class="highlight">insolito</mark> e a prima vista <mark class="highlight">inspiegabile</mark> ha spinto le persone a realizzare moltissimi contenuti a riguardo. Specialmente <br><mark id="Upper">MEME</mark></p>
         </div>
         <div id="title">
             <h1 id="memeTitle" bind:this={title}>MEME</h1>
@@ -299,7 +299,7 @@
         color: var(--neutral-900);
         position: absolute; right: 15%; pointer-events: none;
     }
-    mark {
+    #Upper {
         font-family: var(--font-family);
         font-size: clamp(3rem, 6vw, 8.3125rem);
         font-weight: 900; background-color: transparent;
@@ -331,4 +331,9 @@
         pointer-events: none;
     }
     #Circle { fill: var(--neutral-50); }
+    
+    .highlight{
+        color: var(--brand-sport-insoliti-500);
+        background-color: transparent;
+    }
 </style>

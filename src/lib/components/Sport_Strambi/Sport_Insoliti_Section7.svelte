@@ -48,14 +48,14 @@
                 stagger: 0.05,
             });
 
-            gsap.to(line7, {
+            /*gsap.to(line7, {
                 duration: 1.2,
                 rotateY: xPercent * (-3),
                 rotateX: -yPercent * (-2),
                 scale: 1,
                 ease: "power2.out",
                 overwrite: "auto",
-            });
+            });*/
         };
 
         window.addEventListener("mousemove", moveElements);

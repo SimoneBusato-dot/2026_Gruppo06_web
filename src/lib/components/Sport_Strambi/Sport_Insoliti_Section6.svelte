@@ -8,10 +8,14 @@
     let path2;
     let section;
     let text;
+    let Upper;
 
     onMount(() => {
         const textSplitType = new SplitType(text, { types: 'lines', tagName: 'span' });
         const textLines = textSplitType.lines;
+
+        const UpperSplitType = new SplitType(Upper, { types: 'words', tagName: 'span' })
+        const UpperWords = UpperSplitType.words
 
         const length = path.getTotalLength()
         const length2 = path2.getTotalLength()
@@ -21,6 +25,8 @@
         gsap.set('#text6', { opacity: 0})
        const text6Enter = gsap.fromTo(textLines, { opacity: 0, x: 300 }, { opacity: 1, x: 0, duration: 0.7, ease: "power2.out", stagger: 0.1, paused: true });
        const text6Exit = gsap.fromTo(textLines, { opacity: 1, x: 0 }, { opacity: 0, x: -300, duration: 0.7, ease: "power2.in", stagger: 0.05, paused: true });
+       const UpperEnter = gsap.fromTo(UpperWords, { opacity: 0, x: 300}, {x: 0, opacity: 1, duration: 0.7, ease: "power2.in", stagger: 0.1, paused: true})
+       const UpperExit = gsap.fromTo(UpperWords, { opacity: 1, x: 0}, {x: -300, opacity: 0, duration: 0.7, ease: "power2.in", stagger: 0.1, paused: true})
 
         let tl = gsap.timeline({
             scrollTrigger: {
@@ -36,9 +42,10 @@
                 onEnterBack: () => gsap.set(section, { autoAlpha: 1 }),
                 onLeaveBack: () => gsap.set(section, { autoAlpha: 0 }),
                 onUpdate: (self) => {
-                    if (self.progress >= 0.1) { text6Enter.play(); } else { text6Enter.reverse(); }
+                    if (self.progress >= 0.1) { text6Enter.play(); UpperEnter.play()} else { text6Enter.reverse(); UpperEnter.reverse()}
                     if (self.progress >= 0.17) { gsap.to('#text6', { opacity: 1, duration: 0.5, ease: "power2.out" }); }
-                    if (self.progress >= 0.7) { text6Exit.play(); } else { text6Exit.reverse(); }
+                    if (self.progress >= 0.7) { text6Exit.play(); UpperExit.play()} else { text6Exit.reverse(); UpperExit.reverse()}
+                    if (self.progress >= 0.77) { gsap.to('#text6', { opacity: 0, duration: 0.5, ease: "power2.out" }); }
                 }
             }
         })
@@ -61,7 +68,8 @@
     </div>
 
     <div id="text6">
-        <p bind:this={text} id="paragraph">Niente canoni rigidi o gare asettiche: a suon di meme, i social ci hanno fatto innamorare dell'assurdità di questi strani sport, rendendoli incredibilmente più vicini a noi.</p>
+        <p bind:this={text} id="paragraph"><mark class="highlight">Niente canoni rigidi o gare asettiche:</mark> a suon di meme, i social ci hanno fatto innamorare dell'assurdità di questi strani sport, rendendoli incredibilmente </p>
+        <p id="Upper" bind:this={Upper}>VICINI A NOI</p>
     </div>
 </main>
 
@@ -106,14 +114,31 @@
         font-family: var(--font-family-text);
         color: var(--neutral-900);
         /* da 3.125rem fisso a clamp: min 1.5rem, ideale 3.2vw, max 3.125rem */
-        font-size: clamp(1rem, 3.2vw, 1.5rem);
+        font-size: clamp(1rem, 3.2vw, 1.625rem);
         font-style: normal;
         font-weight: 400;
         line-height: 110%;
         letter-spacing: -0.125rem;
-        /* da 72.625rem fisso a clamp: non sfora mai lo schermo */
-        width: clamp(300px, 72vw, 72.625rem);
+        width: clamp(300px, 72vw, 69.5625rem);
         position: relative;
         z-index: 1;
+        position: relative;
+    }
+
+    .highlight{
+        color: var(--brand-sport-insoliti-500);
+        background-color: transparent;
+    }
+
+    #Upper{
+        color: var(--brand-sport-insoliti-500);
+        font-weight: 900;
+        font-size: clamp(8rem, 6vw, 16rem);
+        font-family: var(--font-family);
+        background-color: transparent;
+        display: block;
+        line-height: 1;
+        position: absolute;
+        left: 35%;
     }
 </style>
