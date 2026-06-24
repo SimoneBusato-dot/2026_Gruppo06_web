@@ -37,8 +37,7 @@
     /* ─── snap ─── */
     let snapTween = null;
 
-    /* ─── wheel ─── */
-    let wheelTimer;
+   
 
     /* ─────────────────────────────────────────────────
        Utility
@@ -121,10 +120,37 @@
        Navigazione
     ───────────────────────────────────────────────── */
     function goToCard(i) {
-        scrollTarget += (i - activeIndex) * STEP;
-        snapToNearest();
+    const slides = getSlides();
+    if (!slides.length) return;
+
+    // Calcola la posizione X visiva di ogni slide
+    const cx = (containerEl?.offsetWidth ?? window.innerWidth) / 2;
+    const range = TOTAL * STEP;
+
+    const getVisualX = (index) => {
+        const rawX = index * STEP - scrollCurrent;
+        const x = ((rawX % range) + range) % range - range / 2;
+        return x + cx - CARD_W / 2 + CARD_W / 2; // centro della card
+    };
+
+    const targetX = getVisualX(i);
+    const activeX = getVisualX(activeIndex);
+
+    // Se il target è visivamente a destra, scorri a destra (+), altrimenti a sinistra (-)
+    if (targetX > activeX) {
+        // target è a destra: vogliamo aumentare scrollTarget
+        let delta = (i - activeIndex) * STEP;
+        if (delta < 0) delta += range; // forza direzione destra
+        scrollTarget += delta;
+    } else {
+        // target è a sinistra: vogliamo diminuire scrollTarget
+        let delta = (i - activeIndex) * STEP;
+        if (delta > 0) delta -= range; // forza direzione sinistra
+        scrollTarget += delta;
     }
 
+    snapToNearest();
+}
     /* ─────────────────────────────────────────────────
        Pointer events — NO setPointerCapture
        Il tracciamento del movimento avviene su window
@@ -175,17 +201,6 @@
     }
 
     /* ─────────────────────────────────────────────────
-       Wheel
-    ───────────────────────────────────────────────── */
-    function onWheel(e) {
-        e.preventDefault();
-        snapTween?.kill();
-        scrollTarget += e.deltaY * 0.8;
-        clearTimeout(wheelTimer);
-        wheelTimer = setTimeout(snapToNearest, 200);
-    }
-
-    /* ─────────────────────────────────────────────────
        Tastiera
     ───────────────────────────────────────────────── */
     function onKeyDown(e) {
@@ -212,18 +227,46 @@
         window.addEventListener('pointermove', onWindowPointerMove);
         window.addEventListener('pointerup',   onWindowPointerUp);
         window.addEventListener('pointercancel', onWindowPointerUp);
-        containerEl.addEventListener('wheel', onWheel, { passive: false });
 
-        return () => {
-            cancelAnimationFrame(rafId);
-            snapTween?.kill();
-            window.removeEventListener('resize', onResize);
-            window.removeEventListener('keydown', onKeyDown);
-            window.removeEventListener('pointermove', onWindowPointerMove);
-            window.removeEventListener('pointerup',   onWindowPointerUp);
-            window.removeEventListener('pointercancel', onWindowPointerUp);
-            containerEl?.removeEventListener('wheel', onWheel);
-        };
+onMount(() => {
+    // ... setup esistente ...
+
+    const loopAnim = gsap.to({}, {          // ✅ PRIMA del return
+        duration: 2,
+        repeat: -1,
+        ease: "none",
+        onUpdate() {
+            const t = this.time() / this.duration() * Math.PI * 2;
+            const xPercent = Math.sin(t);
+            const yPercent = Math.sin(t * 0.5);
+
+            const activeSlide = getSlides()[activeIndex];  // ✅ letto ogni frame
+            if (!activeSlide) return;
+
+            gsap.to(activeSlide, {
+                duration: 0.1,
+                rotateY: xPercent * 7,
+                rotateX: -yPercent * 5,
+                ease: "power2.out",
+                overwrite: "auto"
+            });
+        }
+    });
+
+    return () => {                           // ✅ cleanup alla fine
+        cancelAnimationFrame(rafId);
+        snapTween?.kill();
+        loopAnim.kill();                     // ✅ aggiungi anche questo
+        window.removeEventListener('resize', onResize);
+        window.removeEventListener('keydown', onKeyDown);
+        window.removeEventListener('pointermove', onWindowPointerMove);
+        window.removeEventListener('pointerup', onWindowPointerUp);
+        window.removeEventListener('pointercancel', onWindowPointerUp);
+    };
+});
+
+            
+
     });
 </script>
 
@@ -398,4 +441,15 @@
     .slide:not(.is-active) :global(a) {
         pointer-events: none;
     }
+
+    .slide :global(a),
+    .slide :global(img) {
+    -webkit-user-drag: none;
+    pointer-events: none; /* già gestiti dal JS */
+
+}
+
+.slide.is-active :global(a) {
+    pointer-events: all;
+}
 </style>

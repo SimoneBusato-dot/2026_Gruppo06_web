@@ -188,7 +188,6 @@
     margin-block-start: 2dvh ;
     background-color: var(--neutral-50);
     position: relative;
-    perspective: 2000px;
 }
 
 #perspective, #Content {

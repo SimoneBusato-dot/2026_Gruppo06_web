@@ -168,7 +168,7 @@
         position: relative;
         color: var(--neutral-900);
         font-size: clamp(1.5rem, 1.3vw, 1.5rem);
-        width: clamp(400px, 35vw, 500px);
+        width: clamp(500px, 35vw, 800px);
         font-family: var(--font-family-text);
         display: flex;
         flex-direction: column;
