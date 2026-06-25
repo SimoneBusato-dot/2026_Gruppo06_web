@@ -125,6 +125,7 @@ import { onNavigate } from '$app/navigation';
     /* In alcuni browser storici potrebbe servire anche questo per forzare il clip dell'hardware grafico */
     isolation: isolate;
     transition: all 0.1s ease;
+    border: solid 5px var(--neutral-800);
 }
 
 /* 3. Assicurati che la nuova pagina sia già visibile sotto senza fare nulla */

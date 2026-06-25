@@ -6,7 +6,7 @@ import { goto } from '$app/navigation'
 
     const routes = {
         blue: '/Sport_Insoliti',
-        red: '/Sport_Insoliti',
+        red: '/Villaggio_Olimpico',
         purple: '/Vip_Inaspettati',
         yellow: '/Cucina_Italiana',
     };

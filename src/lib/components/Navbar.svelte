@@ -97,8 +97,9 @@
                 VIP INASPETTATI
             </a>
             <a 
-                href="/Sport_Insoliti" 
+                href="/Villaggio_Olimpico" 
                 class="menu-link link-villaggio" 
+                class:active={$page.url.pathname === '/Villaggio_Olimpico'}
                 onclick={closeMenu}
             >
                 VILLAGGIO OLIMPICO
