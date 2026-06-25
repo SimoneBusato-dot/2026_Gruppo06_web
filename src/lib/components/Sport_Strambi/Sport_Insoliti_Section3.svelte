@@ -84,7 +84,7 @@
 
 <style>
     #section3 { visibility: hidden; background-color: var(--neutral-50); }
-
+    
     #background {
         position: relative;
         width: 100vw;

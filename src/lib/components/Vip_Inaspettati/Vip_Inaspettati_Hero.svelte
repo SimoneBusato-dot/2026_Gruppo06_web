@@ -66,20 +66,21 @@
                 trigger: hero,
                 scroller: window,
                 start: "top top",       
-                end: "+=50%",
+                end: "+=100%",
                 scrub: 1,
                 pin: true,  
                 refreshPriority: 1,
-                pinSpacing: true,
+                pinSpacing: false,
+                markers: true,
                 onLeave: () => gsap.set(hero, { autoAlpha: 0 }),
                 onEnterBack: () => gsap.set(hero, { autoAlpha: 1 }),
             }
         });
         tl.to(svgContainer, {
-            scale: 5, // Aumentato a 12 per essere sicuri di "entrare" nel bianco
+            scale: 6, // Aumentato a 12 per essere sicuri di "entrare" nel bianco
             xPercent: -150,
             yPercent: -50, // Aggiunto per centrare meglio il varco bianco
-            rotate: -60,
+            rotate: -30,
             ease: "power2.inOut"
         });
         

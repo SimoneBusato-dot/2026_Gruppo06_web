@@ -9,132 +9,35 @@
     let path;
     let p1;
     let p2;
-    let transitionElement;
     let line;
 
+
     onMount(() => {
-        const p1SplitText = new SplitType(p1, { types: "lines", tagName: "span" });
-        const p1Lines = p1SplitText.lines;
-        const p2SplitText = new SplitType(p2, { types: "lines", tagName: "span" });
-        const p2Lines = p2SplitText.lines;
+    const p1SplitText = new SplitType(p1, { types: "lines", tagName: "span" });
+    const p1Lines = p1SplitText.lines;
+    const p2SplitText = new SplitType(p2, { types: "lines", tagName: "span" });
+    const p2Lines = p2SplitText.lines;
 
-        const moveElements = (e) => {
-            const xPercent = (e.clientX / window.innerWidth - 0.5) * 2;
-            const yPercent = (e.clientY / window.innerHeight - 0.5) * 2;
-
-            gsap.to(line, {
-                duration: 1.2,
-                rotateY: xPercent * 5,
-                rotateX: -yPercent * 3,
-                scale: 1,
-                ease: "power2.out",
-                overwrite: "auto",
-            });
-        };
-
-        const length = path.getTotalLength();
-
-        gsap.set(path, {
-            strokeDasharray: length,
-            strokeDashoffset: length,
-        });
-
-        const p1Enter = gsap.fromTo(
-            p1Lines,
-            { x: 300, opacity: 0 },
-            { x: 0, opacity: 1, stagger: 0.1, overwrite: "auto", duration: 0.8, paused: true, ease: "power2.out" }
-        );
-
-        const p2Enter = gsap.fromTo(
-            p2Lines,
-            { x: 300, opacity: 0 },
-            { x: 0, opacity: 1, stagger: 0.05, overwrite: "auto", duration: 0.5, paused: true, ease: "power2.out" }
-        );
-
-        const p1Exit = gsap.to(p1Lines, {
-            x: -500,
-            opacity: 0,
-            stagger: 0.1,
-            paused: true,
-            duration: 1,
+    const moveElements = (e) => {
+        const xPercent = (e.clientX / window.innerWidth - 0.5) * 2;
+        const yPercent = (e.clientY / window.innerHeight - 0.5) * 2;
+        gsap.to(line, {
+            duration: 1.2,
+            rotateY: xPercent * 5,
+            rotateX: -yPercent * 3,
+            scale: 1,
+            ease: "power2.out",
             overwrite: "auto",
-            ease: "power2.inOut",
         });
+    };
 
-        const p2Exit = gsap.to(p2Lines, {
-            x: -500,
-            opacity: 0,
-            stagger: 0.1,
-            paused: true,
-            duration: 1,
-            overwrite: "auto",
-            ease: "power2.inOut",
-        });
+    const length = path.getTotalLength();
+    gsap.set(path, { strokeDasharray: length, strokeDashoffset: length });
 
-        const transitionEnter = gsap.fromTo(
-            transitionElement,
-            { scaleX: 0 },
-            { scaleX: 1, duration: 1.2, paused: true, overwrite: "auto", ease: "power2.out" }
-        );
-
-        const tl = gsap.timeline({
-            scrollTrigger: {
-                trigger: section,
-                scroller: window,
-                start: "top top",
-                end: "+=150%",
-                scrub: 1,
-                pin: true,
-                pinSpacing: false,
-                markers: true,
-                onEnter: () => gsap.set(section, { autoAlpha: 1 }),
-                onLeave: () => gsap.set(section, { autoAlpha: 0 }),
-                onEnterBack: () => gsap.set(section, { autoAlpha: 1 }),
-                onLeaveBack: () => gsap.set(section, { autoAlpha: 0 }),
-                onUpdate(self) {
-    if (self.progress >= 0.1) {
-        p1Enter.play();
-    } else {
-        p1Enter.reverse();
-    }
-
-    if (self.progress >= 0.5) {
-        p1Exit.play();
-    } else {
-        p1Exit.reverse();
-    }
-
-    if (self.progress >= 0.55) {
-        p2Enter.play();
-    } else {
-        p2Enter.reverse();
-    }
-
-    if (self.progress >= 0.78) {
-        p2Exit.play();
-    } else {
-        p2Exit.reverse();
-    }
-
-    if (self.progress >= 0.86) {
-        transitionEnter.play();
-    } else {
-        transitionEnter.reverse();
-    }
-                },
-            },
-        });
-
-        tl.to(path, { strokeDashoffset: 0, ease: "none", duration: 1 }, 0);
-        
-
-        window.addEventListener("mousemove", moveElements);
-
-        return () => {
-            window.removeEventListener("mousemove", moveElements);
-            ScrollTrigger.getAll().forEach((t) => t.kill());
-        };
+    window.addEventListener("mousemove", moveElements);
+    return () => window.removeEventListener("mousemove", moveElements);
     });
+
 </script>
 
 <main bind:this={section}>
@@ -158,17 +61,10 @@
         </div>
     </div>
 
-    <svg
-        id="transition"
-        bind:this={transitionElement}
-        viewBox="0 0 1512 982"
-        preserveAspectRatio="none"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-    >
-        <ellipse id="Circle" cx="756" cy="491" rx="756" ry="491" />
-    </svg>
 </main>
+
+
+
 
 <style>
     :global(body) {
@@ -188,8 +84,8 @@
         align-items: center;
         perspective: 1000px;
         background-color: var(--neutral-50);
-        visibility: hidden;
         overflow: hidden;
+        flex-shrink: 0;
     }
 
     #svgContainer {
@@ -254,20 +150,6 @@
         line-height: 0.85;
     }
 
-    #transition {
-        position: absolute;
-        top: -35%;
-        right: -20%;
-        transform-origin: right center;
-        z-index: 2;
-        width: clamp(80vw, 135vw, 160vw);
-        height: clamp(100vh, 178vh, 220vh);
-        pointer-events: none;
-    }
-
-    #Circle {
-        fill: var(--brand-vip-500);
-    }
 
     :global(.swiper) {
         perspective: 1000px;
