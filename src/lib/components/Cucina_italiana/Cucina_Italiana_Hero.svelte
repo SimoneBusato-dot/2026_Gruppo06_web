@@ -122,9 +122,12 @@
 
 
             <div bind:this={background} style="width: 100%; height: 100%;">
-                <svg id="backgroud" width="100vw" height="100vh" viewBox="0 0 1512 977"  preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M 0 0 H 980 C 850 250 820 500 920 720 C 970 850 1020 900 1080 977 H 0 Z" fill="var(--brand-cibo-500)"/>
-                </svg>
+                
+                <svg width="1152" height="870" viewBox="0 0 1152 870" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M-1 0H886.358L811.793 472.14C806.796 503.776 817.256 535.891 839.925 558.517L1152 870H-1V0Z" fill="#DC953E"/>
+</svg>
+
+
             </div>
 
             <div bind:this={line} id="line-wrapper">

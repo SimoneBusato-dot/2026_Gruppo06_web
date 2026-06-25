@@ -453,7 +453,6 @@
                 },
                 onEnter: () => gsap.set(section, { autoAlpha: 1 }),
                 onLeave: () => {
-                    gsap.set(section, { autoAlpha: 0 });
                     goto('/');
                     console.log('onLeave triggered');
                 },
@@ -465,7 +464,6 @@
 
                     // If we reached the end, redirect immediately
                     if (p >= 0.999) {
-                        gsap.set(section, { autoAlpha: 0 });
                         goto('/');
                         return;
                     }
