@@ -6,6 +6,8 @@
     import "swiper/css/bundle";
     import * as d3 from 'd3';
     import SplitType from "split-type";
+    import Comments from "../Comments.svelte";
+    import { goto } from '$app/navigation';
 
     gsap.registerPlugin(ScrollTrigger);
 
@@ -42,6 +44,25 @@
 
     // Slide 7 D3 elements
     let chartText;
+
+    // Slide 7 Quote elements
+    let quoteContainer;
+    let quotePath;
+    let quoteTextElement;
+
+    // Slide 8 Comments elements
+    let commentsContainer;
+    let commentsCards;
+    let commentsVideoScroll;
+    let commentsLine;
+    let commentsPath;
+
+    // Slide 9 Redirect elements
+    let redirectContainer;
+    let redirectLine;
+    let redirectPath;
+    let redirectTextElement;
+    let progressCircle;
 
     // Swiper zafferano colors
     const colors = [
@@ -96,6 +117,7 @@
     ];
 
     onMount(async () => {
+        let isSwipingSwiper = false;
         // ==========================================
         // D3.js Curling Trend Chart Initialization
         // ==========================================
@@ -231,7 +253,11 @@
                     // Stop scrolling through multiple slides in a single gesture
                     swiper.allowTouchMove = false;
                 },
+                touchStart(swiper) {
+                    isSwipingSwiper = true;
+                },
                 touchEnd(swiper) {
+                    isSwipingSwiper = false;
                     // Re-allow drag moves only after user lifts their finger
                     setTimeout(() => {
                         swiper.allowTouchMove = true;
@@ -249,12 +275,19 @@
         const len2 = path2.getTotalLength();
         const lenIntermediate = pathIntermediate.getTotalLength();
         const lenIntermediate2 = pathIntermediate2.getTotalLength();
+        const lenQuote = quotePath.getTotalLength();
+        const lenComments = commentsPath.getTotalLength();
+        const lenRedirect = redirectPath.getTotalLength();
 
         gsap.set(path, { strokeDasharray: len1, strokeDashoffset: len1 });
         gsap.set(path2, { strokeDasharray: len2, strokeDashoffset: len2 });
         gsap.set(pathIntermediate, { strokeDasharray: lenIntermediate, strokeDashoffset: lenIntermediate, opacity: 0 });
         gsap.set(pathIntermediate2, { strokeDasharray: lenIntermediate2, strokeDashoffset: lenIntermediate2, opacity: 0 });
         gsap.set(d3Path, { strokeDasharray: d3Length, strokeDashoffset: d3Length });
+        gsap.set(quotePath, { strokeDasharray: lenQuote, strokeDashoffset: lenQuote });
+        gsap.set(commentsPath, { strokeDasharray: lenComments, strokeDashoffset: lenComments, x: 0 });
+        gsap.set(redirectPath, { strokeDasharray: lenRedirect, strokeDashoffset: lenRedirect });
+        gsap.set(progressCircle, { strokeDasharray: 188.5, strokeDashoffset: 188.5 });
 
         // Initialize states
         gsap.set('.intro-grid .left-col, .intro-grid .right-col', { opacity: 0, y: 100 });
@@ -263,8 +296,60 @@
         gsap.set(fusedContainer, { xPercent: 0 });
         gsap.set(swiperDeckContainer, { xPercent: 100 });
         gsap.set(chartContainer, { xPercent: 100, opacity: 0 });
+        gsap.set(quoteContainer, { xPercent: 100, opacity: 0 });
+        gsap.set(commentsContainer, { xPercent: 0 });
+        gsap.set(commentsLine, { yPercent: 100 });
+        gsap.set(commentsVideoScroll, { x: "180%" });
+        gsap.set(redirectContainer, { xPercent: 0 });
+        gsap.set('.circular-progress-container', { opacity: 0, scale: 0.8 });
         gsap.set('.gallery-col', { y: 0 });
         gsap.set('#intermediateWrapper .para, .gusto-dharma', { opacity: 0, x: 100 });
+
+        // Split quote text into lines
+        const quoteSplit = new SplitType(quoteTextElement, { types: 'lines', tagName: 'span' });
+        const quoteTextLines = quoteSplit.lines;
+        gsap.set(quoteTextLines, { opacity: 0, x: 200 });
+
+        // Split redirect text into words
+        const redirectSplit = new SplitType(redirectTextElement, { types: 'words', tagName: 'span' });
+        const redirectTextWords = redirectSplit.words;
+        gsap.set(redirectTextWords, { opacity: 0, y: 50 });
+
+        // Comments perspective mousemove listener
+        const moveElements = (e) => {
+            const xPercent = (e.clientX / window.innerWidth - 0.5) * 2;
+            const yPercent = (e.clientY / window.innerHeight - 0.5) * 2;
+
+            if (commentsCards) {
+                gsap.to(commentsCards, {
+                    duration: 1.2,
+                    rotateY: xPercent * 25,
+                    rotateX: -yPercent * 25,
+                    ease: "power2.out",
+                    overwrite: "auto",
+                    stagger: 0.04,
+                });
+            }
+
+            gsap.to('#commentsContainer .comments', {
+                duration: 1.2,
+                rotateY: -xPercent * 35,
+                rotateX: yPercent * 35,
+                ease: "power2.out",
+                overwrite: "auto",
+                stagger: 0.04,
+            });
+
+            gsap.to('#commentsContainer .card-bg', {
+                duration: 1.2,
+                rotateY: xPercent * 18,
+                rotateX: -yPercent * 18,
+                ease: "power2.out",
+                overwrite: "auto",
+                stagger: 0.04,
+            });
+        };
+        window.addEventListener("mousemove", moveElements);
 
         // Split PASTA OLIMPICA text into characters using SplitType to ensure natural kerning and layout
         new SplitType(pastaTitle, { types: 'chars', tagName: 'span' });
@@ -276,7 +361,7 @@
         gsap.set(pastaTitleChars, { yPercent: 100, opacity: 0 });
         gsap.set(textLeft, { xPercent: 0, opacity: 1 });
         gsap.set(cardContainer, { scale: 1.0, opacity: 1, y: 0 });
-        gsap.set(cinematicCard, { scale: 1.0, opacity: 0, rotate: 0, borderRadius: 20, zIndex: 100 });
+        gsap.set(cinematicCard, { scale: 0.8, opacity: 0, rotate: -15, x: 40, y: 10, borderRadius: 20, zIndex: 1 });
         gsap.set(chartText, { opacity: 0, x: 200 });
         gsap.set('#firstCircle', { r: 0 });
         gsap.set('#lastCircle', { r: 0 });
@@ -286,37 +371,62 @@
                 trigger: section,
                 scroller: window,
                 start: "top top",
-                end: "+=1350%", // Fast snappy scroll speed to dramatically cut transition times
+                end: "+=2600%", // Extended scroll height for slide 7, 8 and 9
                 scrub: 1,
                 pin: true,
                 pinSpacing: true,
                 snap: {
                     snapTo: (value) => {
+                        // Snapping logic for redirect lock (from 28.0 to 40.0)
+                        const lockStart = 28.0 / 40.0;
+                        if (value >= lockStart && value < 1.0) {
+                            if (value < 39.8 / 40.0) {
+                                return lockStart; // Snap back to start of redirect slide
+                            } else {
+                                return 1.0; // Snap to homepage redirect
+                            }
+                        }
+
                         const points = [
                             0,
-                            2.0 / 17.65,
-                            3.5 / 17.65,
-                            7.0 / 17.65,
-                            8.5 / 17.65,
-                            10.2 / 17.65,
-                            12.0 / 17.65,
-                            13.8 / 17.65,
-                            15.4 / 17.65,
+                            2.0 / 40.0,
+                            3.5 / 40.0,
+                            7.0 / 40.0,
+                            8.5 / 40.0,
+                            10.2 / 40.0,
+                            12.0 / 40.0,
+                            13.8 / 40.0,
+                            15.4 / 40.0,
+                            17.5 / 40.0,
+                            19.0 / 40.0,
+                            20.5 / 40.0,
+                            22.0 / 40.0,
+                            24.0 / 40.0,
+                            25.5 / 40.0,
+                            27.0 / 40.0,
+                            28.0 / 40.0,
                             1
                         ];
 
                         // Free scroll ranges:
                         // 1. Vertical video gallery: from 3.5 to 7.0 timeline progress
-                        const galleryStart = 3.5 / 17.65;
-                        const galleryEnd = 7.0 / 17.65;
+                        const galleryStart = 3.5 / 40.0;
+                        const galleryEnd = 7.0 / 40.0;
                         if (value > galleryStart && value < galleryEnd) {
                             return value; // Return current position (no snap)
                         }
 
                         // 2. D3 chart drawing animation: from 15.4 to 17.0 timeline progress
-                        const chartStart = 15.4 / 17.65;
-                        const chartEnd = 17.0 / 17.65;
+                        const chartStart = 15.4 / 40.0;
+                        const chartEnd = 17.0 / 40.0;
                         if (value > chartStart && value < chartEnd) {
+                            return value; // Return current position (no snap)
+                        }
+
+                        // 3. Comments horizontal scrolling animation: from 22.0 to 25.5 progress
+                        const commentsScrollStart = 22.0 / 40.0;
+                        const commentsScrollEnd = 25.5 / 40.0;
+                        if (value > commentsScrollStart && value < commentsScrollEnd) {
                             return value; // Return current position (no snap)
                         }
 
@@ -337,17 +447,44 @@
                         }
                         return value; // Keep current scroll position in the middle of sections
                     },
-                    duration: { min: 0.4, max: 0.8 },
-                    delay: 0.25,
-                    ease: "power2.out"
+                    duration: { min: 0.1, max: 0.2 },
+                    delay: 0.1,
+                    ease: "power3.out"
                 },
                 onEnter: () => gsap.set(section, { autoAlpha: 1 }),
-                onLeave: () => gsap.set(section, { autoAlpha: 0 }),
+                onLeave: () => {
+                    gsap.set(section, { autoAlpha: 0 });
+                    goto('/');
+                    console.log('onLeave triggered');
+                },
                 onEnterBack: () => gsap.set(section, { autoAlpha: 1 }),
                 onLeaveBack: () => gsap.set(section, { autoAlpha: 0 }),
+                onUpdate: (self) => {
+                    const p = self.progress;
+                    const startP = 28.0 / 40.0;
+
+                    // If we reached the end, redirect immediately
+                    if (p >= 0.999) {
+                        gsap.set(section, { autoAlpha: 0 });
+                        goto('/');
+                        return;
+                    }
+
+                    if (p >= startP) {
+                        // User is scrolling to fill the progress circle
+                        const f = Math.max(0, Math.min(1, (p - startP) / (1 - startP)));
+                        const offset = 188.5 * (1 - f);
+                        if (progressCircle) {
+                            progressCircle.style.strokeDashoffset = offset;
+                        }
+                    } else {
+                        if (progressCircle) {
+                            progressCircle.style.strokeDashoffset = 188.5;
+                        }
+                    }
+                }
             }
         });
-
         // 1. PHASE 1: Slide 1 - Figma intro texts grid
         tl.to(path, { strokeDashoffset: 0, ease: "none", duration: 1.5 }, 0)
           .to(path2, { strokeDashoffset: 0, ease: "none", duration: 1.5 }, 0)
@@ -392,17 +529,35 @@
           .to(swiperDeckContainer, { xPercent: 0, duration: 1.5, ease: "power2.inOut" }, 12.0)
 
           // 8. PHASE 8: Cinematic Card Expansion (one card grows to cover the screen)
-          .to(textLeft, { xPercent: -150, opacity: 0, duration: 1.0, ease: "power2.in" }, 13.8)
-          .to(cardContainer, { scale: 0.8, xPercent: -100, opacity: 0, duration: 1.2, ease: "power2.in" }, 13.8)
+          .set(cinematicCard, { opacity: 0 }, 13.8)
+          .to(cinematicCard, { opacity: 1, duration: 0.15, ease: "power1.out" }, 13.8)
           .to(cinematicCard, { 
-              opacity: 1, 
+              x: 260, 
+              y: -30, 
+              scale: 0.95, 
+              rotate: -5, 
+              duration: 0.4, 
+              ease: "power2.out" 
+          }, 13.8)
+          .to(cinematicCard, { 
+              x: 0, 
+              y: 0, 
+              scale: 1.0, 
+              rotate: 0, 
+              zIndex: 100, 
+              duration: 0.4, 
+              ease: "power2.out" 
+          }, 14.2)
+          .to(textLeft, { xPercent: -150, opacity: 0, duration: 0.4, ease: "power2.in" }, 14.5)
+          .to(cardContainer, { scale: 0.8, xPercent: -100, opacity: 0, duration: 0.4, ease: "power2.in" }, 14.5)
+          .to(cinematicCard, { 
               scaleX: 5.5, 
               scaleY: 3.5, 
               rotate: 90, // Cinematic horizontal turn
               borderRadius: 0, 
-              duration: 1.5, 
+              duration: 0.8, 
               ease: "power2.inOut" 
-          }, 13.8)
+          }, 14.6)
 
           // 9. PHASE 9: Slide 6 - Restored D3 Curling Trend Graph drawn over the yellow background
           .to(chartContainer, { xPercent: 0, opacity: 1, duration: 0.1 }, 15.4)
@@ -412,17 +567,44 @@
           .to(chartText, { opacity: 1, x: 0, ease: "power2.out", duration: 1.0 }, 15.6)
           .to('#lastCircle', { r: 15, ease: "power2.out", duration: 0.1 }, 16.9)
 
-          // 10. PHASE 10: Bubble Zoom Exit (screen turns white) - Quick 0.6s exit zoom and 0.05s buffer to unpin immediately
-          .to('#lastCircle', { r: "120vw", ease: "power2.in", duration: 0.6 }, 17.0)
-          .to(chartText, { opacity: 0, y: -50, ease: "power2.out", duration: 0.5 }, 17.0)
-          .to('.tick line', { attr: { y2: 0 }, ease: "power2.out", duration: 0.5 }, 17.0)
+          // 10. PHASE 10: Transition to Slide 7 (Quote section) with opacity cross-fade
+          .to(chartContainer, { xPercent: -100, opacity: 0, duration: 1.5, ease: "power2.inOut" }, 17.5)
+          .to(cinematicCard, { xPercent: -150, opacity: 0, duration: 1.5, ease: "power2.inOut" }, 17.5)
+          .to(quoteContainer, { xPercent: 0, opacity: 1, duration: 1.5, ease: "power2.inOut" }, 17.5)
+          .to(quotePath, { strokeDashoffset: 0, duration: 1.5, ease: "none" }, 17.5)
+          .to(quoteTextLines, { opacity: 1, x: 0, stagger: 0.1, ease: "power2.out", duration: 1.0 }, 18.0)
 
-          // Tightened unpin buffer to complete transitions quickly
-          .to({}, { duration: 0.05 }, 17.65);
+          // 11. PHASE 11: Transition to Slide 8 (Comments section) with quote retraction and comments line bottom entrance
+          .to(quoteTextLines, { opacity: 0, stagger: 0.05, ease: "power2.in", duration: 0.8 }, 20.5)
+          .to(quotePath, { strokeDashoffset: -lenQuote, duration: 1.5, ease: "power2.inOut" }, 20.5)
+          .to(commentsLine, { yPercent: 0, duration: 1.5, ease: "power2.inOut" }, 20.5)
+          .to(commentsVideoScroll, { x: "-200%", ease: "none", duration: 5.0 }, 20.5)
+          .to(commentsPath, { strokeDashoffset: 0, ease: "none", duration: 5.0, x: "-60%" }, 20.5)
+          .to(commentsPath, { strokeDashoffset: -lenComments, ease: "none", duration: 1.5 }, 24.0)
+
+          // 12. PHASE 12: Transition to Slide 9 (Redirect section)
+          .to(redirectPath, { strokeDashoffset: 0, ease: "none", duration: 1.5 }, 25.5)
+          .to(redirectTextWords, { opacity: 1, y: 0, stagger: 0.1, duration: 1.0, ease: "power2.out" }, 27.0)
+          .fromTo('.circular-progress-container', { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1.0, duration: 1.0, ease: "power2.out" }, 27.0)
+          .to({}, { duration: 12.0 }, 28.0);
+
+        const preventDefaultScroll = (e) => {
+            if (isSwipingSwiper) {
+                if (e.cancelable) {
+                    e.preventDefault();
+                }
+            }
+        };
+
+        window.addEventListener('wheel', preventDefaultScroll, { passive: false });
+        window.addEventListener('touchmove', preventDefaultScroll, { passive: false });
 
         return () => {
             swiper.destroy();
             ScrollTrigger.getAll().forEach(t => t.kill());
+            window.removeEventListener('wheel', preventDefaultScroll);
+            window.removeEventListener('touchmove', preventDefaultScroll);
+            window.removeEventListener("mousemove", moveElements);
         };
     });
 </script>
@@ -529,7 +711,6 @@
         <div id="deckWrapper">
             <!-- Left Side: normal styled text (not Dharma, not Yellow) -->
             <div id="leftColumn" bind:this={textLeft}>
-                <h2 id="pastaSub">o "pasta a cinque cerchi"...</h2>
                 <p id="pastaDesc">Lo strano formato di pasta, nato per queste Olimpiadi Invernali, ha conquistato atleti e turisti.</p>
             </div>
 
@@ -591,6 +772,142 @@
 
         <div id="chartText" bind:this={chartText}>
             <p id="chartParagraph">Il trend della pasta ha avuto picchi altissimi le prime settimane, per poi gradualmente attenuarsi in un entusiasmo a salti sporadici e ritorni improvvisi.</p>
+        </div>
+    </div>
+
+    <!-- ========================================================== -->
+    <!-- SLIDE 7: Quote Section (Section 6)                         -->
+    <!-- ========================================================== -->
+    <div id="quoteContainer" class="slide-container" bind:this={quoteContainer}>
+        <div id="quoteSvgContainer">
+            <svg viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path bind:this={quotePath} d="M -100 320 C 200 320, 250 120, 450 120 C 650 120, 800 180, 950 180 C 1100 180, 1150 -50, 1250 -100" stroke="var(--brand-cibo-500)" stroke-width="51" stroke-linecap="round"/>
+            </svg>
+        </div>
+
+        <div id="quoteText">
+            <p bind:this={quoteTextElement} id="quoteParagraph">Vederli godersi questi piatti con la nostra stessa voglia ha fatto <span class="highlight">crollare l'immagine</span> dell'atleta distante, freddo e rigoroso.</p>
+        </div>
+    </div>
+
+    <!-- ========================================================== -->
+    <!-- SLIDE 8: Comments Section (Section 7)                      -->
+    <!-- ========================================================== -->
+    <div id="commentsContainer" class="slide-container" bind:this={commentsContainer}>
+        <div id="commentsPerspective" bind:this={commentsCards}>
+            <div id="commentsContent">
+                <div id="commentsVideoContainer" bind:this={commentsVideoScroll}>
+                    <!-- Card 1 -->
+                    <div class="v">
+                        <div class="video-wrapper">
+                            <video src="/Cucina_Italiana/Video_introduzione/Sp_Intro1.mp4" autoplay muted loop playsinline></video>
+                            <div class="card-bg"></div>
+                        </div>
+                        <div class="comments">
+                            <Comments variant="yellow">Te la sogni 'sta roba in Usa</Comments>
+                        </div>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="v">
+                        <div class="video-wrapper">
+                            <video src="/Cucina_Italiana/Video_introduzione/Sp_Intro2.mp4" autoplay muted loop playsinline></video>
+                            <div class="card-bg"></div>
+                        </div>
+                        <div class="comments">
+                            <Comments variant="yellow">sono stati creativi in cucina 🇮🇹👏🏻</Comments>
+                        </div>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="v">
+                        <div class="video-wrapper">
+                            <video src="/Cucina_Italiana/Video_introduzione/Sp_Intro3.mp4" autoplay muted loop playsinline></video>
+                            <div class="card-bg"></div>
+                        </div>
+                        <div class="comments">
+                            <Comments variant="yellow">Dude send me some tiramisu that looks so good 🤤😭</Comments>
+                        </div>
+                    </div>
+
+                    <!-- Card 4 -->
+                    <div class="v">
+                        <div class="video-wrapper">
+                            <video src="/Cucina_Italiana/Video_introduzione/Sp_Intro4.mp4" autoplay muted loop playsinline></video>
+                            <div class="card-bg"></div>
+                        </div>
+                        <div class="comments">
+                            <Comments variant="yellow">nessuno ha notato che la pasta è a 5 cerchi</Comments>
+                        </div>
+                    </div>
+
+                    <!-- Card 5 -->
+                    <div class="v">
+                        <div class="video-wrapper">
+                            <video src="/Cucina_Italiana/Video_introduzione/Sp_Intro5.mp4" autoplay muted loop playsinline></video>
+                            <div class="card-bg"></div>
+                        </div>
+                        <div class="comments">
+                            <Comments variant="yellow">olympic muffins, olympic tiramisu, and now olympic pasta??</Comments>
+                        </div>
+                    </div>
+
+                    <!-- Card 6 -->
+                    <div class="v">
+                        <div class="video-wrapper">
+                            <video src="/Cucina_Italiana/Video_introduzione/Sp_Intro1.mp4" autoplay muted loop playsinline></video>
+                            <div class="card-bg"></div>
+                        </div>
+                        <div class="comments">
+                            <Comments variant="yellow">as an italian i want that</Comments>
+                        </div>
+                    </div>
+
+                    <!-- Card 7 -->
+                    <div class="v">
+                        <div class="video-wrapper">
+                            <video src="/Cucina_Italiana/Video_introduzione/Sp_Intro2.mp4" autoplay muted loop playsinline></video>
+                            <div class="card-bg"></div>
+                        </div>
+                        <div class="comments">
+                            <Comments variant="yellow">qui non facciamo fare i menu ai nutrizionisti, ma alle nonne</Comments>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="commentsSvgContainer" bind:this={commentsLine}>
+            <svg width="200%" height="100%" viewBox="0 0 2374 219" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path bind:this={commentsPath} d="M25.1792 395.969C46.2211 264.612 269.241 39.0184 401.679 26.4684C549.667 12.4449 663.179 154.468 758.679 229.969C935.179 369.506 809.673 322.658 974.179 254.469C1104.49 200.455 1153.99 150.045 1284.68 96.9687C1489.35 13.847 1657.03 392.953 1857.18 299.469C1949.36 256.416 1967.82 159.328 2077.18 140.969C2145.68 129.469 2200.82 151.427 2239.68 224.469C2278.87 298.144 2324.47 370.376 2348.68 450.238" stroke="var(--brand-cibo-500)" stroke-width="51" stroke-linejoin="round" stroke-linecap="round"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- ========================================================== -->
+    <!-- SLIDE 9: Redirect Section (Section 8)                      -->
+    <!-- ========================================================== -->
+    <div id="redirectContainer" class="slide-container" bind:this={redirectContainer}>
+        <div id="redirectSvgContainer" bind:this={redirectLine}>
+            <svg viewBox="0 0 1920 1080" width="100%" height="100%" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path bind:this={redirectPath} d="M400 -100 C 400 200, 600 300, 800 200 C 1000 100, 1200 400, 1400 300 C 1600 200, 1800 600, 2100 500" stroke="var(--brand-cibo-500)" stroke-width="51" stroke-linecap="round"/>
+            </svg>
+        </div>
+
+        <div id="redirectText">
+            <p id="redirectParagraph" bind:this={redirectTextElement}>
+                Continua a scrollare per tornare alle card
+            </p>
+        </div>
+
+        <div class="circular-progress-container">
+            <svg class="progress-ring" width="80" height="80">
+                <circle class="progress-ring__background" stroke="rgba(0,0,0,0.1)" stroke-width="6" fill="transparent" r="30" cx="40" cy="40" />
+                <circle class="progress-ring__circle" bind:this={progressCircle} stroke="var(--brand-cibo-500)" stroke-width="6" fill="transparent" r="30" cx="40" cy="40" />
+            </svg>
+            <svg class="arrow-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="var(--brand-cibo-500)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <polyline points="19 12 12 19 5 12"></polyline>
+            </svg>
         </div>
     </div>
 </main>
@@ -916,16 +1233,6 @@
         gap: 1.5rem;
     }
 
-    #pastaSub {
-        font-family: var(--font-family-text);
-        font-size: 3.5rem;
-        font-weight: 800;
-        color: var(--neutral-900);
-        margin: 0;
-        line-height: 1.1;
-        letter-spacing: -0.08rem;
-    }
-
     #pastaDesc {
         font-family: var(--font-family-text);
         font-size: 1.6rem;
@@ -1075,5 +1382,215 @@
         font-weight: 300;
         font-family: var(--font-family-text);
         line-height: 140%;
+    }
+
+    #quoteContainer {
+        z-index: 9;
+        justify-content: center;
+        background-color: var(--neutral-50);
+    }
+
+    #quoteSvgContainer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    #quoteSvgContainer svg {
+        width: 100%;
+        height: 100%;
+        overflow: visible !important;
+    }
+
+    #quoteText {
+        position: relative;
+        z-index: 10;
+        font-family: var(--font-family-text);
+        color: var(--neutral-900);
+        font-size: 24pt;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 145%;
+        letter-spacing: -0.06rem;
+        width: 72.625rem;
+        pointer-events: none;
+    }
+
+    #commentsContainer {
+        z-index: 11;
+        justify-content: center;
+        background-color: transparent;
+    }
+
+    #commentsPerspective, #commentsContent {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        z-index: 2;
+    }
+
+    #commentsPerspective {
+        perspective: 1000px;
+    }
+
+    #commentsVideoContainer {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 16rem;
+        height: 100%;
+    }
+
+    #commentsVideoContainer .v {
+        position: relative;
+        height: 52vh;
+        width: calc(52vh * 9 / 16);
+        flex-shrink: 0;
+        perspective: 800px; 
+    }
+
+    #commentsVideoContainer .video-wrapper {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transform-style: preserve-3d;
+    }
+
+    #commentsVideoContainer .v:nth-child(1) .video-wrapper { transform: translateZ(0px) rotateY(-25deg) translateY(8%); }
+    #commentsVideoContainer .v:nth-child(2) .video-wrapper { transform: translateZ(0px) rotateY(20deg) translateY(-18%); }
+    #commentsVideoContainer .v:nth-child(3) .video-wrapper { transform: translateZ(0px) rotateY(-15deg) translateY(22%); }
+    #commentsVideoContainer .v:nth-child(4) .video-wrapper { transform: translateZ(0px) rotateY(25deg) translateY(-22%); }
+    #commentsVideoContainer .v:nth-child(5) .video-wrapper { transform: translateZ(0px) rotateY(-10deg) translateY(18%); }
+    #commentsVideoContainer .v:nth-child(6) .video-wrapper { transform: translateZ(0px) rotateY(22deg) translateY(-12%); }
+    #commentsVideoContainer .v:nth-child(7) .video-wrapper { transform: translateZ(0px) rotateY(-25deg) translateY(4%); }
+
+    #commentsVideoContainer .card-bg {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-color: var(--brand-cibo-400); /* Zafferano Yellow */
+        border-radius: 12px;
+        z-index: -1;
+        transform-style: preserve-3d;
+    }
+
+    #commentsVideoContainer .v:nth-child(1) .card-bg { transform: translateZ(-70px) rotateZ(3deg); top: 8%; left: 8%; }
+    #commentsVideoContainer .v:nth-child(2) .card-bg { transform: translateZ(-70px) rotateZ(-4deg); top: 6%; left: -10%; }
+    #commentsVideoContainer .v:nth-child(3) .card-bg { transform: translateZ(-70px) rotateZ(2deg); top: 8%; left: 6%; }
+    #commentsVideoContainer .v:nth-child(4) .card-bg { transform: translateZ(-70px) rotateZ(-3deg); top: 8%; left: -8%; }
+    #commentsVideoContainer .v:nth-child(5) .card-bg { transform: translateZ(-70px) rotateZ(4deg); top: 5%; left: 10%; }
+    #commentsVideoContainer .v:nth-child(6) .card-bg { transform: translateZ(-70px) rotateZ(-2deg); top: 8%; left: -12%; }
+    #commentsVideoContainer .v:nth-child(7) .card-bg { transform: translateZ(-70px) rotateZ(3deg); top: 6%; left: 8%; }
+
+    #commentsVideoContainer video {
+        width: 100%;
+        height: 100%;
+        border-radius: 12px;
+        object-fit: cover;
+        position: relative;
+        z-index: 2;
+        transform: translateZ(20px); 
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+
+    #commentsVideoContainer .comments {
+        position: absolute;
+        width: 90%;
+        z-index: 10;
+        transform: translateZ(40px);
+    }
+
+    #commentsVideoContainer .v:nth-child(1) .comments { top: 35%; left: 55%; }
+    #commentsVideoContainer .v:nth-child(2) .comments { transform: translateZ(40px) translateY(-145%); left: -60%; }
+    #commentsVideoContainer .v:nth-child(3) .comments { top: 22%; left: 55%; }
+    #commentsVideoContainer .v:nth-child(4) .comments { transform: translateZ(40px) translateY(-135%); left: -60%; }
+    #commentsVideoContainer .v:nth-child(5) .comments { top: 42%; left: 55%; }
+    #commentsVideoContainer .v:nth-child(6) .comments { transform: translateZ(40px) translateY(-150%); left: -60%; }
+    #commentsVideoContainer .v:nth-child(7) .comments { top: 50%; left: 55%; }
+
+    #commentsSvgContainer {
+        position: absolute;
+        bottom: -40%;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+    }
+
+    #commentsSvgContainer svg {
+        overflow: visible !important;
+    }
+
+    #redirectContainer {
+        z-index: 12;
+        justify-content: center;
+        background-color: transparent;
+    }
+
+    #redirectSvgContainer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+    }
+
+    #redirectSvgContainer svg {
+        overflow: visible !important;
+    }
+
+    #redirectText {
+        position: relative;
+        z-index: 1;
+        font-size: 1.625rem;
+        color: var(--neutral-900);
+        font-family: var(--font-family-text);
+    }
+
+    .circular-progress-container {
+        position: absolute;
+        bottom: 15%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        z-index: 10;
+    }
+
+    .progress-ring {
+        transform: rotate(-90deg);
+        transform-origin: center;
+    }
+
+    .progress-ring__circle {
+        transition: stroke-dashoffset 0.05s linear;
+    }
+
+    .arrow-icon {
+        position: absolute;
+        animation: bounce-cibo 2s infinite;
+        pointer-events: none;
+    }
+
+    @keyframes bounce-cibo {
+        0%, 20%, 50%, 80%, 100% {
+            transform: translateY(0);
+        }
+        40% {
+            transform: translateY(6px);
+        }
+        60% {
+            transform: translateY(3px);
+        }
     }
 </style>

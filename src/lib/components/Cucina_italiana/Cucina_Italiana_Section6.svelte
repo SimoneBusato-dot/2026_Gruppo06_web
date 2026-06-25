@@ -5,7 +5,6 @@
     import SplitType from 'split-type';
 
     let path;
-    let path2;
     let section;
     let text;
 
@@ -14,16 +13,10 @@
         const textLines = textSplitType.lines;
 
         const length = path.getTotalLength();
-        const length2 = path2.getTotalLength();
 
         gsap.set(path, {
             strokeDasharray: length,
             strokeDashoffset: length
-        });
-
-        gsap.set(path2, {
-            strokeDasharray: length2,
-            strokeDashoffset: length2
         });
 
         gsap.set(textLines, { opacity: 0, x: 200 });
@@ -51,8 +44,7 @@
             }
         });
 
-        tl.to(path, { strokeDashoffset: -length, duration: 4.0, ease: "power2.out" }, 0)
-          .to(path2, { strokeDashoffset: -length2, duration: 4.0, ease: "power2.out" }, 1.0)
+        tl.to(path, { strokeDashoffset: 0, duration: 4.0, ease: "power2.out" }, 0)
           .to(textLines, { opacity: 1, x: 0, stagger: 0.1, ease: "power2.out", duration: 1.0 }, 0)
           .to(textLines, { opacity: 0, x: -200, stagger: 0.05, ease: "power2.in", duration: 0.8 }, 3.0)
           .to({}, { duration: 0.05 }, 3.85); // immediate unpin smooth-cut
@@ -60,19 +52,16 @@
 </script>
 
 <main id="section6" bind:this={section}>
-    <!-- Fullscreen SVG containing non-specular edge-to-edge curves bleeding off-screen -->
+    <!-- Fullscreen SVG containing a single wave curve bleeding off-screen -->
     <div id="svgContainer">
         <svg viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <!-- Curve 1: Enters Left, Exits Top (Completely contained in X < 300) -->
-            <path bind:this={path} d="M -100 800 C 200 700 150 150 300 -100" stroke="var(--brand-cibo-500)" stroke-width="51" stroke-linecap="round"/>
-            
-            <!-- Curve 2: Enters Bottom, Exits Right (Completely contained in X > 1600) -->
-            <path bind:this={path2} d="M 1600 1180 C 1700 800 1650 600 2020 400" stroke="var(--brand-cibo-500)" stroke-width="51" stroke-linecap="round"/>
+            <!-- Curve 1: Single wave curve entering left and exiting top-right -->
+            <path bind:this={path} d="M -100 320 C 200 320, 250 120, 450 120 C 650 120, 800 180, 950 180 C 1100 180, 1150 -50, 1250 -100" stroke="var(--brand-cibo-500)" stroke-width="51" stroke-linecap="round"/>
         </svg>
     </div>
 
     <div id="text">
-        <p bind:this={text} id="paragraph">Vederli godersi questi piatti con la nostra stessa voglia ha fatto crollare l'immagine dell'atleta distante, freddo e rigoroso.</p>
+        <p bind:this={text} id="paragraph">Vederli godersi questi piatti con la nostra stessa voglia ha fatto <span class="highlight">crollare l'immagine</span> dell'atleta distante, freddo e rigoroso.</p>
     </div>
 </main>
 
@@ -118,5 +107,9 @@
         letter-spacing: -0.06rem;
         width: 72.625rem;
         pointer-events: none;
+    }
+
+    .highlight {
+        color: var(--brand-cibo-500);
     }
 </style>
