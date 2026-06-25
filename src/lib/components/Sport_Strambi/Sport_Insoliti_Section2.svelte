@@ -64,14 +64,25 @@
                     if (self.progress >= 0.2) { p1Enter.play(); sliderEnter.play(); }
                     else { p1Enter.reverse(); sliderEnter.reverse(); }
                     if (self.progress >= 0.5) { p2Enter.play(); p1Exit.play(); }
-                    else { p2Enter.reverse(); p1Exit.reverse(); }
-                    if (self.progress >= 0.91) { transitionEnter.play(); }
+                    else { p2Enter.reverse(); p1Exit.reverse(); if (self.progress >= 0.2) p1Enter.play();}
+                    if (self.progress >= 0.82) { transitionEnter.play(); }
                     else { transitionEnter.reverse(); }
                 }
             }
         });
 
-        tl.to(path, { strokeDashoffset: 0, ease: "none", duration: 1 }, 0);
+        const tl2 = gsap.timeline({
+            scrollTrigger: {
+                trigger: section,
+                scroller: window,
+                start: "top top",       // parte insieme alla prima
+                end: "+=81%",           // finisce all'80% della prima (81% di 101%)
+                scrub: 1,
+                // NO pin — il pin lo gestisce già tl
+            }
+        });
+
+        tl2.to(path, { strokeDashoffset: 0, ease: "none", duration: 1 }, 0);
 
         window.addEventListener("mousemove", moveElements);
         return () => {
@@ -89,9 +100,9 @@
     </div>
 
     <div id="content">
-        <div id="text">
+        <div id="text2">
             <p bind:this={p1}>I feed su Milano Cortina si sono riempiti di discipline invernali insolite.</p>
-            <p bind:this={p2}>Tra le discese folli dello skeleton o l'assurdo mix sci-carabina del biathlon, le persone hanno scoperto una passione improvvisa per gli sport più di nicchia, divertenti e <mark>STRAMBI</mark></p>
+            <p bind:this={p2}>Tra le discese folli dello <mark class="highlight">skeleton</mark> o il mix sci-carabina del <mark class="highlight">biathlon</mark>, le persone hanno scoperto una passione improvvisa per gli sport più <mark id="Upper">PECULIARI E STRAMBI</mark></p>
         </div>
         <SportSlider bind:el={sliderElement} />
     </div>
@@ -145,13 +156,19 @@
         box-sizing: border-box;
         padding: 0 clamp(1rem, 3vw, 4rem);
         transform: translateX(5%);
+
+        max-height: 100vh;
+        padding-top: clamp(1rem, 4vh, 3rem);
+        padding-bottom: clamp(2rem, 6vh, 4rem); /* spazio per non tagliare */
+        align-items: center;
+        box-sizing: border-box;
     }
 
-    #text {
+    #text2 {
         position: relative;
         color: var(--neutral-900);
         font-size: clamp(1.5rem, 1.3vw, 1.5rem);
-        width: clamp(400px, 35vw, 400px);
+        width: clamp(500px, 35vw, 800px);
         font-family: var(--font-family-text);
         display: flex;
         flex-direction: column;
@@ -161,7 +178,12 @@
         flex-shrink: 0;
     }
 
-    mark {
+    .highlight{
+        color: var(--brand-sport-insoliti-500);
+        background-color: transparent;
+    }
+
+    #Upper{
         color: var(--brand-sport-insoliti-500);
         font-weight: 900;
         font-size: clamp(3rem, 6vw, 8.3rem);

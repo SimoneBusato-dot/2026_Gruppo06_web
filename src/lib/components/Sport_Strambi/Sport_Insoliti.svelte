@@ -6,6 +6,7 @@
     import SportInsolitiSection5 from "./Sport_Insoliti_Section5.svelte";
     import SportInsolitiSection6 from "./Sport_Insoliti_Section6.svelte";
     import SportInsolitiSection7 from "./Sport_Insoliti_Section7.svelte";
+    import SportInsolitiSection8 from "./Sport_Insoliti_Section8.svelte";
 </script>
 
 <SportInsolitiHero />
@@ -15,3 +16,4 @@
 <SportInsolitiSection5 />
 <SportInsolitiSection6 />
 <SportInsolitiSection7 />
+<SportInsolitiSection8 />

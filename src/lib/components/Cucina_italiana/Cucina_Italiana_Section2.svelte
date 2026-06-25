@@ -5,6 +5,7 @@
     import Swiper from "swiper/bundle";
     import "swiper/css/bundle";
     import * as d3 from 'd3';
+    import SplitType from "split-type";
 
     gsap.registerPlugin(ScrollTrigger);
 
@@ -13,6 +14,7 @@
     let galleryContainer;
     let intermediateContainer;
     let pastaContainer;
+    let fusedContainer;
     let swiperDeckContainer;
     let chartContainer;
 
@@ -21,7 +23,6 @@
     let path2;
     let pathIntermediate;
     let pathIntermediate2;
-    let pathPasta;
     let svgElement;
 
     // Slide 1 elements
@@ -248,27 +249,31 @@
         const len2 = path2.getTotalLength();
         const lenIntermediate = pathIntermediate.getTotalLength();
         const lenIntermediate2 = pathIntermediate2.getTotalLength();
-        const lenPasta = pathPasta.getTotalLength();
 
         gsap.set(path, { strokeDasharray: len1, strokeDashoffset: len1 });
         gsap.set(path2, { strokeDasharray: len2, strokeDashoffset: len2 });
-        gsap.set(pathIntermediate, { strokeDasharray: lenIntermediate, strokeDashoffset: lenIntermediate });
-        gsap.set(pathIntermediate2, { strokeDasharray: lenIntermediate2, strokeDashoffset: lenIntermediate2 });
-        gsap.set(pathPasta, { strokeDasharray: lenPasta, strokeDashoffset: lenPasta });
+        gsap.set(pathIntermediate, { strokeDasharray: lenIntermediate, strokeDashoffset: lenIntermediate, opacity: 0 });
+        gsap.set(pathIntermediate2, { strokeDasharray: lenIntermediate2, strokeDashoffset: lenIntermediate2, opacity: 0 });
         gsap.set(d3Path, { strokeDasharray: d3Length, strokeDashoffset: d3Length });
 
         // Initialize states
         gsap.set('.intro-grid .left-col, .intro-grid .right-col', { opacity: 0, y: 100 });
         gsap.set(galleryContainer, { xPercent: 100 });
         gsap.set(intermediateContainer, { xPercent: 100 });
-        gsap.set(pastaContainer, { xPercent: 100 });
+        gsap.set(fusedContainer, { xPercent: 0 });
         gsap.set(swiperDeckContainer, { xPercent: 100 });
         gsap.set(chartContainer, { xPercent: 100, opacity: 0 });
         gsap.set('.gallery-col', { y: 0 });
         gsap.set('#intermediateWrapper .para, .gusto-dharma', { opacity: 0, x: 100 });
-        gsap.set(pastaTitle, { xPercent: 0, opacity: 1 });
+
+        // Split PASTA OLIMPICA text into characters using SplitType to ensure natural kerning and layout
+        new SplitType(pastaTitle, { types: 'chars', tagName: 'span' });
+
+        gsap.set(pastaTitle, { xPercent: 0, opacity: 0 });
         const pastaTitleChars = pastaTitle.querySelectorAll('.char');
-        gsap.set(pastaTitleChars, { x: -1000, skewX: -30, opacity: 0 });
+        const pastaWordChars = pastaTitle.querySelectorAll('.pasta-line:first-of-type .char');
+        const olimpicaWordChars = pastaTitle.querySelectorAll('.pasta-line:last-of-type .char');
+        gsap.set(pastaTitleChars, { yPercent: 100, opacity: 0 });
         gsap.set(textLeft, { xPercent: 0, opacity: 1 });
         gsap.set(cardContainer, { scale: 1.0, opacity: 1, y: 0 });
         gsap.set(cinematicCard, { scale: 1.0, opacity: 0, rotate: 0, borderRadius: 20, zIndex: 100 });
@@ -348,9 +353,9 @@
           .to(path2, { strokeDashoffset: 0, ease: "none", duration: 1.5 }, 0)
           .to('.intro-grid .left-col, .intro-grid .right-col', { opacity: 1, y: 0, stagger: 0.15, duration: 1.2, ease: "power2.out" }, 0.2)
           
-          // 2. PHASE 2: Transition to Slide 2 - Fullscreen phone vertical gallery (slides left)
-          .to(introTextsContainer, { xPercent: -100, opacity: 0, duration: 1.5, ease: "power2.inOut" }, 2.0)
+          // 2. PHASE 2: Transition to Slide 2 - Fullscreen phone vertical gallery (slides left on top of Slide 1)
           .to(galleryContainer, { xPercent: 0, duration: 1.5, ease: "power2.inOut" }, 2.0)
+          .set(introTextsContainer, { opacity: 0 }, 3.5)
 
           // 3. PHASE 3: Portrait Video mosaic parallax scrolling
           .to('.col-0', { y: -800, ease: "none", duration: 3.5 }, 3.5)
@@ -363,20 +368,27 @@
           .to(galleryContainer, { xPercent: -100, duration: 1.5, ease: "power2.inOut" }, 7.0)
           .to(intermediateContainer, { xPercent: 0, duration: 1.5, ease: "power2.inOut" }, 7.0)
 
-          // 5. PHASE 5: Draw intermediate curve & staggered text fade in
-          .to(pathIntermediate, { strokeDashoffset: 0, ease: "none", duration: 1.5 }, 8.5)
-          .to(pathIntermediate2, { strokeDashoffset: 0, ease: "none", duration: 1.5 }, 8.5)
-          .to('#intermediateWrapper .para, .gusto-dharma', { opacity: 1, x: 0, stagger: 0.15, duration: 1.2, ease: "power2.out" }, 8.7)
+          // 5. PHASE 5: Draw top intermediate curve & staggered text fade in (starts early at 7.2/7.4)
+          .to(pathIntermediate, { strokeDashoffset: 0, opacity: 1, ease: "none", duration: 1.5 }, 7.2)
+          .to('#intermediateWrapper .para, .gusto-dharma', { opacity: 1, x: 0, stagger: 0.15, duration: 1.2, ease: "power2.out" }, 7.4)
+          // Bottom curve starts revealing at Y=1000 near end of Section 4, fading quickly to 100% opacity
+          .to(pathIntermediate2, { opacity: 1, duration: 0.3, ease: "power1.out" }, 9.5)
+          .to(pathIntermediate2, { strokeDashoffset: 0, ease: "none", duration: 2.2 }, 9.5)
 
-          // 6. PHASE 6: Transition to Slide 4 - PASTA OLIMPICA push (Slides right-to-left)
+          // 6. PHASE 6: Transition to Slide 4 - Fused Horizontal Scroll & Parallax
           .set(intermediateContainer, { zIndex: 10 }, 10.2)
-          .to(pastaContainer, { xPercent: 0, duration: 0.1 }, 10.2)
-          .to(intermediateContainer, { xPercent: -100, duration: 1.5, ease: "power2.inOut" }, 10.2)
-          .to(pastaTitleChars, { x: 0, skewX: 0, opacity: 1, stagger: 0.08, duration: 1.4, ease: "power3.out" }, 10.3)
+          .to(fusedContainer, { xPercent: -50, duration: 1.5, ease: "power2.inOut" }, 10.2)
+          .to('.inter-left-col > p', { xPercent: -50, duration: 1.5, ease: "power2.inOut" }, 10.2)
+          .to('.gusto-block', { xPercent: -80, duration: 1.5, ease: "power2.inOut" }, 10.2)
+          .to('.inter-right-col > p', { xPercent: -110, duration: 1.5, ease: "power2.inOut" }, 10.2)
+          .fromTo(pastaTitle, { xPercent: -60, opacity: 0 }, { xPercent: 0, opacity: 1, duration: 1.5, ease: "power2.inOut" }, 10.2)
+          // Animate PASTA and OLIMPICA almost together, staggered by 500ms
+          .to(pastaWordChars, { yPercent: 0, opacity: 1, stagger: 0.05, duration: 1.0, ease: "power3.out" }, 10.3)
+          .to(olimpicaWordChars, { yPercent: 0, opacity: 1, stagger: 0.05, duration: 1.0, ease: "power3.out" }, 10.8)
 
           // 7. PHASE 7: Transition to Slide 5 - Figma Cards Deck (left texts, right Swiper slider)
           .set(intermediateContainer, { zIndex: 5 }, 12.0)
-          .to(pastaContainer, { xPercent: -100, duration: 1.5, ease: "power2.inOut" }, 12.0)
+          .to(intermediateContainer, { xPercent: -100, duration: 1.5, ease: "power2.inOut" }, 12.0)
           .to(swiperDeckContainer, { xPercent: 0, duration: 1.5, ease: "power2.inOut" }, 12.0)
 
           // 8. PHASE 8: Cinematic Card Expansion (one card grows to cover the screen)
@@ -459,62 +471,55 @@
     </div>
 
     <!-- ========================================================== -->
-    <!-- SLIDE 3: Figma Intermediate texts and curve (from image)    -->
+    <!-- FUSED SLIDE 3 & 4: Horizontal Scroll Panel with Parallax    -->
     <!-- ========================================================== -->
     <div id="intermediateTextsContainer" class="slide-container" bind:this={intermediateContainer}>
-        <div id="svgContainerPart2" class="svg-bg-layer">
-            <svg class="deco-svg" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path bind:this={pathIntermediate} d="M -350 150 C -50 50 50 300 200 -250" stroke="var(--brand-cibo-500)" stroke-width="51" stroke-linecap="round"/>
-                <path bind:this={pathIntermediate2} d="M 1800 800 C 1500 700 1300 1000 1100 1200" stroke="var(--brand-cibo-500)" stroke-width="51" stroke-linecap="round"/>
-            </svg>
-        </div>
+        <div id="fusedContainer" bind:this={fusedContainer}>
+            <!-- Shared SVG background inside fusedContainer (scrolls horizontally with it) -->
+            <div id="svgContainerPart2" class="svg-bg-layer">
+                <svg class="deco-svg" viewBox="0 0 2880 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- pathIntermediate: top curve (Section 4) -->
+                    <path bind:this={pathIntermediate} d="M -500 60 C -200 60, 100 40, 300 80 C 500 120, 650 30, 850 60 C 1050 90, 1200 30, 1350 -100" stroke="var(--brand-cibo-500)" stroke-width="38" stroke-linecap="round"/>
+                    <!-- pathIntermediate2: bottom curve starting in Section 4 and ending before Section 5 (exits bottom-right of Section 4) -->
+                    <path bind:this={pathIntermediate2} d="M 950 1000 C 1050 780, 1150 720, 1250 760 C 1320 780, 1380 900, 1420 1000" stroke="var(--brand-cibo-500)" stroke-width="38" stroke-linecap="round"/>
+                </svg>
+            </div>
 
-        <div id="intermediateWrapper" bind:this={intermediateParagraphs}>
-            <div class="inter-grid">
-                <div class="inter-left">
-                    <p class="para para-olympic">
-                        Il cibo si è trasformato in un vero e proprio momento pop, un'esperienza non solo da assaggiare, ma da raccontare. Gli atleti hanno filmato tutto, ogni boccone diventava una mini-recensione social.
-                    </p>
-                    <div class="gusto-block">
-                        <p class="para para-olympic" style="margin-bottom: 0;">
-                            Le Olimpiadi non sono solo medaglie e rigore, ma anche condivisione, curiosità e
-                        </p>
-                        <h2 class="gusto-dharma">GUSTO</h2>
+            <!-- Panel 1 (100vw): Section 4 Content -->
+            <div id="intermediatePanel">
+                <div id="intermediateWrapper" bind:this={intermediateParagraphs}>
+                    <div class="inter-top-row">
+                        <div class="inter-left-col">
+                            <p class="para para-olympic">
+                                Il cibo si è trasformato in un'esperienza <span class="highlight">non solo da assaggiare, ma da raccontare.</span> Gli atleti hanno filmato tutto, ogni boccone diventava una mini-recensione social.
+                            </p>
+                        </div>
+                        <div class="inter-right-col">
+                            <p class="para para-olympic">
+                                Ma la vera <span class="highlight">mascotte gastronomica</span> di Milano Cortina è stata...
+                            </p>
+                        </div>
+                    </div>
+                    <div class="inter-bottom-row">
+                        <div class="gusto-block">
+                            <p class="para para-olympic" style="margin-bottom: 0;">
+                                Le Olimpiadi non sono solo medaglie e rigore, ma anche condivisione, curiosità e
+                            </p>
+                            <h2 class="gusto-dharma">GUSTO</h2>
+                        </div>
                     </div>
                 </div>
-                <div class="inter-right">
-                    <p class="para para-olympic">
-                        Ma la vera mascotte gastronomica di Milano Cortina è stata...
-                    </p>
-                </div>
+            </div>
+
+            <!-- Panel 2 (100vw): Section 5 Content -->
+            <div id="pastaPanel" bind:this={pastaContainer}>
+                <h1 id="pastaTitle" bind:this={pastaTitle}>
+                    <span class="pasta-line">PASTA</span>
+                    <br>
+                    <span class="pasta-line">OLIMPICA</span>
+                </h1>
             </div>
         </div>
-    </div>
-
-    <!-- ========================================================== -->
-    <!-- SLIDE 4: Pasta Olimpica Pushed Section (2 lines, 500pt font)-->
-    <!-- ========================================================== -->
-    <div id="pastaOlimpicaContainer" class="slide-container" bind:this={pastaContainer}>
-        <!-- Saffron Wave background line exits at the top margin off-screen -->
-        <div id="svgContainerPart3" class="svg-bg-layer">
-            <svg class="deco-svg" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path bind:this={pathPasta} d="M -150 800 C 150 750 250 500 100 200 C 0 50 -100 -50 200 -100" stroke="var(--brand-cibo-500)" stroke-width="48" stroke-linecap="round"/>
-            </svg>
-        </div>
-
-        <h1 id="pastaTitle" bind:this={pastaTitle}>
-            <span class="pasta-line">
-                {#each "PASTA".split("") as char}
-                    <span class="char">{char}</span>
-                {/each}
-            </span>
-            <br>
-            <span class="pasta-line">
-                {#each "OLIMPICA".split("") as char}
-                    <span class="char">{char}</span>
-                {/each}
-            </span>
-        </h1>
     </div>
 
     <!-- ========================================================== -->
@@ -737,11 +742,59 @@
         object-fit: cover;
     }
 
-    /* Slide 3: Intermediate Texts (Figma layout) */
+    /* Slide 3 & 4 Fused Horizontal Panel */
     #intermediateTextsContainer {
         z-index: 5;
         background-color: var(--neutral-50);
+        justify-content: flex-start;
+    }
+
+    #fusedContainer {
+        width: 200vw;
+        height: 100vh;
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: flex;
+        flex-direction: row;
+        z-index: 2;
+    }
+
+    #svgContainerPart2 {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 200vw;
+        height: 100%;
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    #svgContainerPart2 svg {
+        width: 100%;
+        height: 100%;
+    }
+
+    #intermediatePanel {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
         justify-content: center;
+        position: relative;
+        flex-shrink: 0;
+        z-index: 10;
+    }
+
+    #pastaPanel {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        flex-shrink: 0;
+        z-index: 10;
     }
 
     #intermediateWrapper {
@@ -750,58 +803,59 @@
         z-index: 10;
         position: relative;
         padding-left: 6rem; /* Shift text safe from the top-left curve! */
+        display: flex;
+        flex-direction: column;
+        gap: 6rem;
     }
 
-    .inter-grid {
+    .inter-top-row {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
-        align-items: center;
-        gap: 8rem;
+        align-items: flex-start;
+        gap: 12rem;
     }
 
-    .inter-left {
-        width: 48%;
+    .inter-left-col {
+        width: 46%;
+    }
+
+    .inter-right-col {
+        width: 46%;
+    }
+
+    .inter-bottom-row {
         display: flex;
-        flex-direction: column;
-        gap: 3.5rem;
+        justify-content: flex-start;
     }
 
     .gusto-block {
         display: flex;
-        flex-direction: column;
-        align-items: flex-start;
+        flex-direction: row;
+        align-items: center;
+        gap: 2.5rem;
     }
 
     .gusto-dharma {
         font-family: var(--font-family);
-        font-size: 8rem;
+        font-size: 7.2rem; /* Adjusted slightly to avoid curve overlaps */
         font-weight: 900;
         color: var(--brand-cibo-500);
         line-height: 0.9;
-        margin: 1rem 0 0 0;
+        margin: 0;
     }
 
-    .inter-right {
-        width: 48%;
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
+    .highlight {
+        color: var(--brand-cibo-500);
+        font-weight: 500;
     }
 
     .para-olympic {
-        font-size: 2.2rem;
+        font-size: 1.9rem; /* Adjusted slightly to avoid curve overlaps */
         line-height: 145%;
     }
 
-    /* Slide 4: Pasta Olimpica Pushed Section (2 lines) */
-    #pastaOlimpicaContainer {
-        z-index: 6;
-        background-color: var(--neutral-50);
-        justify-content: center;
-    }
-
-    .char {
+    :global(#pastaTitle .char) {
         display: inline-block;
         transform-origin: center bottom;
         will-change: transform, opacity;
@@ -809,18 +863,27 @@
 
     .pasta-line {
         display: inline-block;
+        overflow: hidden;
+        vertical-align: bottom;
+        padding-bottom: 0.15em; /* Padding for high letter bounds */
     }
 
     #pastaTitle {
+        opacity: 0;
         color: var(--brand-cibo-500);
         font-family: var(--font-family);
-        font-size: clamp(8rem, 18vw, 24rem); /* Premium, responsive double-line scaling */
+        font-size: clamp(29rem, 22vw, 31.25rem); /* Matches Curling Mania size */
         font-weight: 900;
-        line-height: 0.85;
+        line-height: 76%; /* Matches Curling Mania line-height */
         text-align: center;
         pointer-events: none;
         margin: 0;
         text-transform: uppercase;
+    }
+
+    #pastaTitle .pasta-line:first-of-type {
+        position: relative;
+        top: 4.5rem; /* Lowers PASTA to prevent top screen cutoff while keeping OLIMPICA height */
     }
 
     /* Slide 5: Figma 2-Column Cards deck */

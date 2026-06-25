@@ -63,9 +63,11 @@
 
       
         gsap.set('#lastCircle', { r: 0 });
-        let textEnter = gsap.fromTo(textLines, { opacity: 0, x: 300 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out", stagger: 0.1, paused: true });
-        let textExit= gsap.fromTo(textLines, { opacity: 1, x: 0 }, { opacity: 0, x: -300, duration: 0.5, ease: "power2.out", stagger: 0.1, paused: true });
-        const drawArea = gsap.to(area, { width: width, ease: "power2.out", duration: 0.2, paused: true });
+        gsap.set(textLines, { opacity: 0, x: 300 });
+        gsap.set('#text4', { opacity: 0 });
+        let text4Enter = gsap.fromTo(textLines, { opacity: 0, x: 300 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out", stagger: 0.1, paused: true });
+        let text4Exit= gsap.fromTo(textLines, { opacity: 1, x: 0 }, { opacity: 0, x: -300, duration: 0.5, ease: "power2.out", stagger: 0.1, paused: true });
+        
 
         const tl = gsap.timeline({
             scrollTrigger: {
@@ -83,8 +85,9 @@
 
                 onUpdate: (self) => {
                     const progress = self.progress;
-                    if (progress >= 0.3) { textEnter.play(); } else { textEnter.reverse(); }
-                    if (progress >= 0.7) { textExit.play(); } else { textExit.reverse(); }
+                    if (progress >= 0.3) { text4Enter.play(); } else { text4Enter.reverse();}
+                    if (progress >= 0.35) { gsap.to('#text4', { opacity: 1, duration: 0.5, ease: "power2.out" }); }
+                    if (progress >= 0.7) { text4Exit.play(); } else { text4Exit.reverse(); }
                 }
             }
         });
@@ -104,12 +107,12 @@
     });
 </script>
 
-<main id="section4" bind:this={section}>
+<main id="section4" bind:this={section} >
     <div id="svgContainer">
         <svg id="line" width="100%" height="100%" bind:this={svgElement}></svg>
     </div>
-    <div id="text">
-        <p id="paragraph" bind:this={text}>Infatti, ha generato forti picchi di interesse appena è entrato in scena all'interno dei giochi olimpici 2026</p>
+    <div id="text4">
+        <p id="paragraph" bind:this={text}>Il curling ha generato <mark class="highlight">forti picchi</mark> di interesse appena è entrato in scena all’interno dei giochi olimpici 2026</p>
     </div>
 </main>
 
@@ -138,7 +141,7 @@
     :global(.curlingLine) { fill: none; stroke: var(--brand-sport-insoliti-500); stroke-width: clamp(6px, 0.9vw, 14px); }
     :global(.curlingArea) { fill: var(--brand-sport-insoliti-200); }
 
-    #text {
+    #text4 {
         position: absolute;
         /* posizione relativa al viewport invece di px fissi */
         top: 30%;
@@ -152,5 +155,10 @@
         color: var(--neutral-900);
         font-weight: 400;
         font-family: var(--font-family-text);
+    }
+
+    .highlight{
+        color: var(--brand-sport-insoliti-500);
+        background-color: transparent;
     }
 </style>

@@ -2,4 +2,7 @@
     import Categorie from "$lib/components/Card_Selection/Categorie.svelte";
 </script>
 
-<Categorie />
+<main class="page-content">
+  <Categorie />
+</main>
+

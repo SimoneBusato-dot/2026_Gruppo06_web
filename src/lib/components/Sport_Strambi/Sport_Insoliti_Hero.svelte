@@ -19,6 +19,10 @@
     let insoliti;
 
     onMount(() => {
+
+        gsap.set(line, {scale: 1.15 });
+        gsap.set(background, {scale: 1.15 });
+
        const moveBackground = (e) => {
             const xPercent = (e.clientX / window.innerWidth - 0.5) * 2;
             const yPercent = (e.clientY / window.innerHeight - 0.5) * 2;
@@ -28,7 +32,6 @@
                 duration: 1.2,
                 rotateY: xPercent * 5,
                 rotateX: -yPercent * 3,
-                scale: 1.15,
                 ease: "power2.out",
                 overwrite: "auto"
             });
@@ -36,7 +39,7 @@
                 duration: 1.2,
                 rotateY: xPercent * 9,
                 rotateX: -yPercent * 2,
-                scale: 1.15,
+                
                 ease: "power2.out",
                 overwrite: "auto"
             });
@@ -44,7 +47,6 @@
                 duration: 1.2,
                 rotateY: xPercent * 20,
                 rotateX: -yPercent * 10,
-                scale: 1,
                 ease: "power2.out",
                 overwrite: "auto"
             });
@@ -53,7 +55,6 @@
                 duration: 1.2,
                 rotateY: -xPercent * 20,
                 rotateX: yPercent * 10,
-                scale: 1,
                 ease: "power2.out",
                 overwrite: "auto"
             });
@@ -100,7 +101,7 @@
     
 </script>
 
-<main id="hero_spi" bind:this={hero}>
+<main id="hero_spi" bind:this={hero} >
 
     <div id="perspective-wrapper">
 
