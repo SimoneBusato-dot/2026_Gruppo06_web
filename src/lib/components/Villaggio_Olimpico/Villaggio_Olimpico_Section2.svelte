@@ -18,9 +18,7 @@
        
         const villText2NewSplitType = new SplitType(villText2, {types: 'lines', tagName: 'span' })
         const villText2Lines= villText2NewSplitType.lines
-        const dataTexSplitType = new SplitType(".dataText", {types: 'words', tagName: 'span'})
-        const dataTextWords = dataTexSplitType.words
-
+        
         const length = villLine1.getTotalLength();
         gsap.set(villLine1, {strokeDasharray: length, strokeDashoffset: length})
         
@@ -30,8 +28,18 @@
 
         gsap.set("#villText2", { opacity: 0, width: "30rem"})
         gsap.set(graphContainer, {x: "-60%"})
-        const villText2Enter = gsap.fromTo(villText2Lines, {x: "100%", opacity: 0}, {x: "50%", opacity: 1, stagger: 0.08, duration: 0.6, ease: "power2.out", paused: true})
-        const dataTextEnter = gsap.fromTo( dataTextWords, {x: -200, opacity: 0}, {x: 0, opacity:1, duration:0.3, stagger: 0.1, paused: true, ease: "power2.out"})
+        const villText2Enter = gsap.fromTo(villText2Lines, {x: "100%", opacity: 0}, {x: "50%", opacity: 1, stagger: 0.08, duration: 0.6, ease: "elastic.out(0.5,0.4)", paused: true})
+        const dataText = graphContainer.querySelectorAll(".dataText")
+
+        // Crea un'animazione per ogni dataText separatamente
+        const dataTextAnimations = Array.from(dataText).map(el => {
+            const split = new SplitType(el, { types: 'words', tagName: 'span' })
+            return gsap.fromTo(
+                split.words,
+                { x: -200, opacity: 0 },
+                { x: 0, opacity: 1, duration: 0.3, stagger: 0.1, paused: true, ease: "power2.out" }
+            )
+        })
         const lines = graphContainer.querySelectorAll(".line");
         const dataLineEnter = gsap.fromTo(lines, 
             { scaleX: 0 }, 
@@ -49,7 +57,7 @@
                 end: "+=201%",
                 scrub: 1,
                 pin: true,
-                pinSpacing: true,
+                pinSpacing: false,
                 onEnter: () => gsap.set(villSection2, { autoAlpha: 1 }),
                 onLeave: () => gsap.set(villSection2, { autoAlpha: 0 }),
                 onEnterBack: () => gsap.set(villSection2, { autoAlpha: 1 }),
@@ -57,7 +65,7 @@
                 onUpdate(self){
                     if(self.progress >= 0.1){ villText2Enter.play()} else{ villText2Enter.reverse()}
                     if (self.progress >=0.13){ gsap.to("#villText2", { opacity: 1, duration: 0.6})}
-                    if (self.progress >=0.6){dataLineEnter.play(); dataTextEnter.play()} else{dataLineEnter.reverse(); dataTextEnter.reverse()}
+                    if (self.progress >=0.6){dataLineEnter.play(); dataTextAnimations.forEach(anim => anim.play())} else{dataLineEnter.reverse(); dataTextAnimations.forEach(anim => anim.reverse())}
                     if (self.progress >=0.8){contentExit.play()} else {contentExit.reverse()}
 
                 }

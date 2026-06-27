@@ -29,7 +29,7 @@
 
         const p1Enter = gsap.fromTo(p1Lines,
             { x: 300, opacity: 0 },
-            { x: 0, opacity: 1, stagger: 0.1, overwrite: "auto", duration: 0.6, paused: true, ease: "power2.out" }
+            { x: 0, opacity: 1, stagger: 0.2, overwrite: "auto", duration: 0.6, paused: true, ease: "power2.out"}
         );
         const sliderEnter = gsap.fromTo(sliderElement,
             { x: 100, opacity: 0 },
@@ -37,7 +37,7 @@
         );
         const p2Enter = gsap.fromTo(p2Lines,
             { x: 300, opacity: 0 },
-            { x: 0, opacity: 1, stagger: 0.05, overwrite: "auto", duration: 0.5, paused: true, ease: "power2.out" }
+            { x: 0, opacity: 1, stagger: 0.1, overwrite: "auto", duration: 0.5, paused: true, ease: "power2.out"}
         );
         const p1Exit = gsap.to(p1Lines,
             { x: -200, opacity: 0, stagger: 0.1, paused: true, duration: 0.6, overwrite: "auto", ease: "power2.out" }
