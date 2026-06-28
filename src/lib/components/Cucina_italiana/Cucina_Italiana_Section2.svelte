@@ -477,7 +477,7 @@
           // 9. PHASE 9: Slide 6 - New Chart Section
           .to(chartContainer, { xPercent: 0, opacity: 1, duration: 0.1 }, 8.6)
           // Phase 9A: Draw peaks (0.6 duration) and fade in first text
-          .to(chartClipRect, { attr: { width: 2035 * 0.55 }, ease: "none", duration: 0.6 }, 8.7)
+          .to(chartClipRect, { attr: { width: 540 }, ease: "none", duration: 0.6 }, 8.7)
           .to(chartFirstCircle, { scale: 1, duration: 0.2, ease: "back.out(1.7)" }, 8.7)
           .to(chartText1, { opacity: 1, y: 0, ease: "power2.out", duration: 0.3 }, 8.8)
           // Parallax horizontal scroll of graph
@@ -1358,7 +1358,7 @@
     }
 
     .chart-main-line {
-        stroke: #EDCE9A !important;
+        stroke: #ffffff !important;
         stroke-width: 16px;
         stroke-linecap: round;
         stroke-linejoin: round;
@@ -1408,7 +1408,7 @@
         width: 38px;
         height: 38px;
         border-radius: 50%;
-        background-color: #EDCE9A !important;
+        background-color: #ffffff !important;
         pointer-events: none;
         z-index: 10;
     }
