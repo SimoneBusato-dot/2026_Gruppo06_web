@@ -110,6 +110,7 @@
     }
 
     .highlight {
-        color: var(--brand-cibo-500);
-    }
+        color: var(--brand-cibo-500) !important;
+        font-weight: bold !important;
+     }
 </style>

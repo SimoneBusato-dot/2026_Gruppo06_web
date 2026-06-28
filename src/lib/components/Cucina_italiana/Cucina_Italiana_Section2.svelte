@@ -113,11 +113,11 @@
     ];
 
     const columns = [
-        videos.slice(0, 6),
-        videos.slice(6, 12),
-        videos.slice(12, 18),
-        videos.slice(18, 24),
-        videos.slice(24, 30)
+        [...videos.slice(0, 6), ...videos.slice(0, 6), ...videos.slice(0, 6)],
+        [...videos.slice(6, 12), ...videos.slice(6, 12), ...videos.slice(6, 12)],
+        [...videos.slice(12, 18), ...videos.slice(12, 18), ...videos.slice(12, 18)],
+        [...videos.slice(18, 24), ...videos.slice(18, 24), ...videos.slice(18, 24)],
+        [...videos.slice(24, 30), ...videos.slice(24, 30), ...videos.slice(24, 30)]
     ];
 
     onMount(async () => {
@@ -299,10 +299,11 @@
                 pinSpacing: true,
                 snap: {
                     snapTo: (value) => {
-                        // Snapping logic for redirect lock (from 28.0 to 40.0)
-                        const lockStart = 28.0 / 40.0;
+                        const totalD = 20.0;
+                        // Snapping logic for redirect lock
+                        const lockStart = 17.0 / totalD;
                         if (value >= lockStart && value < 1.0) {
-                            if (value < 39.8 / 40.0) {
+                            if (value < 19.8 / totalD) {
                                 return lockStart; // Snap back to start of redirect slide
                             } else {
                                 return 1.0; // Snap to homepage redirect
@@ -311,48 +312,46 @@
 
                         const points = [
                             0,
-                            2.0 / 40.0,
-                            3.5 / 40.0,
-                            7.0 / 40.0,
-                            8.5 / 40.0,
-                            10.2 / 40.0,
-                            12.0 / 40.0,
-                            13.8 / 40.0,
-                            15.4 / 40.0,
-                            17.5 / 40.0,
-                            19.0 / 40.0,
-                            20.5 / 40.0,
-                            22.0 / 40.0,
-                            24.0 / 40.0,
-                            25.5 / 40.0,
-                            27.0 / 40.0,
-                            28.0 / 40.0,
+                            1.0 / totalD,  // gallery transition
+                            1.9 / totalD,  // gallery scroll start
+                            3.5 / totalD,  // intermediate transition
+                            4.5 / totalD,  // intermediate end
+                            5.5 / totalD,  // pasta transition
+                            6.5 / totalD,  // deck transition
+                            7.5 / totalD,  // cinematic card transition
+                            8.8 / totalD,  // chart section start
+                            10.0 / totalD, // chart complete start hold
+                            11.2 / totalD, // chart complete end hold
+                            11.4 / totalD, // quote transition
+                            12.7 / totalD, // comments start
+                            15.2 / totalD, // comments end
+                            17.0 / totalD, // redirect fill start
                             1
                         ];
 
                         // Free scroll ranges:
-                        // 1. Vertical video gallery: from 3.5 to 7.0 timeline progress
-                        const galleryStart = 3.5 / 40.0;
-                        const galleryEnd = 7.0 / 40.0;
+                        // 1. Vertical video gallery
+                        const galleryStart = 1.9 / totalD;
+                        const galleryEnd = 3.5 / totalD;
                         if (value > galleryStart && value < galleryEnd) {
-                            return value; // Return current position (no snap)
+                            return value;
                         }
 
-                        // 2. D3 chart drawing animation: from 15.4 to 17.0 timeline progress
-                        const chartStart = 15.4 / 40.0;
-                        const chartEnd = 17.0 / 40.0;
+                        // 2. D3 chart drawing animation (extending to end of hold)
+                        const chartStart = 8.8 / totalD;
+                        const chartEnd = 11.2 / totalD;
                         if (value > chartStart && value < chartEnd) {
-                            return value; // Return current position (no snap)
+                            return value;
                         }
 
-                        // 3. Comments horizontal scrolling animation: from 22.0 to 25.5 progress
-                        const commentsScrollStart = 22.0 / 40.0;
-                        const commentsScrollEnd = 25.5 / 40.0;
+                        // 3. Comments horizontal scrolling
+                        const commentsScrollStart = 12.7 / totalD;
+                        const commentsScrollEnd = 15.2 / totalD;
                         if (value > commentsScrollStart && value < commentsScrollEnd) {
-                            return value; // Return current position (no snap)
+                            return value;
                         }
 
-                        // Otherwise snap to closest point if within threshold
+                        // Otherwise snap unconditionally to closest point (calamita)
                         let closest = points[0];
                         let minDiff = Math.abs(value - closest);
                         for (let i = 1; i < points.length; i++) {
@@ -362,12 +361,7 @@
                                 closest = points[i];
                             }
                         }
-
-                        const threshold = 0.025; // Snaps only when within 2.5% of the transition points
-                        if (minDiff < threshold) {
-                            return closest;
-                        }
-                        return value; // Keep current scroll position in the middle of sections
+                        return closest;
                     },
                     duration: { min: 0.1, max: 0.2 },
                     delay: 0.1,
@@ -382,7 +376,8 @@
                 onLeaveBack: () => gsap.set(section, { autoAlpha: 0 }),
                 onUpdate: (self) => {
                     const p = self.progress;
-                    const startP = 28.0 / 40.0;
+                    const totalD = 20.0;
+                    const startP = 17.0 / totalD;
 
                     // If we reached the end, redirect immediately
                     if (p >= 0.999) {
@@ -406,129 +401,126 @@
             }
         });
         // 1. PHASE 1: Slide 1 - Figma intro texts grid
-        tl.to(path, { strokeDashoffset: 0, ease: "none", duration: 1.5 }, 0)
-          .to(path2, { strokeDashoffset: 0, ease: "none", duration: 1.5 }, 0.2)
-          .to('.intro-grid .left-col, .intro-grid .right-col', { opacity: 1, y: 0, stagger: 0.15, duration: 1.2, ease: "power2.out" }, 0.2)
+        tl.to(path, { strokeDashoffset: 0, ease: "none", duration: 1.0 }, 0)
+          .to(path2, { strokeDashoffset: 0, ease: "none", duration: 1.0 }, 0.1)
+          .to('.intro-grid .left-col, .intro-grid .right-col', { opacity: 1, y: 0, stagger: 0.1, duration: 0.8, ease: "power2.out" }, 0.1)
           
           // 2. PHASE 2: Transition to Slide 2 - Fullscreen phone vertical gallery (slides left on top of Slide 1)
-          .to(galleryContainer, { xPercent: 0, duration: 1.5, ease: "power2.inOut" }, 2.0)
-          .set(introTextsContainer, { opacity: 0 }, 3.5)
+          .to(galleryContainer, { xPercent: 0, duration: 1.0, ease: "power2.inOut" }, 1.0)
+          .set(introTextsContainer, { opacity: 0 }, 2.0)
 
           // 3. PHASE 3: Portrait Video mosaic parallax scrolling
-          .to('.col-0', { y: -800, ease: "none", duration: 3.5 }, 3.5)
-          .to('.col-1', { y: 650, ease: "none", duration: 3.5 }, 3.5)
-          .to('.col-2', { y: -1000, ease: "none", duration: 3.5 }, 3.5)
-          .to('.col-3', { y: 550, ease: "none", duration: 3.5 }, 3.5)
-          .to('.col-4', { y: -750, ease: "none", duration: 3.5 }, 3.5)
+          .to('.col-0', { y: -800, ease: "none", duration: 1.5 }, 2.0)
+          .to('.col-1', { y: 650, ease: "none", duration: 1.5 }, 2.0)
+          .to('.col-2', { y: -1000, ease: "none", duration: 1.5 }, 2.0)
+          .to('.col-3', { y: 550, ease: "none", duration: 1.5 }, 2.0)
+          .to('.col-4', { y: -750, ease: "none", duration: 1.5 }, 2.0)
 
           // 4. PHASE 4: Transition to Slide 3 - Figma Intermediate Texts (slides left)
-          .to(galleryContainer, { xPercent: -100, duration: 1.5, ease: "power2.inOut" }, 7.0)
-          .to(intermediateContainer, { xPercent: 0, duration: 1.5, ease: "power2.inOut" }, 7.0)
+          .to(galleryContainer, { xPercent: -100, duration: 1.0, ease: "power2.inOut" }, 3.5)
+          .to(intermediateContainer, { xPercent: 0, duration: 1.0, ease: "power2.inOut" }, 3.5)
 
-          // 5. PHASE 5: Draw top intermediate curve & staggered text fade in (starts early at 7.2/7.4)
-          .to(pathIntermediate, { strokeDashoffset: 0, opacity: 1, ease: "none", duration: 1.5 }, 7.2)
-          .to('#intermediateWrapper .para, .gusto-dharma', { opacity: 1, x: 0, stagger: 0.15, duration: 1.2, ease: "power2.out" }, 7.4)
+          // 5. PHASE 5: Draw top intermediate curve & staggered text fade in (starts early at 3.6/3.7)
+          .to(pathIntermediate, { strokeDashoffset: 0, opacity: 1, ease: "none", duration: 1.0 }, 3.6)
+          .to('#intermediateWrapper .para, .gusto-dharma', { opacity: 1, x: 0, stagger: 0.1, duration: 0.8, ease: "power2.out" }, 3.7)
           // Bottom curve starts revealing at Y=1000 near end of Section 4, fading quickly to 100% opacity
-          .to(pathIntermediate2, { opacity: 1, duration: 0.3, ease: "power1.out" }, 9.5)
-          .to(pathIntermediate2, { strokeDashoffset: 0, ease: "none", duration: 2.2 }, 9.5)
+          .to(pathIntermediate2, { opacity: 1, duration: 0.2, ease: "power1.out" }, 4.5)
+          .to(pathIntermediate2, { strokeDashoffset: 0, ease: "none", duration: 1.0 }, 4.5)
 
           // 6. PHASE 6: Transition to Slide 4 - Fused Horizontal Scroll & Parallax
-          .set(intermediateContainer, { zIndex: 10 }, 10.2)
-          .to(fusedContainer, { xPercent: -50, duration: 1.5, ease: "power2.inOut" }, 10.2)
-          .to('.inter-left-col > p', { xPercent: -50, duration: 1.5, ease: "power2.inOut" }, 10.2)
-          .to('.gusto-block', { xPercent: -80, duration: 1.5, ease: "power2.inOut" }, 10.2)
-          .to('.inter-right-col > p', { xPercent: -110, duration: 1.5, ease: "power2.inOut" }, 10.2)
-          .fromTo(pastaTitle, { xPercent: -60, opacity: 0 }, { xPercent: 0, opacity: 1, duration: 1.5, ease: "power2.inOut" }, 10.2)
-          // Animate PASTA and OLIMPICA almost together, staggered by 500ms
-          .to(pastaWordChars, { yPercent: 0, opacity: 1, stagger: 0.05, duration: 1.0, ease: "power3.out" }, 10.3)
-          .to(olimpicaWordChars, { yPercent: 0, opacity: 1, stagger: 0.05, duration: 1.0, ease: "power3.out" }, 10.8)
+          .set(intermediateContainer, { zIndex: 10 }, 5.5)
+          .to(fusedContainer, { xPercent: -50, duration: 1.0, ease: "power2.inOut" }, 5.5)
+          .to('.inter-left-col > p', { xPercent: -50, duration: 1.0, ease: "power2.inOut" }, 5.5)
+          .to('.gusto-block', { xPercent: -80, duration: 1.0, ease: "power2.inOut" }, 5.5)
+          .to('.inter-right-col > p', { xPercent: -110, duration: 1.0, ease: "power2.inOut" }, 5.5)
+          .fromTo(pastaTitle, { xPercent: -60, opacity: 0 }, { xPercent: 0, opacity: 1, duration: 1.0, ease: "power2.inOut" }, 5.5)
+          // Animate PASTA and OLIMPICA almost together, staggered by 400ms
+          .to(pastaWordChars, { yPercent: 0, opacity: 1, stagger: 0.04, duration: 0.6, ease: "power3.out" }, 5.6)
+          .to(olimpicaWordChars, { yPercent: 0, opacity: 1, stagger: 0.04, duration: 0.6, ease: "power3.out" }, 6.0)
 
           // 7. PHASE 7: Transition to Slide 5 - Figma Cards Deck (left texts, right Swiper slider)
-          .set(intermediateContainer, { zIndex: 5 }, 12.0)
-          .to(intermediateContainer, { xPercent: -100, duration: 1.5, ease: "power2.inOut" }, 12.0)
-          .to(swiperDeckContainer, { xPercent: 0, duration: 1.5, ease: "power2.inOut" }, 12.0)
+          .set(intermediateContainer, { zIndex: 5 }, 6.5)
+          .to(intermediateContainer, { xPercent: -100, duration: 1.0, ease: "power2.inOut" }, 6.5)
+          .to(swiperDeckContainer, { xPercent: 0, duration: 1.0, ease: "power2.inOut" }, 6.5)
 
           // 8. PHASE 8: Cinematic Card Expansion (one card grows to cover the screen)
-          .set(cinematicCard, { opacity: 0 }, 13.8)
-          .to(cinematicCard, { opacity: 1, duration: 0.15, ease: "power1.out" }, 13.8)
+          .set(cinematicCard, { opacity: 0 }, 7.5)
+          .to(cinematicCard, { opacity: 1, duration: 0.1, ease: "power1.out" }, 7.5)
           .to(cinematicCard, { 
               x: 260, 
               y: -30, 
               scale: 0.95, 
               rotate: -5, 
-              duration: 0.4, 
+              duration: 0.3, 
               ease: "power2.out" 
-          }, 13.8)
+          }, 7.5)
           .to(cinematicCard, { 
               x: 0, 
               y: 0, 
               scale: 1.0, 
               rotate: 0, 
               zIndex: 100, 
-              duration: 0.4, 
+              duration: 0.3, 
               ease: "power2.out" 
-          }, 14.2)
-          .to(textLeft, { xPercent: -150, opacity: 0, duration: 0.4, ease: "power2.in" }, 14.5)
-          .to(cardContainer, { scale: 0.8, xPercent: -100, opacity: 0, duration: 0.4, ease: "power2.in" }, 14.5)
+          }, 7.8)
+          .to(textLeft, { xPercent: -150, opacity: 0, duration: 0.3, ease: "power2.in" }, 8.0)
+          .to(cardContainer, { scale: 0.8, xPercent: -100, opacity: 0, duration: 0.3, ease: "power2.in" }, 8.0)
           .to(cinematicCard, { 
               scaleX: 5.5, 
               scaleY: 3.5, 
               rotate: 90, // Cinematic horizontal turn
               borderRadius: 0, 
-              duration: 0.8, 
+              duration: 0.6, 
               ease: "power2.inOut" 
-          }, 14.6)
+          }, 8.1)
 
           // 9. PHASE 9: Slide 6 - New Chart Section
-          .to(chartContainer, { xPercent: 0, opacity: 1, duration: 0.1 }, 15.4)
-          // Phase 9A: Draw peaks (0.9 duration) and fade in first text
-          .to(chartClipRect, { attr: { width: 2035 * 0.55 }, ease: "none", duration: 0.9 }, 15.5)
-          .to(chartFirstCircle, { scale: 1, duration: 0.2, ease: "back.out(1.7)" }, 15.5)
-          .to(chartText1, { opacity: 1, y: 0, ease: "power2.out", duration: 0.4 }, 15.6)
-          // Parallax horizontal scroll of graph and text wrapper
-          .to('#svgChartContainer', { x: "-10vw", ease: "none", duration: 0.9 }, 15.5)
-          .to('#chartTextWrapper', { x: "-12vw", ease: "none", duration: 0.9 }, 15.5)
+          .to(chartContainer, { xPercent: 0, opacity: 1, duration: 0.1 }, 8.6)
+          // Phase 9A: Draw peaks (0.6 duration) and fade in first text
+          .to(chartClipRect, { attr: { width: 2035 * 0.55 }, ease: "none", duration: 0.6 }, 8.7)
+          .to(chartFirstCircle, { scale: 1, duration: 0.2, ease: "back.out(1.7)" }, 8.7)
+          .to(chartText1, { opacity: 1, y: 0, ease: "power2.out", duration: 0.3 }, 8.8)
+          // Parallax horizontal scroll of graph
+          .to('#svgChartContainer', { x: "0vw", ease: "none", duration: 0.6 }, 8.7)
 
-          // Phase 9B: Fast transition to post-Olympic section (0.4 duration)
-          .to(chartText1, { opacity: 0, y: -50, ease: "power2.in", duration: 0.2 }, 16.4)
-          .to('#svgChartContainer', { x: "-30vw", ease: "power2.inOut", duration: 0.4 }, 16.4)
-          .to('#chartTextWrapper', { x: "-40vw", ease: "power2.inOut", duration: 0.4 }, 16.4)
+          // Phase 9B: Fast transition to post-Olympic section (0.3 duration)
+          .to(chartText1, { opacity: 0, y: -50, ease: "power2.in", duration: 0.2 }, 9.3)
+          .to('#svgChartContainer', { x: "-30vw", ease: "power2.inOut", duration: 0.3 }, 9.3)
 
-          // Phase 9C: Draw second section (post-Olympic ripples) (0.5 duration) and fade in second text
-          .to(chartClipRect, { attr: { width: 2035 }, ease: "none", duration: 0.5 }, 16.8)
-          .to(chartLastCircle, { scale: 1, duration: 0.2, ease: "back.out(1.7)" }, 17.1)
-          .to(chartText2, { opacity: 1, y: 0, ease: "power2.out", duration: 0.3 }, 16.9)
+          // Phase 9C: Draw second section (post-Olympic ripples) (0.4 duration) and fade in second text
+          .to(chartClipRect, { attr: { width: 2035 }, ease: "none", duration: 0.4 }, 9.6)
+          .to(chartLastCircle, { scale: 1, duration: 0.2, ease: "back.out(1.7)" }, 9.8)
+          .to(chartText2, { opacity: 1, y: 0, ease: "power2.out", duration: 0.3 }, 9.7)
           // Parallax continued scroll slightly
-          .to('#svgChartContainer', { x: "-35vw", ease: "none", duration: 0.5 }, 16.8)
-          .to('#chartTextWrapper', { x: "-45vw", ease: "none", duration: 0.5 }, 16.8)
+          .to('#svgChartContainer', { x: "-35vw", ease: "none", duration: 0.4 }, 9.6)
 
           // Phase 9D: Zoom Circle Transition to Slide 7 (0.2 duration - extremely quick!)
-          .to(chartText2, { opacity: 0, y: -30, ease: "power1.in", duration: 0.1 }, 17.3)
-          .to([chartFirstCircle, '.chart-area', '.chart-main-line'], { opacity: 0, duration: 0.1 }, 17.3)
-          .to(cinematicCard, { backgroundColor: "#ffffff", duration: 0.2, ease: "power2.inOut" }, 17.3)
-          .to(chartLastCircle, { scale: 350, fill: "#ffffff", duration: 0.2, ease: "power2.in" }, 17.3)
-          .set(chartContainer, { opacity: 0 }, 17.5)
+          .to(chartText2, { opacity: 0, y: -30, ease: "power1.in", duration: 0.1 }, 11.2)
+          .to([chartFirstCircle, '.chart-area', '.chart-main-line'], { opacity: 0, duration: 0.1 }, 11.2)
+          .to(cinematicCard, { backgroundColor: "#ffffff", duration: 0.2, ease: "power2.inOut" }, 11.2)
+          .to(chartLastCircle, { scale: 350, fill: "#ffffff", duration: 0.2, ease: "power2.in" }, 11.2)
+          .set(chartContainer, { opacity: 0 }, 11.4)
 
           // 10. PHASE 10: Transition to Slide 7 (Quote section) with opacity cross-fade (no sliding)
-          .to(chartContainer, { opacity: 0, duration: 1.5, ease: "power2.inOut" }, 17.5)
-          .to(cinematicCard, { opacity: 0, duration: 1.5, ease: "power2.inOut" }, 17.5)
-          .to(quoteContainer, { opacity: 1, duration: 1.5, ease: "power2.inOut" }, 17.5)
-          .to(quotePath, { strokeDashoffset: 0, duration: 1.5, ease: "none" }, 18.0)
-          .to(quoteTextLines, { opacity: 1, x: 0, stagger: 0.1, ease: "power2.out", duration: 1.0 }, 18.0)
+          .to(chartContainer, { opacity: 0, duration: 1.0, ease: "power2.inOut" }, 11.4)
+          .to(cinematicCard, { opacity: 0, duration: 1.0, ease: "power2.inOut" }, 11.4)
+          .to(quoteContainer, { opacity: 1, duration: 1.0, ease: "power2.inOut" }, 11.4)
+          .to(quotePath, { strokeDashoffset: 0, duration: 1.0, ease: "none" }, 11.9)
+          .to(quoteTextLines, { opacity: 1, x: 0, stagger: 0.08, ease: "power2.out", duration: 0.8 }, 11.9)
 
           // 11. PHASE 11: Transition to Slide 8 (Comments section) with quote retraction and comments line bottom entrance
-          .to(quoteTextLines, { opacity: 0, stagger: 0.05, ease: "power2.in", duration: 0.8 }, 20.5)
-          .to(quotePath, { strokeDashoffset: -lenQuote, duration: 1.5, ease: "power2.inOut" }, 20.5)
-          .to(commentsLine, { yPercent: 0, opacity: 1, duration: 1.5, ease: "power2.inOut" }, 20.5)
-          .to(commentsVideoScroll, { x: "-200%", ease: "none", duration: 5.0 }, 20.5)
-          .to(commentsPath, { strokeDashoffset: 0, ease: "none", duration: 5.0, x: "-60%" }, 20.5)
+          .to(quoteTextLines, { opacity: 0, stagger: 0.04, ease: "power2.in", duration: 0.5 }, 12.7)
+          .to(quotePath, { strokeDashoffset: -lenQuote, duration: 1.0, ease: "power2.inOut" }, 12.7)
+          .to(commentsLine, { yPercent: 0, opacity: 1, duration: 1.0, ease: "power2.inOut" }, 12.7)
+          .to(commentsVideoScroll, { x: "-200%", ease: "none", duration: 2.5 }, 12.7)
+          .to(commentsPath, { strokeDashoffset: 0, ease: "none", duration: 2.5, x: "-60%" }, 12.7)
 
           // 12. PHASE 12: Transition to Slide 9 (Redirect section)
-          .to(redirectPath, { strokeDashoffset: 0, ease: "none", duration: 1.5 }, 25.5)
-          .to(commentsLine, { yPercent: 100, opacity: 0, duration: 2.0, ease: "power1.inOut" }, 24.5)
-          .to(redirectTextWords, { opacity: 1, y: 0, stagger: 0.1, duration: 1.0, ease: "power2.out" }, 27.0)
-          .fromTo('.circular-progress-container', { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1.0, duration: 1.0, ease: "power2.out" }, 27.0)
-          .to({}, { duration: 12.0 }, 28.0);
+          .to(redirectPath, { strokeDashoffset: 0, ease: "none", duration: 1.0 }, 15.2)
+          .to(commentsLine, { yPercent: 100, opacity: 0, duration: 1.5, ease: "power1.inOut" }, 14.7)
+          .to(redirectTextWords, { opacity: 1, y: 0, stagger: 0.08, duration: 0.8, ease: "power2.out" }, 16.0)
+          .fromTo('.circular-progress-container', { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1.0, duration: 0.8, ease: "power2.out" }, 16.0)
+          .to({}, { duration: 20.0 - 17.0 }, 17.0);
 
         const preventDefaultScroll = (e) => {
             if (isSwipingSwiper) {
@@ -570,8 +562,8 @@
         <div class="intro-grid">
             <div class="left-col" bind:this={p1}>
                 <p class="para">
-                    Non c'è creator, atleta o turista a Milano Cortina che non abbia ripreso i piatti della cucina italiana. <br><br>
-                    I feed sono stati invasi da atleti di ogni nazione intenti a scoprire pizza, pasta, parmigiano e dolci tipici, in un trionfo di tradizione e puro food porn.
+                    Non c'è creator, atleta o turista che non abbia ripreso i piatti della cucina italiana. <br><br>
+                    I feed <span class="highlight">sono stati invasi</span> da atleti di ogni nazione intenti a scoprire pizza, pasta e dolci tipici, in un trionfo di tradizione e puro <span class="highlight">food porn.</span>
                 </p>
             </div>
             <div class="right-col" bind:this={p2Container}>
@@ -736,7 +728,7 @@
                 <p id="chartParagraph">Il trend della pasta ha avuto picchi altissimi le prime settimane, per poi gradualmente attenuarsi in un entusiasmo a salti sporadici e ritorni improvvisi.</p>
             </div>
             <div id="chartText2" class="chart-paragraph right" bind:this={chartText2}>
-                <p id="chartParagraph2">Anche dopo la fine dei Giochi, l'interesse per la pasta a cinque cerchi è rimasto vivo. Le ricerche online dimostrano che la passione per questo formato insolito non si è spenta con lo spegnersi dei riflettori olimpici.</p>
+                <p id="chartParagraph2">Anche dopo lo spegnersi dei riflettori olimpici, il trend ha continuato a registrare inaspettati picchi di interesse online, dimostrando come la curiosità attorno a questo formato di pasta sia rimasta viva ben oltre la fine dei Giochi.</p>
             </div>
         </div>
     </div>
@@ -1015,11 +1007,11 @@
         flex-shrink: 0;
     }
 
-    .col-0 { margin-top: 5vh; }
-    .col-1 { margin-top: -30vh; }
-    .col-2 { margin-top: 20vh; }
-    .col-3 { margin-top: -20vh; }
-    .col-4 { margin-top: 10vh; }
+    .col-0 { margin-top: -10vh; }
+    .col-1 { margin-top: -100vh; }
+    .col-2 { margin-top: -10vh; }
+    .col-3 { margin-top: -90vh; }
+    .col-4 { margin-top: -10vh; }
 
     .video-card {
         background: var(--neutral-900);
@@ -1162,7 +1154,7 @@
 
     .highlight {
         color: var(--brand-cibo-500) !important;
-        font-weight: 600 !important;
+        font-weight: regular !important;
     }
 
     .para-olympic {
@@ -1378,33 +1370,31 @@
         position: absolute;
         top: 0;
         left: 0;
-        width: 145vw;
+        width: 100vw;
         height: 100%;
         z-index: 5;
         pointer-events: none;
     }
 
     .chart-paragraph {
-        left: 0;
-        width: 40%;
-        font-size: 26px;
-        color: var(--neutral-50) !important;
-        font-weight: 400;
-        font-family: var(--font-family-text);
-        line-height: 140%;
-    }
-    .chart-paragraph.right {
-        left: auto;
-        right: 0;
-    }
         position: absolute;
-        top: 30%;
-        width: 40%;
+        top: 12vh;
+        width: 40vw;
         font-size: 26px;
         color: var(--neutral-50) !important;
         font-weight: 400;
         font-family: var(--font-family-text);
         line-height: 140%;
+    }
+
+    #chartText1 {
+        left: 10vw;
+        right: auto;
+    }
+
+    #chartText2 {
+        right: 10vw;
+        left: auto;
     }
 
     .chart-area {
@@ -1433,13 +1423,6 @@
         top: 84.75%;
     }
 
-    #chartText1 {
-        left: 45vw;
-    }
-
-    #chartText2 {
-        left: 105vw;
-    }
 
     #quoteContainer {
         z-index: 9;
