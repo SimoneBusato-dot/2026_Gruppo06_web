@@ -60,7 +60,7 @@
         {#each [1,2,3,4,5] as n}
             <div class="swiper-slide">
                 <div class="overlay"></div>
-                <video src="/Sport_Insoliti/Video_introduzione/Sp_Intro{n}.mp4" muted loop></video>
+                <video src="/Villaggio_Olimpico/Video_Carosello/vl_intro{n}.mp4" muted loop></video>
             </div>
         {/each}
     </div>
