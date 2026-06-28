@@ -16,12 +16,15 @@
     let textRight;
     let lineContainer;
 
+    let transitionEllipse;
+
     // --- Sezione 2 ---
     let s2Section;
     let s2Path;
     let s2P1;
     let s2P2;
     let s2Line;
+    
 
     onMount(() => {
         gsap.set(section, { autoAlpha: 1 });
@@ -80,26 +83,24 @@
         const s4Length = path.getTotalLength();
         gsap.set(path, { strokeDasharray: s4Length, strokeDashoffset: s4Length });
 
-        // SplitType sezione 4
-        const titleLines = new SplitType(titleMain, { types: "lines", tagName: "span" }).lines;
-        const subtitleLines = new SplitType(subtitle, { types: "lines", tagName: "span" }).lines;
-
-        // Animazioni sezione 4
-        const textLeftEnter = gsap.fromTo(textLeft,
-            { x: -200, opacity: 0 },
-            { x: 0, opacity: 1, duration: 0.8, paused: true, ease: "power2.out", overwrite: "auto" }
+        // Scritte sezione 4
+        const textSmallEnter = gsap.fromTo(textLeft,
+            { x: 50, opacity: 0 },
+            { x: 0, opacity: 1, duration: 0.5, paused: true, ease: "power2.out", overwrite: "auto" }
         );
-        const subtitleEnter = gsap.fromTo(subtitleLines,
-            { x: -200, opacity: 0 },
-            { x: 0, opacity: 1, stagger: 0.08, duration: 0.7, paused: true, ease: "power2.out", overwrite: "auto" }
+        const textSmallExit = gsap.to(textLeft,
+            { x: -50, opacity: 0, duration: 0.5, paused: true, ease: "power2.in", overwrite: "auto" }
         );
-        const titleEnter = gsap.fromTo(titleLines,
-            { x: -300, opacity: 0 },
-            { x: 0, opacity: 1, stagger: 0.1, duration: 0.8, paused: true, ease: "power2.out", overwrite: "auto" }
+        const titleEnter = gsap.fromTo([titleMain],
+            { x: 80, opacity: 0 },
+            { x: 0, opacity: 1, stagger: 0.1, duration: 0.5, paused: true, ease: "power2.out", overwrite: "auto" }
         );
-        const textRightEnter = gsap.fromTo(textRight,
-            { x: 200, opacity: 0 },
-            { x: 0, opacity: 1, duration: 0.8, paused: true, ease: "power2.out", overwrite: "auto" }
+        const titleExit = gsap.to([titleMain],
+            { x: -80, opacity: 0, stagger: 0.05, duration: 0.5, paused: true, ease: "power2.in", overwrite: "auto" }
+        );
+        const textDescEnter = gsap.fromTo(textRight,
+            { x: 50, opacity: 0 },
+            { x: 0, opacity: 1, duration: 0.6, paused: true, ease: "power2.out", overwrite: "auto" }
         );
 
         // === SCROLL TRIGGER UNICO ===
@@ -108,7 +109,7 @@
                 trigger: hScroll,
                 scroller: window,
                 start: "top top",
-                end: "+=700%",
+                end: "+=600%",
                 scrub: 1,
                 pin: true,
                 pinSpacing: false,
@@ -146,27 +147,30 @@
                         s2P2Enter.reverse();
                     }
 
-                    // --- Sezione 4: 56–100% dello scroll ---
-                    if (self.progress >= 0.58) {
-                        textLeftEnter.play();
+                    // --- Sezione 4 ---
+                    if (self.progress >= 0.77) {
+                        textSmallEnter.play();
                     } else {
-                        textLeftEnter.reverse();
+                        textSmallEnter.reverse();
                     }
-                    if (self.progress >= 0.64) {
-                        subtitleEnter.play();
+                    if (self.progress >= 0.83) {
+                        textSmallExit.play();
                     } else {
-                        subtitleEnter.reverse();
+                        textSmallExit.reverse();
                     }
-                    if (self.progress >= 0.70) {
+                    if (self.progress >= 0.83) {
                         titleEnter.play();
                     } else {
                         titleEnter.reverse();
                     }
-                    if (self.progress >= 0.76) {
-                        textRightEnter.play();
+                    if (self.progress >= 0.89) {
+                        titleExit.play();
+                        textDescEnter.play();
                     } else {
-                        textRightEnter.reverse();
+                        titleExit.reverse();
+                        textDescEnter.reverse();
                     }
+                    
                 },
             },
         });
@@ -174,9 +178,12 @@
         // Linea sezione 2 si disegna nel primo terzo
         tl.to(s2Path, { strokeDashoffset: 0, ease: "none", duration: 0.22 }, 0.03);
         // Linea sezione 4 si disegna nell'ultimo terzo
-        tl.to(path, { strokeDashoffset: 0, ease: "none", duration: 0.30 }, 0.62);
+        tl.to(path, { strokeDashoffset: 0, ease: "none", duration: 0.20 }, 0.75);
         // Scroll orizzontale
-        tl.fromTo(hScroll, { x: "0vw" }, { x: "-220vw", ease: "none", duration: 0.7 }, 0.3);
+        tl.fromTo(hScroll, { x: "0vw" }, { x: "-200vw", ease: "none", duration: 0.7 }, 0.3);
+
+        tl.to(transitionEllipse, { attr: { rx: 3000, ry: 3000 }, ease: "power2.inOut", duration: 0.05 }, 0.95);
+        tl.to("#transitionOverlay", { autoAlpha: 0, duration: 0.01 }, 1.0);
 
         // Parallax su entrambi
         const moveElements = (e) => {
@@ -197,15 +204,16 @@
     <!-- PANNELLO 1: Sezione 2 -->
     <main id="s2Panel" bind:this={s2Section}>
         <div id="svgContainer" bind:this={s2Line}>
-            <svg width="100%" height="100%" viewBox="0 0 1399 555" preserveAspectRatio="xMidYMid meet" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                    bind:this={s2Path}
-                    d="M85.4009 -405.708C-19.0926 -18.9122 35.0396 277.01 162.383 278.739C289.726 280.468 354.941 -25.4755 470.868 -64.9128C586.794 -104.35 690.647 178.046 857.728 140.98C1029.17 102.947 1119.94 -224.333 1119.94 -224.333"
-                    stroke-width="51"
+            <svg width=100% height=100% viewBox="0 0 1986 688" preserveAspectRatio="xMidYMid meet" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path bind:this={s2Path}
+                    d="M85.4009 -405.708C-19.0926 -18.9122 35.0396 277.01 162.383 278.739C289.726 280.468 354.941 -25.4755 470.868 -64.9128C586.794 -104.35 690.647 178.046 857.728 140.98C1029.17 102.947 1119.94 -224.333 1119.94 -224.333" 
+                    stroke="#DC3ECC" 
+                    stroke-width="51" 
                     stroke-linecap="round"
-                />
+                    />
             </svg>
         </div>
+
         <div id="s2Content">
             <div id="text">
                 <p bind:this={s2P1}>o potremmo anche dire...</p>
@@ -237,22 +245,25 @@
             </svg>
         </div>
         <div id="content">
-            <div id="topRow">
-                <p id="textLeft" bind:this={textLeft}>
-                    <span class="highlight">Oggi il mito non vive più nella distanza.</span> I VIP diventano iconici quando si mostrano umani, imperfetti, riconoscibili. È questa la nuova forma di idolatria:
-                </p>
-                <p id="subtitle" bind:this={subtitle}>SENTIRSI PARTE</p>
+            <p id="textSmall" bind:this={textLeft}>
+                <span class="highlight">Oggi il mito non vive più nella distanza.</span> I VIP diventano iconici quando si mostrano umani, imperfetti, riconoscibili. È questa la nuova forma di idolatria:
+            </p>
+            <div id="titleBlock">
+                <h2 id="titleMain" bind:this={titleMain}>SENTIRSI PARTE DELLA STESSA STORIA</h2>
             </div>
-            <div id="bottomRow">
-                <h2 id="titleMain" bind:this={titleMain}>DELLA STESSA STORIA</h2>
-                <p bind:this={textRight}>
-                    Il successo di questi personaggi nasce da un meccanismo semplice: <span class="highlight">chi guarda si riconosce.</span> Non ammira soltanto, partecipa. E in quella partecipazione si crea un legame che supera lo schermo.
-                </p>
-            </div>
+            <p id="textDesc" bind:this={textRight}>
+                Il successo di questi personaggi nasce da un meccanismo semplice: <span class="highlight">chi guarda si riconosce.</span> Non ammira soltanto, partecipa. E in quella partecipazione si crea un legame che supera lo schermo.
+            </p>
         </div>
     </main>
 
 </div>
+
+    <div id="transitionOverlay">
+        <svg id="transitionSvg" viewBox="0 0 1986 688" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+            <ellipse bind:this={transitionEllipse} cx="1974" cy=88 rx="0" ry="0" fill="var(--brand-vip-500)"/>
+        </svg>
+    </div>
 
 <style>
     :global(body) {
@@ -266,7 +277,7 @@
     #hScroll {
         display: flex;
         flex-direction: row;
-        width: 400vw; /* 120 + 60 + 120 ++100 */
+        width: 250vw; /* 120 + 60 + 120 ++100 */
         height: 100vh;
         position: relative;
     }
@@ -320,23 +331,24 @@
     #text {
         position: relative;
         color: var(--neutral-900);
-        font-size: clamp(1.25rem, 1.3vw, 1.5rem);
-        width: clamp(220px, 28vw, 380px);
+        font-size: clamp(0.95rem, 1.1vw, 1.3rem);
         font-family: var(--font-family-text);
-        display: flex;
-        flex-direction: column;
         gap: 1.5rem;
         pointer-events: none;
         font-weight: 400;
-        margin-left: -8vw;
+        justify-content: flex-start;
     }
 
     #titlePanel {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        width: clamp(380px, 45vw, 760px);
-        margin-right: -8vw;
+        font-family: var(--font-family);
+        font-size: clamp(3rem, 6vw, 8.3rem);
+        font-weight: 900;
+        color: var(--brand-vip-500);
+        line-height: 0.9;
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: -0.02em;
+        white-space: nowrap;
     }
 
     mark {
@@ -407,7 +419,8 @@
     #lineContainer {
         position: absolute;
         top: 20%;
-        right: -5%;
+        right: auto;
+        left: -5%;
         width: 100%;
         height: 100%;
         pointer-events: none;
@@ -424,79 +437,83 @@
     }
 
     #content {
-        position: relative;
-        z-index: 1;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        padding: clamp(2rem, 5vw, 4rem);
-        box-sizing: border-box;
-        gap: 0.5rem;
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    padding: clamp(3rem, 6vw, 5rem);
+    box-sizing: border-box;
+    gap: 1rem;
     }
 
-    #topRow {
-        display: flex;
-        flex-direction: row;
-        align-items: flex-end;
-        justify-content: space-between;
-        gap: clamp(2rem, 4vw, 5rem);
+    #textSmall {
+    font-family: var(--font-family-text);
+    font-size: clamp(0.95rem, 1.1vw, 1.3rem);
+    color: var(--neutral-900);
+    font-weight: 400;
+    margin: 0;
+    line-height: 1.5;
     }
 
-    #bottomRow {
-        display: flex;
-        flex-direction: row;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: clamp(2rem, 4vw, 5rem);
-    }
-
-    #textLeft {
-        font-family: var(--font-family-text);
-        font-size: clamp(0.95rem, 1.1vw, 1.3rem);
-        color: var(--neutral-900);
-        font-weight: 400;
-        margin: 0;
-        line-height: 1.5;
-        max-width: 40%;
-    }
-
-    #subtitle {
-        font-family: var(--font-family);
-        font-size: clamp(3rem, 5.5vw, 7rem);
-        font-weight: 900;
-        color: var(--brand-vip-500);
-        line-height: 0.9;
-        margin: 0;
-        text-transform: uppercase;
-        letter-spacing: -0.02em;
-        white-space: nowrap;
+    #titleBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
     }
 
     #titleMain {
-        font-family: var(--font-family);
-        font-size: clamp(3rem, 5.5vw, 7rem);
-        font-weight: 900;
-        color: var(--brand-vip-500);
-        line-height: 0.9;
-        margin: 0;
-        text-transform: uppercase;
-        letter-spacing: -0.02em;
+    font-family: var(--font-family);
+    font-size: clamp(3rem, 5.5vw, 7rem);
+    font-weight: 900;
+    color: var(--brand-vip-500);
+    line-height: 0.9;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
     }
 
-    #bottomRow p {
-        font-family: var(--font-family-text);
-        font-size: clamp(0.95rem, 1.1vw, 1.3rem);
-        color: var(--neutral-900);
-        font-weight: 400;
-        margin: 0;
-        line-height: 1.6;
-        max-width: 40%;
+    #textDesc {
+    font-family: var(--font-family-text);
+    font-size: clamp(0.95rem, 1.1vw, 1.3rem);
+    color: var(--neutral-900);
+    font-weight: 400;
+    margin: 0;
+    line-height: 1.6;
+    }
+
+    #textSmall,
+    #titleBlock,
+    #textDesc {
+    position: absolute;
+    text-align: left;
+    max-width: 850px;
+    padding: clamp(3rem, 6vw, 5rem);
+    left: 10%;                  /* sposta a sinistra */
+    top: 40%;                   /* sposta in basso */
+    transform: translateY(-50%);
     }
 
     .highlight {
-        color: var(--brand-vip-500);
-        font-weight: 400;
+    color: var(--brand-vip-500);
+    font-weight: 400;
+    }
+
+    #transitionOverlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        pointer-events: none;
+        z-index: 100;
+    }
+
+    #transitionSvg {
+        width: 100%;
+        height: 100%;
     }
 </style>
