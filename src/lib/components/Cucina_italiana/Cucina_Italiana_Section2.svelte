@@ -485,7 +485,7 @@
         });
         // 1. PHASE 1: Slide 1 - Figma intro texts grid
         tl.to(path, { strokeDashoffset: 0, ease: "none", duration: 1.5 }, 0)
-          .to(path2, { strokeDashoffset: 0, ease: "none", duration: 1.5 }, 0)
+          .to(path2, { strokeDashoffset: 0, ease: "none", duration: 1.5 }, 0.2)
           .to('.intro-grid .left-col, .intro-grid .right-col', { opacity: 1, y: 0, stagger: 0.15, duration: 1.2, ease: "power2.out" }, 0.2)
           
           // 2. PHASE 2: Transition to Slide 2 - Fullscreen phone vertical gallery (slides left on top of Slide 1)
@@ -569,19 +569,19 @@
           .to(chartContainer, { xPercent: -100, opacity: 0, duration: 1.5, ease: "power2.inOut" }, 17.5)
           .to(cinematicCard, { xPercent: -150, opacity: 0, duration: 1.5, ease: "power2.inOut" }, 17.5)
           .to(quoteContainer, { xPercent: 0, opacity: 1, duration: 1.5, ease: "power2.inOut" }, 17.5)
-          .to(quotePath, { strokeDashoffset: 0, duration: 1.5, ease: "none" }, 17.5)
+          .to(quotePath, { strokeDashoffset: 0, duration: 1.5, ease: "none" }, 18.0)
           .to(quoteTextLines, { opacity: 1, x: 0, stagger: 0.1, ease: "power2.out", duration: 1.0 }, 18.0)
 
           // 11. PHASE 11: Transition to Slide 8 (Comments section) with quote retraction and comments line bottom entrance
           .to(quoteTextLines, { opacity: 0, stagger: 0.05, ease: "power2.in", duration: 0.8 }, 20.5)
           .to(quotePath, { strokeDashoffset: -lenQuote, duration: 1.5, ease: "power2.inOut" }, 20.5)
-          .to(commentsLine, { yPercent: 0, duration: 1.5, ease: "power2.inOut" }, 20.5)
+          .to(commentsLine, { yPercent: 0, opacity: 1, duration: 1.5, ease: "power2.inOut" }, 20.5)
           .to(commentsVideoScroll, { x: "-200%", ease: "none", duration: 5.0 }, 20.5)
           .to(commentsPath, { strokeDashoffset: 0, ease: "none", duration: 5.0, x: "-60%" }, 20.5)
-          .to(commentsPath, { strokeDashoffset: -lenComments, ease: "none", duration: 1.5 }, 24.0)
 
           // 12. PHASE 12: Transition to Slide 9 (Redirect section)
           .to(redirectPath, { strokeDashoffset: 0, ease: "none", duration: 1.5 }, 25.5)
+          .to(commentsLine, { yPercent: 100, opacity: 0, duration: 2.0, ease: "power1.inOut" }, 24.5)
           .to(redirectTextWords, { opacity: 1, y: 0, stagger: 0.1, duration: 1.0, ease: "power2.out" }, 27.0)
           .fromTo('.circular-progress-container', { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1.0, duration: 1.0, ease: "power2.out" }, 27.0)
           .to({}, { duration: 12.0 }, 28.0);
@@ -615,7 +615,11 @@
         <div id="svgContainerPart1" class="svg-bg-layer">
             <svg class="deco-svg" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path bind:this={path} d="M -300 200 C 100 100 200 400 350 -200" stroke="var(--brand-cibo-500)" stroke-width="51" stroke-linecap="round"/>
-                <path bind:this={path2} d="M 1800 800 C 1500 700 1300 1000 1100 1200" stroke="var(--brand-cibo-500)" stroke-width="51" stroke-linecap="round"/>
+            </svg>
+        </div>
+        <div id="svgContainerPart1_right">
+            <svg style="overflow: visible;" width="100%" height="100%" viewBox="0 0 588 394" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path bind:this={path2} d="M-150 600 C-50 550 154.281 264.428 249.618 253.057C313.753 245.407 314.596 339.527 379.118 336.557C516.689 330.224 650 -100 750 -150" stroke="#DC953E" stroke-width="51" stroke-linecap="round"/>
             </svg>
         </div>
 
@@ -658,15 +662,17 @@
             <!-- Shared SVG background inside fusedContainer (scrolls horizontally with it) -->
             <div id="svgContainerPart2" class="svg-bg-layer">
                 <svg class="deco-svg" viewBox="0 0 2880 900" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <!-- pathIntermediate: top curve (Section 4) -->
-                    <path bind:this={pathIntermediate} d="M -500 60 C -200 60, 100 40, 300 80 C 500 120, 650 30, 850 60 C 1050 90, 1200 30, 1350 -100" stroke="var(--brand-cibo-500)" stroke-width="38" stroke-linecap="round"/>
-                    <!-- pathIntermediate2: bottom curve starting in Section 4 and ending before Section 5 (exits bottom-right of Section 4) -->
-                    <path bind:this={pathIntermediate2} d="M 950 1000 C 1050 780, 1150 720, 1250 760 C 1320 780, 1380 900, 1420 1000" stroke="var(--brand-cibo-500)" stroke-width="38" stroke-linecap="round"/>
+                    <path bind:this={pathIntermediate2} d="M 950 1000 C 1050 780, 1150 720, 1250 760 C 1320 780, 1380 900, 1420 1000" stroke="var(--brand-cibo-500)" stroke-width="51" stroke-linecap="round"/>
                 </svg>
             </div>
 
             <!-- Panel 1 (100vw): Section 4 Content -->
             <div id="intermediatePanel">
+                <div id="intermediateSvgContainer">
+                    <svg style="overflow: visible;" width="100%" viewBox="0 0 1085 237" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path bind:this={pathIntermediate} d="M-300 41 C-150 41, 188.61 290.8, 336.882 119.501 C434.382 6.85782, 618.882 193.001, 786.882 193.001 C927.882 193.001, 1062.88 -21, 1600 -21" stroke="#DC953E" stroke-width="51" stroke-linecap="round"/>
+                    </svg>
+                </div>
                 <div id="intermediateWrapper" bind:this={intermediateParagraphs}>
                     <div class="inter-top-row">
                         <div class="inter-left-col">
@@ -778,8 +784,8 @@
     <!-- ========================================================== -->
     <div id="quoteContainer" class="slide-container" bind:this={quoteContainer}>
         <div id="quoteSvgContainer">
-            <svg viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path bind:this={quotePath} d="M -100 320 C 200 320, 250 120, 450 120 C 650 120, 800 180, 950 180 C 1100 180, 1150 -50, 1250 -100" stroke="var(--brand-cibo-500)" stroke-width="51" stroke-linecap="round"/>
+            <svg style="overflow: visible;" width="100%" viewBox="0 0 1559 244" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path bind:this={quotePath} d="M-200 -150 C 62.501 -248.146, 284.606 44.1801, 388.939 118.5 C 493.272 192.82, 775.44 278.503, 898.939 157.501 C 1022.44 36.4994, 1121.94 241, 1292.94 181.5 C 1463.94 122, 1650 -37, 1800 -37" stroke="#DC953E" stroke-width="51" stroke-linejoin="round" stroke-linecap="round"/>
             </svg>
         </div>
 
@@ -887,7 +893,7 @@
     <div id="redirectContainer" class="slide-container" bind:this={redirectContainer}>
         <div id="redirectSvgContainer" bind:this={redirectLine}>
             <svg viewBox="0 0 1920 1080" width="100%" height="100%" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path bind:this={redirectPath} d="M400 -100 C 400 200, 600 300, 800 200 C 1000 100, 1200 400, 1400 300 C 1600 200, 1800 600, 2100 500" stroke="var(--brand-cibo-500)" stroke-width="51" stroke-linecap="round"/>
+                <path bind:this={redirectPath} d="M400 -100 C 400 200, 600 300, 800 200 C 1000 100, 1200 400, 1400 300 C 1600 200, 1800 -100, 2000 -150" stroke="var(--brand-cibo-500)" stroke-width="51" stroke-linecap="round"/>
             </svg>
         </div>
 
@@ -911,6 +917,18 @@
 </main>
 
 <style>
+    /* Enforce uniform 51px screen line thickness on all decorative paths except chart */
+    #svgContainerPart1 svg path,
+    #svgContainerPart1_right svg path,
+    #intermediateSvgContainer svg path,
+    #svgContainerPart2 svg path,
+    #quoteSvgContainer svg path,
+    #commentsSvgContainer svg path,
+    #redirectSvgContainer svg path {
+        vector-effect: non-scaling-stroke;
+        stroke-width: 51px !important;
+    }
+
     main {
         position: relative;
         width: 100vw;
@@ -1075,6 +1093,16 @@
         z-index: 2;
     }
 
+     #svgContainerPart1_right {
+        position: absolute;
+        bottom: -60px;
+        right: -120px;
+        width: 588px;
+        height: 394px;
+        z-index: 1;
+        pointer-events: none;
+    }
+
     #svgContainerPart2 {
         position: absolute;
         top: 0;
@@ -1088,6 +1116,15 @@
     #svgContainerPart2 svg {
         width: 100%;
         height: 100%;
+    }
+
+    #intermediateSvgContainer {
+        position: absolute;
+        top: -160px;
+        left: 0;
+        width: 100vw;
+        z-index: 1;
+        pointer-events: none;
     }
 
     #intermediatePanel {
@@ -1148,7 +1185,7 @@
         display: flex;
         flex-direction: row;
         align-items: center;
-        gap: 2.5rem;
+        gap: 1.8rem;
     }
 
     .gusto-dharma {
@@ -1392,15 +1429,13 @@
         position: absolute;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
+        width: 100vw;
         z-index: 1;
         pointer-events: none;
     }
 
     #quoteSvgContainer svg {
         width: 100%;
-        height: 100%;
         overflow: visible !important;
     }
 
