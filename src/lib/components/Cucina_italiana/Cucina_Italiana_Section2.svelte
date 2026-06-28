@@ -25,7 +25,7 @@
     let path2;
     let pathIntermediate;
     let pathIntermediate2;
-    let svgElement;
+    let chartPath;
 
     // Slide 1 elements
     let p1;
@@ -42,8 +42,12 @@
     let cardContainer;
     let cinematicCard;
 
-    // Slide 7 D3 elements
-    let chartText;
+    // Slide 7 Chart elements
+    let chartText1;
+    let chartText2;
+    let chartClipRect;
+    let chartFirstCircle;
+    let chartLastCircle;
 
     // Slide 7 Quote elements
     let quoteContainer;
@@ -121,91 +125,7 @@
         // ==========================================
         // D3.js Curling Trend Chart Initialization
         // ==========================================
-        let svg = d3.select(svgElement);
-        const box = svgElement.getBoundingClientRect();
-        const width = box.width;
-        const height = box.height;
-
-        const renderChart = (chartData) => {
-            const xValue = d => d.Time;
-            const yValue = d => d.Curling;
-
-            const xScale = d3.scaleTime()
-                .domain(d3.extent(chartData, xValue))
-                .range([0, width])
-                .nice();
-
-            const yScale = d3.scaleLinear()
-                .domain(d3.extent(chartData, yValue))
-                .range([height, 0])
-                .nice();
-
-            const xAxis = d3.axisBottom(xScale).tickSize(-height);
-            const g = svg.append('g');
-            const xAxisG = g.append('g').call(xAxis).attr('transform', `translate(0, ${height})`);
-            xAxisG.selectAll('.domain').remove();
-
-            const areaGenerator = d3.area()
-                .x(d => xScale(xValue(d)))
-                .y0(height)
-                .y1(d => yScale(yValue(d)))
-                .curve(d3.curveBasis);
-
-            const curlingArea = g.append('path')
-                .attr('d', areaGenerator(chartData))
-                .attr('class', 'curlingArea');
-
-            const clip = svg.append('defs')
-                .append('clipPath')
-                .attr('id', 'clip-area-cibo-restored')
-                .append('rect')
-                .attr('width', 0)
-                .attr('height', height)
-                .attr('x', 0)
-                .attr('y', 0);
-
-            curlingArea.attr('clip-path', 'url(#clip-area-cibo-restored)');
-
-            const lineGenerator = d3.line()
-                .x(d => xScale(xValue(d)))
-                .y(d => yScale(yValue(d)))
-                .curve(d3.curveBasis);
-
-            const curlingLine = g.append('path')
-                .attr('d', lineGenerator(chartData))
-                .attr('class', 'curlingLine');
-
-            const firstRecord = chartData[0];
-            const lastRecord = chartData.at(-1);
-
-            g.append('circle')
-                .attr('cx', xScale(xValue(firstRecord)))
-                .attr('cy', yScale(yValue(firstRecord)))
-                .attr('r', 15)
-                .attr('fill', 'var(--neutral-50)')
-                .attr('id', 'firstCircle');
-
-            g.append('circle')
-                .attr('cx', xScale(xValue(lastRecord)))
-                .attr('cy', yScale(yValue(lastRecord)))
-                .attr('r', 15)
-                .attr('fill', 'var(--neutral-50)')
-                .attr('id', 'lastCircle');
-        };
-
-        const chartData = await d3.csv('/Sport_Insoliti/Sport_CSV/Olympics.csv', (d) => {
-            return {
-                ...d,
-                Curling: +d.Curling,
-                Time: new Date(d.Time)
-            };
-        });
-
-        renderChart(chartData);
-
-        let d3Path = svgElement.querySelector('.curlingLine');
-        const d3Length = d3Path.getTotalLength();
-        let d3Area = svgElement.querySelector('#clip-area-cibo-restored rect');
+        // Non-d3 static chart initialization
 
         // Set Swiper color utilities
         const applyColors = (swiper) => {
@@ -283,7 +203,6 @@
         gsap.set(path2, { strokeDasharray: len2, strokeDashoffset: len2 });
         gsap.set(pathIntermediate, { strokeDasharray: lenIntermediate, strokeDashoffset: lenIntermediate, opacity: 0 });
         gsap.set(pathIntermediate2, { strokeDasharray: lenIntermediate2, strokeDashoffset: lenIntermediate2, opacity: 0 });
-        gsap.set(d3Path, { strokeDasharray: d3Length, strokeDashoffset: d3Length });
         gsap.set(quotePath, { strokeDasharray: lenQuote, strokeDashoffset: lenQuote });
         gsap.set(commentsPath, { strokeDasharray: lenComments, strokeDashoffset: lenComments, x: 0 });
         gsap.set(redirectPath, { strokeDasharray: lenRedirect, strokeDashoffset: lenRedirect });
@@ -296,7 +215,7 @@
         gsap.set(fusedContainer, { xPercent: 0 });
         gsap.set(swiperDeckContainer, { xPercent: 100 });
         gsap.set(chartContainer, { xPercent: 100, opacity: 0 });
-        gsap.set(quoteContainer, { xPercent: 100, opacity: 0 });
+        gsap.set(quoteContainer, { xPercent: 0, opacity: 0 });
         gsap.set(commentsContainer, { xPercent: 0 });
         gsap.set(commentsLine, { yPercent: 100 });
         gsap.set(commentsVideoScroll, { x: "180%" });
@@ -362,9 +281,12 @@
         gsap.set(textLeft, { xPercent: 0, opacity: 1 });
         gsap.set(cardContainer, { scale: 1.0, opacity: 1, y: 0 });
         gsap.set(cinematicCard, { scale: 0.8, opacity: 0, rotate: -15, x: 40, y: 10, borderRadius: 20, zIndex: 1 });
-        gsap.set(chartText, { opacity: 0, x: 200 });
-        gsap.set('#firstCircle', { r: 0 });
-        gsap.set('#lastCircle', { r: 0 });
+        gsap.set([chartText1, chartText2], { opacity: 0, y: 50 });
+        gsap.set(chartClipRect, { attr: { width: 0 } });
+        gsap.set([chartFirstCircle, chartLastCircle], { scale: 0, xPercent: -50, yPercent: -50, transformOrigin: "center center", opacity: 1 });
+        gsap.set('.chart-area', { opacity: 1 });
+        gsap.set('#svgChartContainer', { x: "0vw" });
+        gsap.set('#chartTextWrapper', { x: "0vw" });
 
         const tl = gsap.timeline({
             scrollTrigger: {
@@ -485,7 +407,7 @@
         });
         // 1. PHASE 1: Slide 1 - Figma intro texts grid
         tl.to(path, { strokeDashoffset: 0, ease: "none", duration: 1.5 }, 0)
-          .to(path2, { strokeDashoffset: 0, ease: "none", duration: 1.5 }, 0)
+          .to(path2, { strokeDashoffset: 0, ease: "none", duration: 1.5 }, 0.2)
           .to('.intro-grid .left-col, .intro-grid .right-col', { opacity: 1, y: 0, stagger: 0.15, duration: 1.2, ease: "power2.out" }, 0.2)
           
           // 2. PHASE 2: Transition to Slide 2 - Fullscreen phone vertical gallery (slides left on top of Slide 1)
@@ -557,31 +479,53 @@
               ease: "power2.inOut" 
           }, 14.6)
 
-          // 9. PHASE 9: Slide 6 - Restored D3 Curling Trend Graph drawn over the yellow background
+          // 9. PHASE 9: Slide 6 - New Chart Section
           .to(chartContainer, { xPercent: 0, opacity: 1, duration: 0.1 }, 15.4)
-          .to('#firstCircle', { r: 15, ease: "power2.out", duration: 0.1 }, 15.5)
-          .to(d3Path, { strokeDashoffset: 0, ease: "none", duration: 1.5 }, 15.6)
-          .to(d3Area, { width: "100vw", ease: "none", duration: 1.5 }, 15.6)
-          .to(chartText, { opacity: 1, x: 0, ease: "power2.out", duration: 1.0 }, 15.6)
-          .to('#lastCircle', { r: 15, ease: "power2.out", duration: 0.1 }, 16.9)
+          // Phase 9A: Draw peaks (0.9 duration) and fade in first text
+          .to(chartClipRect, { attr: { width: 2035 * 0.55 }, ease: "none", duration: 0.9 }, 15.5)
+          .to(chartFirstCircle, { scale: 1, duration: 0.2, ease: "back.out(1.7)" }, 15.5)
+          .to(chartText1, { opacity: 1, y: 0, ease: "power2.out", duration: 0.4 }, 15.6)
+          // Parallax horizontal scroll of graph and text wrapper
+          .to('#svgChartContainer', { x: "-10vw", ease: "none", duration: 0.9 }, 15.5)
+          .to('#chartTextWrapper', { x: "-12vw", ease: "none", duration: 0.9 }, 15.5)
 
-          // 10. PHASE 10: Transition to Slide 7 (Quote section) with opacity cross-fade
-          .to(chartContainer, { xPercent: -100, opacity: 0, duration: 1.5, ease: "power2.inOut" }, 17.5)
-          .to(cinematicCard, { xPercent: -150, opacity: 0, duration: 1.5, ease: "power2.inOut" }, 17.5)
-          .to(quoteContainer, { xPercent: 0, opacity: 1, duration: 1.5, ease: "power2.inOut" }, 17.5)
-          .to(quotePath, { strokeDashoffset: 0, duration: 1.5, ease: "none" }, 17.5)
+          // Phase 9B: Fast transition to post-Olympic section (0.4 duration)
+          .to(chartText1, { opacity: 0, y: -50, ease: "power2.in", duration: 0.2 }, 16.4)
+          .to('#svgChartContainer', { x: "-30vw", ease: "power2.inOut", duration: 0.4 }, 16.4)
+          .to('#chartTextWrapper', { x: "-40vw", ease: "power2.inOut", duration: 0.4 }, 16.4)
+
+          // Phase 9C: Draw second section (post-Olympic ripples) (0.5 duration) and fade in second text
+          .to(chartClipRect, { attr: { width: 2035 }, ease: "none", duration: 0.5 }, 16.8)
+          .to(chartLastCircle, { scale: 1, duration: 0.2, ease: "back.out(1.7)" }, 17.1)
+          .to(chartText2, { opacity: 1, y: 0, ease: "power2.out", duration: 0.3 }, 16.9)
+          // Parallax continued scroll slightly
+          .to('#svgChartContainer', { x: "-35vw", ease: "none", duration: 0.5 }, 16.8)
+          .to('#chartTextWrapper', { x: "-45vw", ease: "none", duration: 0.5 }, 16.8)
+
+          // Phase 9D: Zoom Circle Transition to Slide 7 (0.2 duration - extremely quick!)
+          .to(chartText2, { opacity: 0, y: -30, ease: "power1.in", duration: 0.1 }, 17.3)
+          .to([chartFirstCircle, '.chart-area', '.chart-main-line'], { opacity: 0, duration: 0.1 }, 17.3)
+          .to(cinematicCard, { backgroundColor: "#ffffff", duration: 0.2, ease: "power2.inOut" }, 17.3)
+          .to(chartLastCircle, { scale: 350, fill: "#ffffff", duration: 0.2, ease: "power2.in" }, 17.3)
+          .set(chartContainer, { opacity: 0 }, 17.5)
+
+          // 10. PHASE 10: Transition to Slide 7 (Quote section) with opacity cross-fade (no sliding)
+          .to(chartContainer, { opacity: 0, duration: 1.5, ease: "power2.inOut" }, 17.5)
+          .to(cinematicCard, { opacity: 0, duration: 1.5, ease: "power2.inOut" }, 17.5)
+          .to(quoteContainer, { opacity: 1, duration: 1.5, ease: "power2.inOut" }, 17.5)
+          .to(quotePath, { strokeDashoffset: 0, duration: 1.5, ease: "none" }, 18.0)
           .to(quoteTextLines, { opacity: 1, x: 0, stagger: 0.1, ease: "power2.out", duration: 1.0 }, 18.0)
 
           // 11. PHASE 11: Transition to Slide 8 (Comments section) with quote retraction and comments line bottom entrance
           .to(quoteTextLines, { opacity: 0, stagger: 0.05, ease: "power2.in", duration: 0.8 }, 20.5)
           .to(quotePath, { strokeDashoffset: -lenQuote, duration: 1.5, ease: "power2.inOut" }, 20.5)
-          .to(commentsLine, { yPercent: 0, duration: 1.5, ease: "power2.inOut" }, 20.5)
+          .to(commentsLine, { yPercent: 0, opacity: 1, duration: 1.5, ease: "power2.inOut" }, 20.5)
           .to(commentsVideoScroll, { x: "-200%", ease: "none", duration: 5.0 }, 20.5)
           .to(commentsPath, { strokeDashoffset: 0, ease: "none", duration: 5.0, x: "-60%" }, 20.5)
-          .to(commentsPath, { strokeDashoffset: -lenComments, ease: "none", duration: 1.5 }, 24.0)
 
           // 12. PHASE 12: Transition to Slide 9 (Redirect section)
           .to(redirectPath, { strokeDashoffset: 0, ease: "none", duration: 1.5 }, 25.5)
+          .to(commentsLine, { yPercent: 100, opacity: 0, duration: 2.0, ease: "power1.inOut" }, 24.5)
           .to(redirectTextWords, { opacity: 1, y: 0, stagger: 0.1, duration: 1.0, ease: "power2.out" }, 27.0)
           .fromTo('.circular-progress-container', { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1.0, duration: 1.0, ease: "power2.out" }, 27.0)
           .to({}, { duration: 12.0 }, 28.0);
@@ -615,7 +559,11 @@
         <div id="svgContainerPart1" class="svg-bg-layer">
             <svg class="deco-svg" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path bind:this={path} d="M -300 200 C 100 100 200 400 350 -200" stroke="var(--brand-cibo-500)" stroke-width="51" stroke-linecap="round"/>
-                <path bind:this={path2} d="M 1800 800 C 1500 700 1300 1000 1100 1200" stroke="var(--brand-cibo-500)" stroke-width="51" stroke-linecap="round"/>
+            </svg>
+        </div>
+        <div id="svgContainerPart1_right">
+            <svg style="overflow: visible;" width="100%" height="100%" viewBox="0 0 588 394" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path bind:this={path2} d="M-150 600 C-50 550 154.281 264.428 249.618 253.057C313.753 245.407 314.596 339.527 379.118 336.557C516.689 330.224 650 -100 750 -150" stroke="#DC953E" stroke-width="51" stroke-linecap="round"/>
             </svg>
         </div>
 
@@ -658,15 +606,17 @@
             <!-- Shared SVG background inside fusedContainer (scrolls horizontally with it) -->
             <div id="svgContainerPart2" class="svg-bg-layer">
                 <svg class="deco-svg" viewBox="0 0 2880 900" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <!-- pathIntermediate: top curve (Section 4) -->
-                    <path bind:this={pathIntermediate} d="M -500 60 C -200 60, 100 40, 300 80 C 500 120, 650 30, 850 60 C 1050 90, 1200 30, 1350 -100" stroke="var(--brand-cibo-500)" stroke-width="38" stroke-linecap="round"/>
-                    <!-- pathIntermediate2: bottom curve starting in Section 4 and ending before Section 5 (exits bottom-right of Section 4) -->
-                    <path bind:this={pathIntermediate2} d="M 950 1000 C 1050 780, 1150 720, 1250 760 C 1320 780, 1380 900, 1420 1000" stroke="var(--brand-cibo-500)" stroke-width="38" stroke-linecap="round"/>
+                    <path bind:this={pathIntermediate2} d="M 950 1000 C 1050 780, 1150 720, 1250 760 C 1320 780, 1380 900, 1420 1000" stroke="var(--brand-cibo-500)" stroke-width="51" stroke-linecap="round"/>
                 </svg>
             </div>
 
             <!-- Panel 1 (100vw): Section 4 Content -->
             <div id="intermediatePanel">
+                <div id="intermediateSvgContainer">
+                    <svg style="overflow: visible;" width="100%" viewBox="0 0 1085 237" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path bind:this={pathIntermediate} d="M-300 41 C-150 41, 188.61 290.8, 336.882 119.501 C434.382 6.85782, 618.882 193.001, 786.882 193.001 C927.882 193.001, 1062.88 -21, 1600 -21" stroke="#DC953E" stroke-width="51" stroke-linecap="round"/>
+                    </svg>
+                </div>
                 <div id="intermediateWrapper" bind:this={intermediateParagraphs}>
                     <div class="inter-top-row">
                         <div class="inter-left-col">
@@ -765,11 +715,29 @@
     <!-- ========================================================== -->
     <div id="d3ChartContainer" class="slide-container" bind:this={chartContainer}>
         <div id="svgChartContainer">
-            <svg id="chartLine" width="100vw" height="100vh" bind:this={svgElement}></svg>
+            <svg id="chartLine" viewBox="0 0 2035 708.5" width="135vw" height="100%" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="overflow: visible;">
+                <defs>
+                    <clipPath id="chartClip">
+                        <rect bind:this={chartClipRect} x="0" y="0" width="0" height="708.5" />
+                    </clipPath>
+                </defs>
+                <!-- Area underneath the curve -->
+                <path class="chart-area" clip-path="url(#chartClip)" d="M32 289C18 289 0 219.5 0 219.5V708.5H2035V603.5C2035 603.5 1965 584.5 1927.5 584.5C1912.46 584.5 1908.94 601.75 1894 603.5C1882.13 604.89 1876.11 597.5 1864 597.5C1852.09 597.5 1844.41 603.5 1832.5 603.5C1804.38 603.5 1788.49 606.183 1760.5 603.5C1735.6 601.114 1722.48 593.112 1697.5 592C1689.31 591.635 1684.7 592 1676.5 592C1668.3 592 1663.68 591.445 1655.5 592C1635.89 593.33 1626.04 601.341 1606.5 603.5C1588.64 605.473 1577.09 596.614 1560.5 603.5C1549.93 607.887 1537 621 1537 621H1431C1431 621 1414 520.5 1401.5 520.5H1364C1349.5 520.5 1334.5 621 1334.5 621H792.5C792.5 621 774 491 760.5 491C747 491 728.5 621 728.5 621H525.5C525.5 621 497.5 470 460.5 476C444.136 478.654 446.078 505 429.5 505C369.5 505 349 2.6921e-10 329 0C314.5 2.67858e-10 315.5 225.5 297 225.5C271.059 225.5 286.441 170 260.5 170C225 170 234.5 358 198.5 358C168.747 358 129 -0.000357951 99.5 0C70 0.000357952 57 289 32 289Z" fill="#E3B166"/>
+                <!-- Outline -->
+                <path bind:this={chartPath} class="chart-main-line" transform="translate(0, -10)" clip-path="url(#chartClip)" d="M6.77588 226.5C6.77588 226.5 24.7759 296 38.7759 296C63.7759 296 76.7759 7.00036 106.276 7C135.776 6.99964 175.523 365 205.276 365C241.276 365 231.776 177 267.276 177C293.217 177 277.835 232.5 303.776 232.5C322.276 232.5 321.276 7 335.776 7C355.776 7 376.276 512 436.276 512C452.854 512 450.912 485.654 467.276 483C504.276 477 532.276 628 532.276 628H735.276C735.276 628 753.776 498 767.276 498C780.776 498 799.276 628 799.276 628H1341.28C1341.28 628 1356.28 527.5 1370.78 527.5C1385.42 527.5 1393.63 527.5 1408.28 527.5C1420.78 527.5 1437.78 628 1437.78 628H1543.78C1543.78 628 1556.71 614.887 1567.28 610.5C1583.87 603.614 1595.42 612.473 1613.28 610.5C1632.81 608.341 1642.67 600.33 1662.28 599C1670.46 598.445 1675.07 599 1683.28 599C1691.48 599 1696.08 598.635 1704.28 599C1729.26 600.113 1742.38 608.114 1767.28 610.5C1795.27 613.183 1811.16 610.5 1839.28 610.5C1851.19 610.5 1858.86 604.5 1870.78 604.5C1882.88 604.5 1888.91 611.89 1900.78 610.5C1915.71 608.75 1919.24 591.5 1934.28 591.5C1971.78 591.5 2032.78 610.5 2032.78 610.5" />
+            </svg>
+            <!-- HTML Dots to prevent ellipse distortion while stretching SVG -->
+            <div bind:this={chartFirstCircle} class="chart-circle-html first-circle"></div>
+            <div bind:this={chartLastCircle} class="chart-circle-html last-circle"></div>
         </div>
 
-        <div id="chartText" bind:this={chartText}>
-            <p id="chartParagraph">Il trend della pasta ha avuto picchi altissimi le prime settimane, per poi gradualmente attenuarsi in un entusiasmo a salti sporadici e ritorni improvvisi.</p>
+        <div id="chartTextWrapper">
+            <div id="chartText1" class="chart-paragraph" bind:this={chartText1}>
+                <p id="chartParagraph">Il trend della pasta ha avuto picchi altissimi le prime settimane, per poi gradualmente attenuarsi in un entusiasmo a salti sporadici e ritorni improvvisi.</p>
+            </div>
+            <div id="chartText2" class="chart-paragraph right" bind:this={chartText2}>
+                <p id="chartParagraph2">Anche dopo la fine dei Giochi, l'interesse per la pasta a cinque cerchi è rimasto vivo. Le ricerche online dimostrano che la passione per questo formato insolito non si è spenta con lo spegnersi dei riflettori olimpici.</p>
+            </div>
         </div>
     </div>
 
@@ -778,8 +746,8 @@
     <!-- ========================================================== -->
     <div id="quoteContainer" class="slide-container" bind:this={quoteContainer}>
         <div id="quoteSvgContainer">
-            <svg viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path bind:this={quotePath} d="M -100 320 C 200 320, 250 120, 450 120 C 650 120, 800 180, 950 180 C 1100 180, 1150 -50, 1250 -100" stroke="var(--brand-cibo-500)" stroke-width="51" stroke-linecap="round"/>
+            <svg style="overflow: visible;" width="100%" viewBox="0 0 1559 244" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path bind:this={quotePath} d="M-200 -150 C 62.501 -248.146, 284.606 44.1801, 388.939 118.5 C 493.272 192.82, 775.44 278.503, 898.939 157.501 C 1022.44 36.4994, 1121.94 241, 1292.94 181.5 C 1463.94 122, 1650 -37, 1800 -37" stroke="#DC953E" stroke-width="51" stroke-linejoin="round" stroke-linecap="round"/>
             </svg>
         </div>
 
@@ -887,7 +855,7 @@
     <div id="redirectContainer" class="slide-container" bind:this={redirectContainer}>
         <div id="redirectSvgContainer" bind:this={redirectLine}>
             <svg viewBox="0 0 1920 1080" width="100%" height="100%" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path bind:this={redirectPath} d="M400 -100 C 400 200, 600 300, 800 200 C 1000 100, 1200 400, 1400 300 C 1600 200, 1800 600, 2100 500" stroke="var(--brand-cibo-500)" stroke-width="51" stroke-linecap="round"/>
+                <path bind:this={redirectPath} d="M400 -100 C 400 200, 600 300, 800 200 C 1000 100, 1200 400, 1400 300 C 1600 200, 1800 -100, 2000 -150" stroke="var(--brand-cibo-500)" stroke-width="51" stroke-linecap="round"/>
             </svg>
         </div>
 
@@ -911,12 +879,24 @@
 </main>
 
 <style>
+    /* Enforce uniform 51px screen line thickness on all decorative paths except chart */
+    #svgContainerPart1 svg path,
+    #svgContainerPart1_right svg path,
+    #intermediateSvgContainer svg path,
+    #svgContainerPart2 svg path,
+    #quoteSvgContainer svg path,
+    #commentsSvgContainer svg path,
+    #redirectSvgContainer svg path {
+        vector-effect: non-scaling-stroke;
+        stroke-width: 51px !important;
+    }
+
     main {
         position: relative;
         width: 100vw;
         height: 100vh;
         overflow: hidden;
-        background-color: var(--neutral-50);
+        background-color: #ffffff;
         visibility: hidden;
     }
 
@@ -984,7 +964,8 @@
     .para {
         font-family: var(--font-family-text);
         color: var(--neutral-900);
-        font-size: 2.1rem;
+        font-size: 26px;
+        font-weight: 400;
         line-height: 145%;
         margin: 0;
     }
@@ -992,9 +973,9 @@
     .p2-sub {
         font-family: var(--font-family-text);
         color: var(--neutral-900);
-        font-size: 2.1rem;
+        font-size: 26px;
         margin: 0 0 1rem 0;
-        font-weight: 300;
+        font-weight: 400;
         text-transform: uppercase;
         letter-spacing: -0.05rem;
     }
@@ -1002,7 +983,7 @@
     .p2-dharma {
         font-family: var(--font-family);
         color: var(--brand-cibo-500);
-        font-size: 8.3rem;
+        font-size: 128px;
         line-height: 0.85;
         font-weight: 900;
         margin: 0;
@@ -1075,6 +1056,16 @@
         z-index: 2;
     }
 
+     #svgContainerPart1_right {
+        position: absolute;
+        bottom: -60px;
+        right: -120px;
+        width: 588px;
+        height: 394px;
+        z-index: 1;
+        pointer-events: none;
+    }
+
     #svgContainerPart2 {
         position: absolute;
         top: 0;
@@ -1088,6 +1079,15 @@
     #svgContainerPart2 svg {
         width: 100%;
         height: 100%;
+    }
+
+    #intermediateSvgContainer {
+        position: absolute;
+        top: -160px;
+        left: 0;
+        width: 100vw;
+        z-index: 1;
+        pointer-events: none;
     }
 
     #intermediatePanel {
@@ -1148,12 +1148,12 @@
         display: flex;
         flex-direction: row;
         align-items: center;
-        gap: 2.5rem;
+        gap: 1.8rem;
     }
 
     .gusto-dharma {
         font-family: var(--font-family);
-        font-size: 7.2rem; /* Adjusted slightly to avoid curve overlaps */
+        font-size: 128px;
         font-weight: 900;
         color: var(--brand-cibo-500);
         line-height: 0.9;
@@ -1161,12 +1161,14 @@
     }
 
     .highlight {
-        color: var(--brand-cibo-500);
-        font-weight: 500;
+        color: var(--brand-cibo-500) !important;
+        font-weight: 600 !important;
     }
 
     .para-olympic {
-        font-size: 1.9rem; /* Adjusted slightly to avoid curve overlaps */
+        font-family: var(--font-family-text);
+        font-size: 26px;
+        font-weight: 400;
         line-height: 145%;
     }
 
@@ -1233,8 +1235,8 @@
 
     #pastaDesc {
         font-family: var(--font-family-text);
-        font-size: 1.6rem;
-        font-weight: 300;
+        font-size: 26px;
+        font-weight: 400;
         color: var(--neutral-700);
         margin: 0;
         line-height: 140%;
@@ -1344,63 +1346,118 @@
 
     #svgChartContainer {
         position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 135vw;
+        height: 65vh; /* Imposta altezza per allinearlo in basso e sollevarlo a sufficienza */
+        z-index: 1;
+        display: flex;
+        align-items: flex-end;
+        box-sizing: border-box;
+    }
+
+    #chartLine {
+        width: 135vw;
+        height: 100%;
+        overflow: visible !important;
+        padding-left: 0;   /* Parte vicino al bordo sinistro come nel grafico blu */
+        padding-right: 0;  /* Finisce perfettamente al bordo destro */
+        box-sizing: border-box;
+    }
+
+    .chart-main-line {
+        stroke: #EDCE9A !important;
+        stroke-width: 16px;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        fill: none;
+        transform-origin: center center;
+    }
+
+    #chartTextWrapper {
+        position: absolute;
         top: 0;
         left: 0;
-        width: 100%;
+        width: 145vw;
         height: 100%;
-        z-index: 1;
-    }
-
-    :global(.tick line) {
-        stroke: rgba(255, 255, 255, 0.15) !important;
-    }
-
-    :global(.curlingLine) {
-        fill: none;
-        stroke: var(--neutral-50) !important;
-        stroke-width: 14px;
-    }
-
-    :global(.curlingArea) {
-        fill: rgba(255, 255, 255, 0.15) !important;
-    }
-
-    #chartText {
-        position: absolute;
-        top: 30%;
-        left: 45%;
-        width: 40%;
         z-index: 5;
         pointer-events: none;
     }
 
-    #chartParagraph {
-        font-size: 2.2rem;
+    .chart-paragraph {
+        left: 0;
+        width: 40%;
+        font-size: 26px;
         color: var(--neutral-50) !important;
-        font-weight: 300;
+        font-weight: 400;
         font-family: var(--font-family-text);
         line-height: 140%;
+    }
+    .chart-paragraph.right {
+        left: auto;
+        right: 0;
+    }
+        position: absolute;
+        top: 30%;
+        width: 40%;
+        font-size: 26px;
+        color: var(--neutral-50) !important;
+        font-weight: 400;
+        font-family: var(--font-family-text);
+        line-height: 140%;
+    }
+
+    .chart-area {
+        fill: #E3B166 !important;
+        opacity: 1;
+        pointer-events: none;
+    }
+
+    .chart-circle-html {
+        position: absolute;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background-color: #EDCE9A !important;
+        pointer-events: none;
+        z-index: 10;
+    }
+
+    .first-circle {
+        left: 0.33%;
+        top: 30.55%;
+    }
+
+    .last-circle {
+        left: 99.89%;
+        top: 84.75%;
+    }
+
+    #chartText1 {
+        left: 45vw;
+    }
+
+    #chartText2 {
+        left: 105vw;
     }
 
     #quoteContainer {
         z-index: 9;
         justify-content: center;
-        background-color: var(--neutral-50);
+        background-color: #ffffff;
     }
 
     #quoteSvgContainer {
         position: absolute;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
+        width: 100vw;
         z-index: 1;
         pointer-events: none;
     }
 
     #quoteSvgContainer svg {
         width: 100%;
-        height: 100%;
         overflow: visible !important;
     }
 
@@ -1409,7 +1466,7 @@
         z-index: 10;
         font-family: var(--font-family-text);
         color: var(--neutral-900);
-        font-size: 24pt;
+        font-size: 26px;
         font-style: normal;
         font-weight: 400;
         line-height: 145%;
