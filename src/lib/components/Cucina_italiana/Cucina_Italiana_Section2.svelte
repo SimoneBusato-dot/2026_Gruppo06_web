@@ -215,7 +215,7 @@
         gsap.set(fusedContainer, { xPercent: 0 });
         gsap.set(swiperDeckContainer, { xPercent: 100 });
         gsap.set(chartContainer, { xPercent: 100, opacity: 0 });
-        gsap.set(quoteContainer, { xPercent: 100, opacity: 0 });
+        gsap.set(quoteContainer, { xPercent: 0, opacity: 0 });
         gsap.set(commentsContainer, { xPercent: 0 });
         gsap.set(commentsLine, { yPercent: 100 });
         gsap.set(commentsVideoScroll, { x: "180%" });
@@ -509,10 +509,10 @@
           .to(chartLastCircle, { scale: 350, fill: "#ffffff", duration: 0.2, ease: "power2.in" }, 17.3)
           .set(chartContainer, { opacity: 0 }, 17.5)
 
-          // 10. PHASE 10: Transition to Slide 7 (Quote section) with opacity cross-fade
-          .to(chartContainer, { xPercent: -100, opacity: 0, duration: 1.5, ease: "power2.inOut" }, 17.5)
-          .to(cinematicCard, { xPercent: -150, opacity: 0, duration: 1.5, ease: "power2.inOut" }, 17.5)
-          .to(quoteContainer, { xPercent: 0, opacity: 1, duration: 1.5, ease: "power2.inOut" }, 17.5)
+          // 10. PHASE 10: Transition to Slide 7 (Quote section) with opacity cross-fade (no sliding)
+          .to(chartContainer, { opacity: 0, duration: 1.5, ease: "power2.inOut" }, 17.5)
+          .to(cinematicCard, { opacity: 0, duration: 1.5, ease: "power2.inOut" }, 17.5)
+          .to(quoteContainer, { opacity: 1, duration: 1.5, ease: "power2.inOut" }, 17.5)
           .to(quotePath, { strokeDashoffset: 0, duration: 1.5, ease: "none" }, 18.0)
           .to(quoteTextLines, { opacity: 1, x: 0, stagger: 0.1, ease: "power2.out", duration: 1.0 }, 18.0)
 
@@ -735,7 +735,7 @@
             <div id="chartText1" class="chart-paragraph" bind:this={chartText1}>
                 <p id="chartParagraph">Il trend della pasta ha avuto picchi altissimi le prime settimane, per poi gradualmente attenuarsi in un entusiasmo a salti sporadici e ritorni improvvisi.</p>
             </div>
-            <div id="chartText2" class="chart-paragraph" bind:this={chartText2}>
+            <div id="chartText2" class="chart-paragraph right" bind:this={chartText2}>
                 <p id="chartParagraph2">Anche dopo la fine dei Giochi, l'interesse per la pasta a cinque cerchi è rimasto vivo. Le ricerche online dimostrano che la passione per questo formato insolito non si è spenta con lo spegnersi dei riflettori olimpici.</p>
             </div>
         </div>
@@ -964,7 +964,8 @@
     .para {
         font-family: var(--font-family-text);
         color: var(--neutral-900);
-        font-size: 2.1rem;
+        font-size: 26px;
+        font-weight: 400;
         line-height: 145%;
         margin: 0;
     }
@@ -972,9 +973,9 @@
     .p2-sub {
         font-family: var(--font-family-text);
         color: var(--neutral-900);
-        font-size: 2.1rem;
+        font-size: 26px;
         margin: 0 0 1rem 0;
-        font-weight: 300;
+        font-weight: 400;
         text-transform: uppercase;
         letter-spacing: -0.05rem;
     }
@@ -982,7 +983,7 @@
     .p2-dharma {
         font-family: var(--font-family);
         color: var(--brand-cibo-500);
-        font-size: 8.3rem;
+        font-size: 128px;
         line-height: 0.85;
         font-weight: 900;
         margin: 0;
@@ -1152,7 +1153,7 @@
 
     .gusto-dharma {
         font-family: var(--font-family);
-        font-size: 7.2rem; /* Adjusted slightly to avoid curve overlaps */
+        font-size: 128px;
         font-weight: 900;
         color: var(--brand-cibo-500);
         line-height: 0.9;
@@ -1160,12 +1161,14 @@
     }
 
     .highlight {
-        color: var(--brand-cibo-500);
-        font-weight: 500;
+        color: var(--brand-cibo-500) !important;
+        font-weight: 600 !important;
     }
 
     .para-olympic {
-        font-size: 1.9rem; /* Adjusted slightly to avoid curve overlaps */
+        font-family: var(--font-family-text);
+        font-size: 26px;
+        font-weight: 400;
         line-height: 145%;
     }
 
@@ -1232,8 +1235,8 @@
 
     #pastaDesc {
         font-family: var(--font-family-text);
-        font-size: 1.6rem;
-        font-weight: 300;
+        font-size: 26px;
+        font-weight: 400;
         color: var(--neutral-700);
         margin: 0;
         line-height: 140%;
@@ -1382,12 +1385,24 @@
     }
 
     .chart-paragraph {
+        left: 0;
+        width: 40%;
+        font-size: 26px;
+        color: var(--neutral-50) !important;
+        font-weight: 400;
+        font-family: var(--font-family-text);
+        line-height: 140%;
+    }
+    .chart-paragraph.right {
+        left: auto;
+        right: 0;
+    }
         position: absolute;
         top: 30%;
-        width: 35%;
-        font-size: 2.2rem;
+        width: 40%;
+        font-size: 26px;
         color: var(--neutral-50) !important;
-        font-weight: 300;
+        font-weight: 400;
         font-family: var(--font-family-text);
         line-height: 140%;
     }
@@ -1451,7 +1466,7 @@
         z-index: 10;
         font-family: var(--font-family-text);
         color: var(--neutral-900);
-        font-size: 24pt;
+        font-size: 26px;
         font-style: normal;
         font-weight: 400;
         line-height: 145%;
