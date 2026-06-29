@@ -24,11 +24,11 @@
 
 
         const text41SplitType = new SplitType(villText41, {types: 'lines', tagName: 'span'})
-        const lines41 = text41SplitType.lines
+        const lines41 = text41SplitType.lines ?? []
         const text42SplitType = new SplitType(villText42, {types: 'words', tagName: 'span'})
-        const words42 = text42SplitType.words
+        const words42 = text42SplitType.words ?? []
         const titleSplitType = new SplitType(title4, {types: 'chars', tagName: 'span'})
-        const title4Chars = titleSplitType.chars
+        const title4Chars = titleSplitType.chars ?? []
 
         // Posiziona l'SVG sulla seconda O (indice 4: C=0, O=1, N=2, D=3, O=4)
 
@@ -39,7 +39,6 @@
         const words42Enter = gsap.fromTo(words42, {x: "30%", opacity: 0}, {x:0, opacity: 1, stagger: 0.1, duration:0.6, ease:"power2.out", paused: true})
         const words42Exit = gsap.fromTo(words42, {x: 0, opacity: 1}, {x:"30%", opacity: 0, stagger: 0.1, duration:0.6, ease:"power2.out", paused: true})
         const Title4Enter = gsap.fromTo(title4Chars, {x: "30%", opacity: 0}, {x:0, opacity: 1, duration: 1, stagger: 0.1, ease: "elastic.out(0.5,0.4)", paused:true})
-        gsap.set("#textContainer4", {opacity:0})
         
         const tl = gsap.timeline({
             scrollTrigger: {
@@ -50,13 +49,12 @@
                 scrub: 1,
                 pin: true,
                 pinSpacing: false,
-                onEnter: () => gsap.set(villSection4, { autoAlpha: 1 }),
+                onEnter: () => {gsap.set(villSection4, { autoAlpha: 1 }); gsap.set([...lines41, ...words42, ...title4Chars], {x: "30%", opacity: 0})},
                 onLeave: () => gsap.set(villSection4, { autoAlpha: 0 }),
                 onEnterBack: () => gsap.set(villSection4, { autoAlpha: 1 }),
                 onLeaveBack: () => gsap.set(villSection4, { autoAlpha: 0 }),
                 onUpdate(self){
                     if(self.progress>=0.1){lines41Enter.play(); words42Enter.play()} else {lines41Enter.reverse(); words42Enter.reverse()}
-                    if(self.progress>=0.12){gsap.set("#textContainer4", {opacity: 1, duration: 0.6})}
                     if(self.progress>=0.5){lines41Exit.play(); words42Exit.play()} else {lines41Exit.reverse(); words42Exit.reverse()}
                     if(self.progress>=0.6){Title4Enter.play()} else {Title4Enter.reverse()}
                     if (self.progress >= 0.8) {

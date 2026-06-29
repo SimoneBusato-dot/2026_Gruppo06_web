@@ -1,6 +1,6 @@
 <script>
      import gsap from "gsap";
-    import { onMount } from "svelte";
+    import { onMount, tick } from "svelte";
     import { ScrollTrigger } from "gsap/ScrollTrigger";
     import SplitType from "split-type";
 
@@ -8,25 +8,32 @@
     let path6;
     let text61, text62, upper1, upper2
     gsap.registerPlugin(ScrollTrigger);
-    onMount(()=> {
-
+    onMount(async()=> {
+        await tick()
+        await new Promise(r => requestAnimationFrame(r))
         const length6 = path6.getTotalLength()
         gsap.set(path6, {strokeDasharray: length6, strokeDashoffset: length6})
 
         const text61Split = new SplitType(text61, {types: 'lines', tagName: 'span'})
-        const text61Lines = text61Split.lines
+        const text61Lines = text61Split.lines ??[]
         const text62Split = new SplitType(text62, {types: 'lines', tagName: 'span'})
-        const text62Lines = text62Split.lines
+        const text62Lines = text62Split.lines ??[]
         const upper1Split = new SplitType(upper1, {types: 'lines', tagName: 'span'})
-        const upper1Lines = upper1Split.lines
+        const upper1Lines = upper1Split.lines ??[]
         const upper2Split = new SplitType(upper2, {types: 'chars', tagName: 'span'})
-        const upper2Lines = upper2Split.chars
-        const text61Enter = gsap.fromTo(text61Lines, {x: "30%", opacity: 0}, {x:0, opacity:1, stagger: 0.1, duration: 0.6, ease:"power2.out", paused: true})
-        const text61Exit = gsap.fromTo(text61Lines, {x: 0, opacity: 1}, {x:"30%", opacity:0, stagger: 0.1, duration: 0.6, ease:"power2.out", paused: true})
-        const text62Enter = gsap.fromTo(text62Lines, {x: "30%", opacity: 0}, {x:0, opacity:1, stagger: 0.1, duration: 0.6, ease:"power2.out", paused: true})
-        const text62Exit = gsap.fromTo(text62Lines, {x: 0, opacity: 1}, {x:"30%", opacity:0, stagger: 0.1, duration: 0.6, ease:"power2.out", paused: true})
-        gsap.set("#textContainer61", {opacity: 0})
-        gsap.set("#textContainer62", {opacity: 0})
+        const upper2Chars = upper2Split.chars ??[]
+
+        
+        const text61Enter = gsap.fromTo(text61Lines, {x: "30%", opacity: 0}, {x:0, opacity:1, stagger: 0.1, duration: 0.6, ease:"elastic.out(0.5,0.4)", paused: true})
+        const text61Exit = gsap.fromTo(text61Lines, {x: 0, opacity: 1}, {x:"30%", opacity:0, stagger: 0.1, duration: 0.6, ease:"elastic.out(0.5,0.4)", paused: true})
+        const text62Enter = gsap.fromTo(text62Lines, {x: "30%", opacity: 0}, {x:0, opacity:1, stagger: 0.1, duration: 0.6, ease:"elastic.out(0.5,0.4)", paused: true})
+        const text62Exit = gsap.fromTo(text62Lines, {x: 0, opacity: 1}, {x:"30%", opacity:0, stagger: 0.1, duration: 0.6, ease:"elastic.out(0.5,0.4)", paused: true})
+        const upper1Enter = gsap.fromTo(upper1Lines, {x: "30%", opacity: 0}, {x:0, opacity:1, stagger: 0.1, duration: 0.6, ease:"elastic.out(0.5,0.4)", paused: true})
+        const upper1Exit = gsap.fromTo(upper1Lines, {x: 0, opacity: 1}, {x:"30%", opacity:0, stagger: 0.1, duration: 0.6, ease:"elastic.out(0.5,0.4)", paused: true})
+        const upper2Enter = gsap.fromTo(upper2Chars, {x: "30%", opacity: 0}, {x:0, opacity:1, stagger: 0.1, duration: 0.6, ease:"elastic.out(0.5,0.4)", paused: true})
+        const upper2Exit = gsap.fromTo(upper2Chars, {x: 0, opacity: 1}, {x:"30%", opacity:0, stagger: 0.1, duration: 0.6, ease:"elastic.out(0.5,0.4)", paused: true})
+        // gsap.set("#textContainer61", {opacity: 0})
+        // gsap.set("#textContainer62", {opacity: 0})
     const tl = gsap.timeline({
         scrollTrigger: {
             trigger: villSection6,
@@ -36,14 +43,20 @@
             scrub: 1,
             pin: true,
             pinSpacing: true,
-            onEnter: () => gsap.set(villSection6, { autoAlpha: 1 }),
+            onEnter: () => {gsap.set(villSection6, { autoAlpha: 1 }); // Forza subito lo stato "from" su tutti gli elementi
+        gsap.set([...text61Lines, ...text62Lines, ...upper1Lines, ...upper2Chars], {
+            x: "30%",
+            opacity: 0
+        })},
             onLeave: () => gsap.set(villSection6, { autoAlpha: 0 }),
             onEnterBack: () => gsap.set(villSection6, { autoAlpha: 1 }),
             onLeaveBack: () => gsap.set(villSection6, { autoAlpha: 0 }),
             onUpdate(self) {
-                if(self.progress>=0.1){text61Enter.play(); text62Enter.play()} else {text61Enter.reverse(); text62Enter.reverse()}
-                if(self.progress>=0.13){gsap.set("#textContainer61", {opacity: 1, duration: 0.6, ease:"power2.out"}); gsap.set("#textContainer62", {opacity: 1, duration: 0.6, ease:"power2.out"})}
-                if(self.progress>=0.7){text61Exit.play(); text62Exit.play()} else {text61Exit.reverse(); text62Exit.reverse()}
+                if(self.progress>=0.1){text61Enter.play(); upper1Enter.play();} else {text61Enter.reverse(); upper1Enter.reverse()}
+                // if(self.progress>=0.1){gsap.set("#textContainer61", {opacity: 1, duration: 0.1, ease:"power2.out"});}
+                if(self.progress>=0.55){text62Enter.play(); upper2Enter.play()} else {text62Enter.reverse(); upper2Enter.reverse()}
+                // if(self.progress>=0.55){gsap.set("#textContainer62", {opacity: 1, duration: 0.1, ease:"power2.out"})}
+                if(self.progress>=0.7){text61Exit.play(); text62Exit.play(); upper1Exit.play(); upper2Exit.play()} else {text61Exit.reverse(); text62Exit.reverse(); upper1Exit.reverse(); upper2Exit.reverse()}
             }
         }
     })

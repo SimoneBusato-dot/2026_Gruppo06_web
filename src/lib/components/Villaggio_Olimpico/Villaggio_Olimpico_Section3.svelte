@@ -34,7 +34,7 @@
        const villText3Enter = gsap.fromTo(villText3Lines, {x: "30%", opacity:0}, {x: 0, opacity:1, duration: 0.6, stagger: 0.1,ease: "elastic.out(0.1,0.5)", paused: true})
        const villText3Exit = gsap.fromTo(villText3Lines, {x: 0, opacity: 1}, {x: "40%", opacity:0, duration: 0.6, stagger: 0.1,ease: "elastic.in(0.1,0.5)", paused: true})
        gsap.set(sliderContainer, {opacity: 0})
-       gsap.set("#textContainer", {opacity: 0})
+
 
         const tl = gsap.timeline({
             scrollTrigger: {
@@ -45,14 +45,13 @@
                 scrub: 1,
                 pin: true,
                 pinSpacing: false,
-                onEnter: () => gsap.set(villSection3, { autoAlpha: 1 }),
+                onEnter: () => {gsap.set(villSection3, { autoAlpha: 1 }); gsap.set(villText3Lines, {x: "30%", opacity:0})},
                 onLeave: () => gsap.set(villSection3, { autoAlpha: 0 }),
                 onEnterBack: () => gsap.set(villSection3, { autoAlpha: 1 }),
                 onLeaveBack: () => gsap.set(villSection3, { autoAlpha: 0 }),
                 onUpdate(self) {
                     if(self.progress >= 0.1){sliderEnter.play(); villText3Enter.play()} else {sliderEnter.reverse(); villText3Enter.reverse()}
                     if(self.progress>=0.1){gsap.to(sliderContainer, {opacity: 1, duration: 0.5, ease: "power2.out"})}
-                    if(self.progress>=0.12){gsap.set("#textContainer", {opacity: 1, duration: 0.6})}
                     if(self.progress>= 0.6){sliderExit.play(); villText3Exit.play()} else {sliderExit.reverse(); villText3Exit.reverse()}
                 }
     }})

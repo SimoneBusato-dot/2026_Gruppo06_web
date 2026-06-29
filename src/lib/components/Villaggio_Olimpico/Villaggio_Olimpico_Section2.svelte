@@ -17,7 +17,7 @@
     onMount(()=> {
        
         const villText2NewSplitType = new SplitType(villText2, {types: 'lines', tagName: 'span' })
-        const villText2Lines= villText2NewSplitType.lines
+        const villText2Lines= villText2NewSplitType.lines ??[]
         
         const length = villLine1.getTotalLength();
         gsap.set(villLine1, {strokeDasharray: length, strokeDashoffset: length})
@@ -26,7 +26,6 @@
         gsap.set(villLine2, {strokeDasharray: length2, strokeDashoffset: length2, x:"60%"})
 
 
-        gsap.set("#villText2", { opacity: 0, width: "30rem"})
         gsap.set(graphContainer, {x: "-60%"})
         const villText2Enter = gsap.fromTo(villText2Lines, {x: "100%", opacity: 0}, {x: "50%", opacity: 1, stagger: 0.08, duration: 0.6, ease: "elastic.out(0.5,0.4)", paused: true})
         const dataText = graphContainer.querySelectorAll(".dataText")
@@ -58,13 +57,12 @@
                 scrub: 1,
                 pin: true,
                 pinSpacing: false,
-                onEnter: () => gsap.set(villSection2, { autoAlpha: 1 }),
+                onEnter: () => {gsap.set(villSection2, { autoAlpha: 1 }); gsap.set([...villText2Lines], {x: "100%", opacity: 0})},
                 onLeave: () => gsap.set(villSection2, { autoAlpha: 0 }),
                 onEnterBack: () => gsap.set(villSection2, { autoAlpha: 1 }),
                 onLeaveBack: () => gsap.set(villSection2, { autoAlpha: 0 }),
                 onUpdate(self){
                     if(self.progress >= 0.1){ villText2Enter.play()} else{ villText2Enter.reverse()}
-                    if (self.progress >=0.13){ gsap.to("#villText2", { opacity: 1, duration: 0.6})}
                     if (self.progress >=0.6){dataLineEnter.play(); dataTextAnimations.forEach(anim => anim.play())} else{dataLineEnter.reverse(); dataTextAnimations.forEach(anim => anim.reverse())}
                     if (self.progress >=0.8){contentExit.play()} else {contentExit.reverse()}
 

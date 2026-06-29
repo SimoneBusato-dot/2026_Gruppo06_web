@@ -12,19 +12,18 @@
 
     onMount(() => {
         const textSplitType = new SplitType(text, { types: 'lines', tagName: 'span' });
-        const textLines = textSplitType.lines;
+        const textLines6 = textSplitType.lines ?? [];
 
         const UpperSplitType = new SplitType(Upper, { types: 'words', tagName: 'span' })
-        const UpperWords = UpperSplitType.words
+        const UpperWords = UpperSplitType.words ?? []
 
         const length = path.getTotalLength()
         const length2 = path2.getTotalLength()
 
         gsap.set(path, { strokeDasharray: length, strokeDashoffset: length })
         gsap.set(path2, { strokeDasharray: length2, strokeDashoffset: length2 })
-        gsap.set('#text6', { opacity: 0})
-       const text6Enter = gsap.fromTo(textLines, { opacity: 0, x: 300 }, { opacity: 1, x: 0, duration: 0.7, ease: "power2.out", stagger: 0.1, paused: true });
-       const text6Exit = gsap.fromTo(textLines, { opacity: 1, x: 0 }, { opacity: 0, x: -300, duration: 0.7, ease: "power2.in", stagger: 0.05, paused: true });
+       const text6Enter = gsap.fromTo(textLines6, { opacity: 0, x: 300 }, { opacity: 1, x: 0, duration: 0.7, ease: "power2.out", stagger: 0.1, paused: true });
+       const text6Exit = gsap.fromTo(textLines6, { opacity: 1, x: 0 }, { opacity: 0, x: -300, duration: 0.7, ease: "power2.in", stagger: 0.05, paused: true });
        const UpperEnter = gsap.fromTo(UpperWords, { opacity: 0, x: 300}, {x: 0, opacity: 1, duration: 0.7, ease: "power2.in", stagger: 0.1, paused: true})
        const UpperExit = gsap.fromTo(UpperWords, { opacity: 1, x: 0}, {x: -300, opacity: 0, duration: 0.7, ease: "power2.in", stagger: 0.1, paused: true})
 
@@ -37,13 +36,12 @@
                 scrub: 1,
                 pin: true,
                 pinSpacing: false,
-                onEnter: () => gsap.set(section, { autoAlpha: 1 }),
+                onEnter: () => {gsap.set(section, { autoAlpha: 1 }); gsap.set([...textLines6, ...UpperWords], {opacity: 0, x: 300} )},
                 onLeave: () => gsap.set(section, { autoAlpha: 0 }),
                 onEnterBack: () => gsap.set(section, { autoAlpha: 1 }),
                 onLeaveBack: () => gsap.set(section, { autoAlpha: 0 }),
                 onUpdate: (self) => {
                     if (self.progress >= 0.1) { text6Enter.play(); UpperEnter.play()} else { text6Enter.reverse(); UpperEnter.reverse()}
-                    if (self.progress >= 0.17) { gsap.to('#text6', { opacity: 1, duration: 0.5, ease: "power2.out" }); }
                     if (self.progress >= 0.7) { text6Exit.play(); UpperExit.play()} else { text6Exit.reverse(); UpperExit.reverse()}
                     if (self.progress >= 0.77) { gsap.to('#text6', { opacity: 0, duration: 0.5, ease: "power2.out" }); }
                 }
