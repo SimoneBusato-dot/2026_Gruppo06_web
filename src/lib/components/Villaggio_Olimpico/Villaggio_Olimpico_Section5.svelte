@@ -49,7 +49,7 @@
             trigger: villSection5,
             scroller: window,
             start: "top top",
-            end: "+=160%",
+            end: "+=240%",
             scrub: 1,
             onUpdate(self) {
     const progress = self.progress
@@ -79,18 +79,18 @@
         }
     })
 
-    tl2.to(line5, { strokeDashoffset: -length5, x: "-60%", duration: 2, ease: "none" }, 0)
-    tl2.to(content5, { x: "-150%", duration: 3, ease: "power2.out" }, 0)
+    tl2.to(line5, { strokeDashoffset: -length5, x: "-60%", duration: 10, ease: "none" }, 0)
+    tl2.to(content5, { x: "-150%", duration: 9.5, ease: "power2.out" }, 0)
 
-    gsap.timeline({
+    const tl = gsap.timeline({
         scrollTrigger: {
             trigger: villSection5,
             scroller: window,
             start: "top top",
-            end: "+=201%",
+            end: "+=301%",
             scrub: 1,
             pin: true,
-            pinSpacing: true,
+            pinSpacing: false,
             onEnter: () => gsap.set(villSection5, { autoAlpha: 1 }),
             onLeave: () => gsap.set(villSection5, { autoAlpha: 0 }),
             onEnterBack: () => gsap.set(villSection5, { autoAlpha: 1 }),

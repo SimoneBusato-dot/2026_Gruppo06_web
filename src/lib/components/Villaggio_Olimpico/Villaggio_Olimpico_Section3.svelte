@@ -108,7 +108,7 @@
         bottom: 0;
         left: -45%;
         z-index: -1;
-        transform-style: preserve-3d
+        
     }
 
     #svgContainer svg{
