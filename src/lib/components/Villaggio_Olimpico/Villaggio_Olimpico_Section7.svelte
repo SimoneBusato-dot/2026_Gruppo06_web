@@ -112,7 +112,7 @@
                         <div class="card-bg"></div>
                     </div>
                     <div class="comments">
-                        <Comments variant="blue" user="iced.latte_">How do you even get involved in this?!</Comments>
+                        <Comments variant="red" user="burrrp_">I'm confused? Why condoms? can someone explain</Comments>
                     </div>
                 </div>
                 <div class="v">
@@ -121,7 +121,7 @@
                         <div class="card-bg"></div>
                     </div>
                     <div class="comments">
-                        <Comments variant="blue" user="door.flavor">And we call this a sport why..?😭</Comments>
+                        <Comments variant="red" user="boh_vabbe">NON LI USANO VERAMENTE SONO TIPO SOUVENIR</Comments>
                     </div>
                 </div>
                 <div class="v">
@@ -130,7 +130,7 @@
                         <div class="card-bg"></div>
                     </div>
                     <div class="comments">
-                        <Comments variant="blue" user="skrunkly.67">Non capisco niente di questa cosa 😂😂😂😂😂😂 ma fa ridere 😆😆</Comments>
+                        <Comments variant="red" user="yawn.01">I’m too asexual for this 😭</Comments>
                     </div>
                 </div>
                 <div class="v">
@@ -139,7 +139,7 @@
                         <div class="card-bg"></div>
                     </div>
                     <div class="comments">
-                        <Comments variant="blue" user="couch.guy_">I cant understand the mechanics of this😅</Comments>
+                        <Comments variant="red" user="gay.qaz">Journalism at its peak</Comments>
                     </div>
                 </div>
                 <div class="v">
@@ -148,7 +148,7 @@
                         <div class="card-bg"></div>
                     </div>
                     <div class="comments">
-                        <Comments variant="blue" user="sadfrog.99">I wish I did sports as a kid</Comments>
+                        <Comments variant="red" user="bingoOow">But can we get an actual Olympic village reality tv show</Comments>
                     </div>
                 </div>
                 <div class="v">
@@ -157,7 +157,7 @@
                         <div class="card-bg"></div>
                     </div>
                     <div class="comments">
-                        <Comments variant="blue" user="qaz.wsx">hay........HayYyyyyyyyy HAYYYYYYYYYYYY GOGO HAY!</Comments>
+                        <Comments variant="red" user="fnurf">but how are THE BEDS</Comments>
                     </div>
                 </div>
                 <div class="v">
@@ -166,7 +166,7 @@
                         <div class="card-bg"></div>
                     </div>
                     <div class="comments">
-                        <Comments variant="blue" user="a_l_e_8_5">Il curling è lo sport più bello del mondo</Comments>
+                        <Comments variant="red" user="tramp_fanclub">Thank you for sharing from an American</Comments>
                     </div>
                 </div>
             </div>
@@ -175,9 +175,12 @@
 
      <div id="svgContainer7" bind:this={line7}>
         <svg width="200%" height="100%" viewBox="0 0 2374 219" fill="none" xmlns="http://www.w3.org/2000/svg">
-             <path bind:this={path7} d="M25.1792 395.969C46.2211 264.612 269.241 39.0184 401.679 26.4684C549.667 12.4449 663.179 154.468 758.679 229.969C935.179 369.506 809.673 322.658 974.179 254.469C1104.49 200.455 1153.99 150.045 1284.68 96.9687C1489.35 13.847 1657.03 392.953 1857.18 299.469C1949.36 256.416 1967.82 159.328 2077.18 140.969C2145.68 129.469 2200.82 151.427 2239.68 224.469C2278.87 298.144 2324.47 370.376 2348.68 450.238" stroke="#533EDC" stroke-width="51" stroke-linejoin="round" stroke-linecap="round"/>
+             <path bind:this={path7} d="M25.1792 354.5C46.2211 223.143 141.241 134.05 273.679 121.5C421.667 107.477 435.565 302.114 574.679 354.5C741.334 417.257 866.173 422.69 1030.68 354.5C1160.99 300.487 1175.99 200.548 1306.68 147.472C1511.35 64.3502 1668.03 309.456 1868.18 215.972C1960.36 172.919 1957.18 25.5014 2070.18 25.5C2158.92 25.4989 2198.18 51.9228 2242.18 354.923C2254.17 437.508 2241.47 314.638 2265.68 394.5" stroke="#DC3E41" stroke-width="51" stroke-linejoin="round" stroke-linecap="round"/>
         </svg>
     </div>
+
+ 
+
 </main>
 
 <style>
@@ -185,7 +188,7 @@
     width: 100vw;
     height: 100vh;
     visibility: hidden;
-    margin-block-start: 2dvh ;
+    margin-block-start: 100dvh ;
     background-color: var(--neutral-50);
     position: relative;
 }
@@ -248,7 +251,7 @@
     position: absolute;
     width: 100%;
     height: 100%;
-    background-color: var(--brand-sport-insoliti-400);
+    background-color: var(--brand-villaggio-400);
     border-radius: 12px;
     z-index: -1;
     transform-style: preserve-3d;

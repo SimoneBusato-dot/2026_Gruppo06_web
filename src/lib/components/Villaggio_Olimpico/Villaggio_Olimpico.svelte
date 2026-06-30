@@ -5,6 +5,8 @@
     import VillaggioOlimpicoSection4 from "./Villaggio_Olimpico_Section4.svelte";
     import VillaggioOlimpicoSection5 from "./Villaggio_Olimpico_Section5.svelte";
     import VillaggioOlimpicoSection6 from "./Villaggio_Olimpico_Section6.svelte";
+    import VillaggioOlimpicoSection7 from "./Villaggio_Olimpico_Section7.svelte";
+    import VillaggioOlimpicoSection8 from "./Villaggio_Olimpico_Section8.svelte";
     
 </script>
 
@@ -14,4 +16,6 @@
 <VillaggioOlimpicoSection4 />
 <VillaggioOlimpicoSection5 />
 <VillaggioOlimpicoSection6 />
+<VillaggioOlimpicoSection7 />
+<VillaggioOlimpicoSection8 />
 

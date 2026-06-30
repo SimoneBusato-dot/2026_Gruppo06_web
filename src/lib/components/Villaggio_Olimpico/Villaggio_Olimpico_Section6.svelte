@@ -42,7 +42,7 @@
             end: "+=201%",
             scrub: 1,
             pin: true,
-            pinSpacing: true,
+            pinSpacing: false,
             onEnter: () => {gsap.set(villSection6, { autoAlpha: 1 }); // Forza subito lo stato "from" su tutti gli elementi
         gsap.set([...text61Lines, ...text62Lines, ...upper1Lines, ...upper2Chars], {
             x: "30%",

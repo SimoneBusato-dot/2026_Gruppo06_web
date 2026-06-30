@@ -1,7 +1,7 @@
 <script>
     import Page from "../../routes/+page.svelte";
 
-    let { variant = 'blue', children} = $props();
+    let { variant = 'blue', children, user = 'User'} = $props();
 </script>
 
 <div class={`comm comm-${variant}`}>
@@ -12,7 +12,7 @@
     </svg>
 
     <div id="textContainer">
-        <p id="User">User</p>
+        <p id="User">{user}</p>
         {@render children?.()}
     </div>
 </div>
