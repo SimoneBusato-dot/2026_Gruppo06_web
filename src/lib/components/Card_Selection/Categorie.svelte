@@ -331,7 +331,7 @@ onMount(() => {
         display: flex;
         flex-direction: column;
         align-items: center;
-        background-color: var(--neutral-50);
+        background-color: #ffffff;
     }
 
     #text {
