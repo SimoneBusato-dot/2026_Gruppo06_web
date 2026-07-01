@@ -6,6 +6,7 @@
 	import Considerations from "$lib/components/Card_Selection/considerations.svelte";
 	import gsap from "gsap";
     import { ScrollTrigger } from "gsap/ScrollTrigger";
+	import SplitType from 'split-type';
 	import '$lib/styles/counter.css';
 
 	let resizeObserver;
