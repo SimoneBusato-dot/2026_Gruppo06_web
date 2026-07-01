@@ -2,6 +2,7 @@
     import gsap from "gsap";
     import { onMount } from "svelte";
     import { ScrollTrigger } from "gsap/ScrollTrigger";
+    import VipSlider from "./Vip_Slider.svelte";
     import SplitType from "split-type";
 
     gsap.registerPlugin(ScrollTrigger);
@@ -11,7 +12,6 @@
     let path;
     let hScroll;
     let textLeft;
-    let subtitle;
     let titleMain;
     let textRight;
     let lineContainer;
@@ -24,86 +24,32 @@
     let s2P1;
     let s2P2;
     let s2Line;
+
+    let sliderElement = $state(null);
     
 
     onMount(() => {
-        gsap.set(section, { autoAlpha: 1 });
-        gsap.set(s2Section, { autoAlpha: 1 });
+        gsap.set([section, s2Section, "#section3Panel"], { autoAlpha: 1 });
 
-        // === SEZIONE 2 ===
-
-        // Parallax sezione 2
-        const moveElementsS2 = (e) => {
-            const xPercent = (e.clientX / window.innerWidth - 0.5) * 2;
-            const yPercent = (e.clientY / window.innerHeight - 0.5) * 2;
-            gsap.to(s2Line, {
-                duration: 1.2,
-                rotateY: xPercent * 5,
-                rotateX: -yPercent * 3,
-                scale: 1,
-                ease: "power2.out",
-                overwrite: "auto",
-            });
-        };
-
-        // Linea sezione 2
+        
+        
+        // === PREPARAZIONE ELEMENTI ===
         const s2Length = s2Path.getTotalLength();
         gsap.set(s2Path, { strokeDasharray: s2Length, strokeDashoffset: s2Length });
-
-        // SplitType sezione 2
-        const s2P1Lines = new SplitType(s2P1, { types: "lines", tagName: "span" }).lines;
-        const s2P2Lines = new SplitType(s2P2, { types: "lines", tagName: "span" }).lines;
-
-        // Animazioni sezione 2
-        const s2P1Enter = gsap.fromTo(s2P1Lines,
-            { x: 300, opacity: 0 },
-            { x: 0, opacity: 1, stagger: 0.1, overwrite: "auto", duration: 0.8, paused: true, ease: "power2.out" }
-        );
-        const s2P2Enter = gsap.fromTo(s2P2Lines,
-            { x: 300, opacity: 0 },
-            { x: 0, opacity: 1, stagger: 0.05, overwrite: "auto", duration: 0.5, paused: true, ease: "power2.out" }
-        );
-
-        // === SEZIONE 4 ===
-
-        // Parallax sezione 4
-        const moveElementsS4 = (e) => {
-            const xPercent = (e.clientX / window.innerWidth - 0.5) * 2;
-            const yPercent = (e.clientY / window.innerHeight - 0.5) * 2;
-            gsap.to(lineContainer, {
-                duration: 1.2,
-                rotateY: xPercent * 5,
-                rotateX: -yPercent * 3,
-                ease: "power2.out",
-                overwrite: "auto",
-            });
-        };
-
-        // Linea sezione 4
+        
         const s4Length = path.getTotalLength();
         gsap.set(path, { strokeDasharray: s4Length, strokeDashoffset: s4Length });
 
-        // Scritte sezione 4
-        const textSmallEnter = gsap.fromTo(textLeft,
-            { x: 50, opacity: 0 },
-            { x: 0, opacity: 1, duration: 0.5, paused: true, ease: "power2.out", overwrite: "auto" }
-        );
-        const textSmallExit = gsap.to(textLeft,
-            { x: -50, opacity: 0, duration: 0.5, paused: true, ease: "power2.in", overwrite: "auto" }
-        );
-        const titleEnter = gsap.fromTo([titleMain],
-            { x: 80, opacity: 0 },
-            { x: 0, opacity: 1, stagger: 0.1, duration: 0.5, paused: true, ease: "power2.out", overwrite: "auto" }
-        );
-        const titleExit = gsap.to([titleMain],
-            { x: -80, opacity: 0, stagger: 0.05, duration: 0.5, paused: true, ease: "power2.in", overwrite: "auto" }
-        );
-        const textDescEnter = gsap.fromTo(textRight,
-            { x: 50, opacity: 0 },
-            { x: 0, opacity: 1, duration: 0.6, paused: true, ease: "power2.out", overwrite: "auto" }
-        );
 
-        // === SCROLL TRIGGER UNICO ===
+        
+        // SplitType sezione 2
+        const s2P1Lines = new SplitType(s2P1, { types: "lines", tagName: "span" }).lines;
+        const s2P2Lines = new SplitType(s2P2, { types: "lines", tagName: "span" }).lines;
+        
+
+// === TIMELINE UNICA (TUTTO SOTTO SCRUB) ===
+        // Uniamo le animazioni dei testi direttamente qui dentro. 
+        // I tempi (0.03, 0.3, ecc.) determinano l'inizio assoluto lungo lo scroll (da 0 a 1)
         const tl = gsap.timeline({
             scrollTrigger: {
                 trigger: hScroll,
@@ -113,83 +59,56 @@
                 scrub: 1,
                 pin: true,
                 pinSpacing: false,
-                markers: true,
-                onEnter: () => {
-                    gsap.set(section, { autoAlpha: 1 });
-                    gsap.set(s2Section, { autoAlpha: 1 });
-                    gsap.set("#section3Panel", { autoAlpha: 1 });
-                },
-                onLeave: () => {
-                    gsap.set(section, { autoAlpha: 0 });
-                    gsap.set(s2Section, { autoAlpha: 0 });
-                    gsap.set("#section3Panel", { autoAlpha: 0 });
-                },
-                onEnterBack: () => {
-                    gsap.set(section, { autoAlpha: 1 });
-                    gsap.set(s2Section, { autoAlpha: 1 });
-                    gsap.set("#section3Panel", { autoAlpha: 1 });
-                },
-                onLeaveBack: () => {
-                    gsap.set(section, { autoAlpha: 0 });
-                    gsap.set(s2Section, { autoAlpha: 0 });
-                    gsap.set("#section3Panel", { autoAlpha: 0 });
-                },
-                onUpdate(self) {
-                    // --- Sezione 2: 0–43% dello scroll ---
-                    if (self.progress >= 0.04) {
-                        s2P1Enter.play();
-                    } else {
-                        s2P1Enter.reverse();
-                    }
-                    if (self.progress >= 0.18) {
-                        s2P2Enter.play();
-                    } else {
-                        s2P2Enter.reverse();
-                    }
-
-                    // --- Sezione 4 ---
-                    if (self.progress >= 0.77) {
-                        textSmallEnter.play();
-                    } else {
-                        textSmallEnter.reverse();
-                    }
-                    if (self.progress >= 0.83) {
-                        textSmallExit.play();
-                    } else {
-                        textSmallExit.reverse();
-                    }
-                    if (self.progress >= 0.83) {
-                        titleEnter.play();
-                    } else {
-                        titleEnter.reverse();
-                    }
-                    if (self.progress >= 0.89) {
-                        titleExit.play();
-                        textDescEnter.play();
-                    } else {
-                        titleExit.reverse();
-                        textDescEnter.reverse();
-                    }
-                    
-                },
+                markers: true
             },
         });
 
-        // Linea sezione 2 si disegna nel primo terzo
-        tl.to(s2Path, { strokeDashoffset: 0, ease: "none", duration: 0.22 }, 0.03);
-        // Linea sezione 4 si disegna nell'ultimo terzo
-        tl.to(path, { strokeDashoffset: 0, ease: "none", duration: 0.20 }, 0.75);
-        // Scroll orizzontale
-        tl.fromTo(hScroll, { x: "0vw" }, { x: "-200vw", ease: "none", duration: 0.7 }, 0.3);
+        // --- TIMELINE SEZIONE 2 ---
+        // Disegno linea s2
+        tl.to(s2Path, { strokeDashoffset: 0, ease: "none", duration: 0.30 }, 0.03);
+        // Comparsa testi s2 (Spostati qui dentro! Niente più onUpdate)
+        tl.fromTo(s2P1Lines, { x: 150, opacity: 0 }, { x: 0, opacity: 1, stagger: 0.05, duration: 0.08, ease: "power2.out" }, 0.04);
+        tl.fromTo(s2P2Lines, { x: 150, opacity: 0 }, { x: 0, opacity: 1, stagger: 0.05, duration: 0.08, ease: "power2.out" }, 0.15);
 
-        tl.to(transitionEllipse, { attr: { rx: 3000, ry: 3000 }, ease: "power2.inOut", duration: 0.05 }, 0.95);
-        tl.to("#transitionOverlay", { autoAlpha: 0, duration: 0.01 }, 1.0);
+        // --- SCROLL ORIZZONTALE ---
+        tl.fromTo(hScroll, { x: "0vw" }, { x: () => -(hScroll.scrollWidth - window.innerWidth), ease: "none", duration: 0.5 }, 0.3);
 
-        // Parallax su entrambi
+        // --- TIMELINE SEZIONE 4 ---
+        // Disegno linea s4 (dura da 0.70 a 0.88)
+        tl.to(path, { strokeDashoffset: 0, ease: "none", duration: 0.37 }, 0.57);
+        
+        // TESTO 1: Entra a 0.68, esce a 0.75
+        tl.fromTo(textLeft, { x: 50, opacity: 0 }, { x: 0, opacity: 1, duration: 0.03, ease: "power2.out" }, 0.57)
+          .to(textLeft, { x: -50, opacity: 0, duration: 0.03, ease: "power2.in" }, 0.65);
+
+        // TESTO 2: Entra a 0.75 (appena esce il primo), esce a 0.82
+        tl.fromTo(titleMain, { x: 50, opacity: 0 }, { x: 0, opacity: 1, duration: 0.03, ease: "power2.out" }, 0.72)
+          .to(titleMain, { x: -50, opacity: 0, duration: 0.03, ease: "power2.in" }, 0.80);
+
+        // TESTO 3: Entra a 0.82 e resta visibile fino alla fine dello scroll
+        tl.fromTo(textRight, { x: 50, opacity: 0 }, { x: 0, opacity: 1, duration: 0.04, ease: "power2.out" }, 0.81)
+            .to(textRight, { x: -50, opacity: 0, duration: 0.03, ease: "power2.in" }, 0.91);
+
+        // --- TRANSIZIONE FINALE (Anticipata a 0.88 per coincidere con la fine della linea) ---
+        tl.to(transitionEllipse, { attr: { rx: 3000, ry: 3000 }, ease: "power2.inOut", duration: 0.08 }, 0.92);
+        tl.to("#transitionOverlay", { autoAlpha: 0, duration: 0 }, 1.0);
+
+
+        // === PARALLAX MOUSE OTTIMIZZATO ===
+        // Un solo calcolo, un solo evento, performance nettamente migliori.
         const moveElements = (e) => {
-            moveElementsS2(e);
-            moveElementsS4(e);
+            const xPercent = (e.clientX / window.innerWidth - 0.5) * 2;
+            const yPercent = (e.clientY / window.innerHeight - 0.5) * 2;
+
+            gsap.to([s2Line, lineContainer], {
+                duration: 1.2,
+                rotateY: xPercent * 5,
+                rotateX: -yPercent * 3,
+                ease: "power2.out",
+                overwrite: "auto",
+            });
         };
+
         window.addEventListener("mousemove", moveElements);
 
         return () => {
@@ -197,6 +116,7 @@
             ScrollTrigger.getAll().forEach((t) => t.kill());
         };
     });
+      
 </script>
 
 <div id="hScroll" bind:this={hScroll}>
@@ -227,8 +147,7 @@
     <!-- PANNELLO 2: Sezione 3 rosa -->
     <div id="section3Panel">
         <div id="s3Content">
-            <p id="s3Eyebrow">VIP INASPETTATI</p>
-            <h2 id="s3Title">SNOOP<br>DOGG</h2>
+            <VipSlider bind:el={sliderElement} />
         </div>
     </div>
 
@@ -246,13 +165,16 @@
         </div>
         <div id="content">
             <p id="textSmall" bind:this={textLeft}>
-                <span class="highlight">Oggi il mito non vive più nella distanza.</span> I VIP diventano iconici quando si mostrano umani, imperfetti, riconoscibili. È questa la nuova forma di idolatria:
+                <span class="highlight">Oggi il mito non vive più nella distanza.</span><br>
+                I VIP diventano iconici quando si mostrano umani, imperfetti, riconoscibili.<br>
+                È questa la nuova forma di idolatria:
             </p>
             <div id="titleBlock">
                 <h2 id="titleMain" bind:this={titleMain}>SENTIRSI PARTE DELLA STESSA STORIA</h2>
             </div>
             <p id="textDesc" bind:this={textRight}>
-                Il successo di questi personaggi nasce da un meccanismo semplice: <span class="highlight">chi guarda si riconosce.</span> Non ammira soltanto, partecipa. E in quella partecipazione si crea un legame che supera lo schermo.
+                Il successo di questi personaggi nasce da un meccanismo semplice: <span class="highlight">chi guarda si riconosce.</span> Non ammira soltanto, partecipa.<br>
+                E in quella partecipazione si crea un legame che supera lo schermo.
             </p>
         </div>
     </main>
@@ -277,7 +199,7 @@
     #hScroll {
         display: flex;
         flex-direction: row;
-        width: 250vw; /* 120 + 60 + 120 ++100 */
+        width: max-content; /* 120 + 60 + 120 ++100 */
         height: 100vh;
         position: relative;
     }
@@ -285,7 +207,7 @@
     /* ===== PANNELLO 1 — Sezione 2 ===== */
     #s2Panel {
         position: relative;
-        width: 120vw;
+        width: 100vw;
         height: 100vh;
         display: flex;
         justify-content: center;
@@ -294,13 +216,12 @@
         background-color: var(--neutral-50);
         overflow: hidden;
         flex-shrink: 0;
-        visibility: hidden;
     }
 
     #svgContainer {
         position: absolute;
         top: -10%;
-        right: -10%;
+        right: -25%;
         width: 100%;
         height: 100%;
         overflow: hidden;
@@ -320,12 +241,13 @@
         z-index: 1;
         width: 100%;
         display: flex;
+        flex-direction: row;
         justify-content: center;
         align-items: center;
-        padding: clamp(3rem, 6vw, 5rem);
+        padding: clamp(1rem, s3vw, 3rem);
         min-height: 100%;
         box-sizing: border-box;
-        gap: clamp(2rem, 6vw, 4rem);
+        gap: 1.5rem;
     }
 
     #text {
@@ -337,6 +259,11 @@
         pointer-events: none;
         font-weight: 400;
         justify-content: flex-start;
+        white-space: nowrap;
+    }
+
+    #text p, #titlePanel p {
+        margin: 0; /* Rimuove margini di default che sfasano l'allineamento */
     }
 
     #titlePanel {
@@ -371,7 +298,6 @@
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
-        visibility: hidden;
     }
 
     #s3Content {
@@ -381,30 +307,10 @@
         padding: 4rem;
     }
 
-    #s3Eyebrow {
-        font-family: var(--font-family-text);
-        font-size: clamp(1rem, 1.2vw, 1.4rem);
-        color: rgba(255,255,255,0.7);
-        text-transform: uppercase;
-        letter-spacing: 0.3em;
-        margin: 0;
-    }
-
-    #s3Title {
-        font-family: var(--font-family);
-        font-size: clamp(6rem, 14vw, 16rem);
-        font-weight: 900;
-        color: rgba(255,255,255,0.35);
-        line-height: 0.85;
-        margin: 0;
-        text-transform: uppercase;
-        letter-spacing: -0.04em;
-    }
-
     /* ===== PANNELLO 3 — Sezione 4 ===== */
     #s4Panel {
         position: relative;
-        width: 120vw;
+        width: 100vw; /* Riportato a 120vw perché ora i testi non occupano spazio in larghezza */
         height: 100vh;
         display: flex;
         justify-content: center;
@@ -413,14 +319,13 @@
         overflow: hidden;
         perspective: 1000px;
         flex-shrink: 0;
-        visibility: hidden;
     }
 
     #lineContainer {
         position: absolute;
         top: 20%;
         right: auto;
-        left: -5%;
+        left: 0;
         width: 100%;
         height: 100%;
         pointer-events: none;
@@ -430,76 +335,79 @@
     #lineContainer svg {
         position: absolute;
         top: -10%;
-        left: 0;
+        left: 5%;
         width: 100%;
         height: 100%;
         stroke: var(--brand-vip-500);
     }
 
     #content {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: center;
-    padding: clamp(3rem, 6vw, 5rem);
-    box-sizing: border-box;
-    gap: 1rem;
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        height: 100%;
+        display: grid; 
+        /* Cambiato da place-items: center a questo per allineare a sinistra e al centro verticale */
+        justify-items: start; 
+        align-items: center; 
+        /* Aumenta o diminuisci questo padding-left per decidere ESATTAMENTE dove deve iniziare il testo a sinistra */
+        padding-left: clamp(5rem, 10vw, 12rem); 
+        padding-right: clamp(3rem, 6vw, 5rem);
+        box-sizing: border-box;
     }
 
+    /* ==========================================================================
+       CONFIGURAZIONE SPECIFICA DEI TRE TESTI (SEZIONE 4)
+       ========================================================================== */
+
+    /* TESTO 1: Diviso su 3 righe (Larghezza massima stretta) */
     #textSmall {
-    font-family: var(--font-family-text);
-    font-size: clamp(0.95rem, 1.1vw, 1.3rem);
-    color: var(--neutral-900);
-    font-weight: 400;
-    margin: 0;
-    line-height: 1.5;
+        grid-area: 1 / 1 / 2 / 2;
+        text-align: left;
+        margin: 0;
+        line-height: 1.5;
+        font-family: var(--font-family-text);
+        font-size: clamp(0.95rem, 1.1vw, 1.3rem);
+        color: var(--neutral-900);
+        font-weight: 400;
+        white-space: normal; /* Permette al testo di andare a capo */
     }
 
+    /* TESTO 2: Spostato più a destra */
     #titleBlock {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
+        grid-area: 1 / 1 / 2 / 2;
+        padding: 0;
+        margin-left: 5vw; /* Spinge il titolo più a destra rispetto al punto di origine comune */
     }
 
     #titleMain {
-    font-family: var(--font-family);
-    font-size: clamp(3rem, 5.5vw, 7rem);
-    font-weight: 900;
-    color: var(--brand-vip-500);
-    line-height: 0.9;
-    margin: 0;
-    text-transform: uppercase;
-    letter-spacing: -0.02em;
+        font-family: var(--font-family);
+        font-size: clamp(3rem, 5.5vw, 7rem);
+        font-weight: 900;
+        color: var(--brand-vip-500);
+        line-height: 0.9;
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: -0.02em;
+        white-space: nowrap; /* Il titolo rimane compatto su una riga */
     }
 
+    /* TESTO 3: Diviso su 2 righe (Larghezza massima media) */
     #textDesc {
-    font-family: var(--font-family-text);
-    font-size: clamp(0.95rem, 1.1vw, 1.3rem);
-    color: var(--neutral-900);
-    font-weight: 400;
-    margin: 0;
-    line-height: 1.6;
-    }
-
-    #textSmall,
-    #titleBlock,
-    #textDesc {
-    position: absolute;
-    text-align: left;
-    max-width: 850px;
-    padding: clamp(3rem, 6vw, 5rem);
-    left: 10%;                  /* sposta a sinistra */
-    top: 40%;                   /* sposta in basso */
-    transform: translateY(-50%);
+        grid-area: 1 / 1 / 2 / 2;
+        text-align: left;
+        margin: 0;
+        line-height: 1.6;
+        font-family: var(--font-family-text);
+        font-size: clamp(0.95rem, 1.1vw, 1.3rem);
+        color: var(--neutral-900);
+        font-weight: 400;
+        white-space: normal; /* Permette al testo di andare a capo */
     }
 
     .highlight {
-    color: var(--brand-vip-500);
-    font-weight: 400;
+        color: var(--brand-vip-500);
+        font-weight: 400;
     }
 
     #transitionOverlay {
