@@ -257,11 +257,11 @@
         const titleSplit = new SplitText(title, { type: 'words', mask: 'words'});
         const subtitleSplit = new SplitText(subtitle, { type: 'lines', mask: 'lines'});
 
-        const titleEnter = gsap.fromTo(titleSplit.words, {y: "100%"}, {y: "0%", stagger: 0.1, duration: 0.6, ease:"elastic.out(0.5,0.4)", paused: true, delay: 1.5});
-        const subtitleEnter = gsap.fromTo(subtitleSplit.lines, {y: "100%"}, {y: "0%", duration: 0.6, ease:"power2.out", paused: true, delay: 2});
-        const cardEnter = gsap.fromTo(trackEl, {y: "100%"}, {y: "0%", duration: 1, ease:"elastic.out(0.5,0.4)", paused: true, delay: 1.5});
+        const titleEnter = gsap.fromTo(titleSplit.words, {y: "100%"}, {y: "0%", stagger: 0.1, duration: 0.6, ease:"elastic.out(0.5,0.4)", paused: true, delay: 1});
+        const subtitleEnter = gsap.fromTo(subtitleSplit.lines, {y: "100%"}, {y: "0%", duration: 0.6, ease:"power2.out", paused: true, delay: 1.5});
+        const cardEnter = gsap.fromTo(trackEl, {y: "100%"}, {y: "0%", duration: 1, ease:"elastic.out(0.5,0.4)", paused: true, delay: 1});
 
-        const clipMove = gsap.fromTo(ClipPath, {width: 0 } , {width: width, duration: 1, ease: "power2.out", paused: true, delay: 1 });
+        const clipMove = gsap.fromTo(ClipPath, {width: 0 } , {width: width, duration: 1, ease: "power2.out", paused: true, delay: 0.5});
 
         /* ── ScrollTrigger con pin: la sezione resta fissa a schermo
            finché l'animazione di ingresso non è terminata ── */

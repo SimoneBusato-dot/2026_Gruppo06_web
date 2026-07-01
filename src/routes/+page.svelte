@@ -13,6 +13,8 @@
 	let blueSplit;
 	let redSplit;
 
+	gsap.registerPlugin(ScrollTrigger);
+
 	function adjustPageHeight() {
 		const selezCategorie = document.getElementById('Selezione-Categorie');
 		if (selezCategorie) {

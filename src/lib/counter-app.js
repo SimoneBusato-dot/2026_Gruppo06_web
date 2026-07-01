@@ -9,6 +9,8 @@ let descSplit = null;
 
 export function cleanup() {
   isAppDestroyed = true;
+  
+  isAppDestroyed = true;
   activeListeners.forEach(({ target, type, listener, options }) => {
     if (target && typeof target.removeEventListener === 'function') {
       target.removeEventListener(type, listener, options);
