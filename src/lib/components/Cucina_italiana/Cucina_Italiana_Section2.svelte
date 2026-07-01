@@ -1,6 +1,6 @@
 <script>
     import gsap from "gsap";
-    import { onMount } from "svelte";
+    import { onMount, onDestroy } from "svelte";
     import { ScrollTrigger } from "gsap/ScrollTrigger";
     import Swiper from "swiper/bundle";
     import "swiper/css/bundle";
@@ -42,6 +42,22 @@
     let cardContainer;
     let cinematicCard;
 
+    // Swiper single-slide lock variables
+    let swiperInstance;
+
+    const handleStartGesture = () => {
+        if (swiperInstance) {
+            swiperInstance.allowTouchMove = true;
+        }
+    };
+
+    onDestroy(() => {
+        if (cardContainer) {
+            cardContainer.removeEventListener('mousedown', handleStartGesture, true);
+            cardContainer.removeEventListener('touchstart', handleStartGesture, true);
+        }
+    });
+
     // Slide 7 Chart elements
     let chartText1;
     let chartText2;
@@ -78,50 +94,42 @@
         "#7f3420",      // brand-cibo-900
     ];
 
-    // Generate 30 video configurations representing the vertical gallery mosaic
-    const videos = [
-        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro1.mp4", height: "450px" },
-        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro2.mp4", height: "300px" },
-        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro3.mp4", height: "220px" },
-        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro4.mp4", height: "350px" },
-        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro5.mp4", height: "260px" },
-        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro1.mp4", height: "380px" },
-        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro2.mp4", height: "240px" },
-        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro3.mp4", height: "480px" },
-        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro4.mp4", height: "280px" },
-        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro5.mp4", height: "320px" },
-        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro1.mp4", height: "420px" },
-        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro2.mp4", height: "220px" },
-        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro3.mp4", height: "350px" },
-        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro4.mp4", height: "270px" },
-        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro5.mp4", height: "400px" },
-        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro1.mp4", height: "310px" },
-        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro2.mp4", height: "250px" },
-        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro3.mp4", height: "440px" },
-        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro4.mp4", height: "290px" },
-        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro5.mp4", height: "330px" },
-        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro1.mp4", height: "410px" },
-        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro2.mp4", height: "230px" },
-        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro3.mp4", height: "360px" },
-        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro4.mp4", height: "260px" },
-        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro5.mp4", height: "390px" },
-        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro1.mp4", height: "320px" },
-        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro2.mp4", height: "240px" },
-        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro3.mp4", height: "460px" },
-        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro4.mp4", height: "300px" },
-        { src: "/Cucina_Italiana/Video_introduzione/Sp_Intro5.mp4", height: "340px" }
-    ];
+    // Generate 31 unique video configurations representing the vertical gallery mosaic
+    // 1. 21 Intro Videos
+    const introVideos = Array.from({ length: 21 }, (_, i) => {
+        const id = i + 1;
+        const heights = ["450px", "300px", "220px", "350px", "260px", "380px", "240px", "480px", "280px", "320px", "420px"];
+        return {
+            src: `/Cucina_Italiana/Video_introduzione/Sp_Intro${id}.mp4`,
+            height: heights[i % heights.length]
+        };
+    });
+
+    // 2. 10 Comment Videos (as unique additional items to prevent duplication)
+    const commentVideos = Array.from({ length: 10 }, (_, i) => {
+        const id = i + 1;
+        const heights = ["350px", "270px", "400px", "310px", "250px", "440px", "290px", "330px", "410px", "380px"];
+        return {
+            src: `/Cucina_Italiana/Video_commenti/Commento${id}.mp4`,
+            height: heights[i % heights.length]
+        };
+    });
+
+    const allVideos = [...introVideos, ...commentVideos];
 
     const columns = [
-        [...videos.slice(0, 6), ...videos.slice(0, 6), ...videos.slice(0, 6)],
-        [...videos.slice(6, 12), ...videos.slice(6, 12), ...videos.slice(6, 12)],
-        [...videos.slice(12, 18), ...videos.slice(12, 18), ...videos.slice(12, 18)],
-        [...videos.slice(18, 24), ...videos.slice(18, 24), ...videos.slice(18, 24)],
-        [...videos.slice(24, 30), ...videos.slice(24, 30), ...videos.slice(24, 30)]
+        [...allVideos.slice(0, 6), ...allVideos.slice(6, 8)],
+        [...allVideos.slice(6, 12), ...allVideos.slice(12, 14)],
+        [...allVideos.slice(12, 18), ...allVideos.slice(18, 20)],
+        [...allVideos.slice(18, 24), ...allVideos.slice(24, 26)],
+        [...allVideos.slice(24, 31), ...allVideos.slice(0, 2)]
     ];
 
     onMount(async () => {
         let isSwipingSwiper = false;
+
+        cardContainer.addEventListener('mousedown', handleStartGesture, true);
+        cardContainer.addEventListener('touchstart', handleStartGesture, true);
         // ==========================================
         // D3.js Curling Trend Chart Initialization
         // ==========================================
@@ -169,6 +177,9 @@
                     const videos = cardContainer.querySelectorAll("video");
                     videos.forEach(v => { v.pause(); v.currentTime = 0; });
                     videos[swiper.activeIndex]?.play().catch(() => {});
+
+                    // Lock Swiper dragging in the current gesture instantly upon slide change
+                    swiper.allowTouchMove = false;
                 },
                 touchStart(swiper) {
                     isSwipingSwiper = true;
@@ -179,7 +190,7 @@
             }
         };
 
-        const swiper = new Swiper(cardContainer, swiperConfig);
+        swiperInstance = new Swiper(cardContainer, swiperConfig);
 
         // ==========================================
         // GSAP ScrollTrigger timeline configuration
@@ -755,77 +766,77 @@
                     <!-- Card 1 -->
                     <div class="v">
                         <div class="video-wrapper">
-                            <video src="/Cucina_Italiana/Video_introduzione/Sp_Intro1.mp4" autoplay muted loop playsinline></video>
+                            <video src="/Cucina_Italiana/Video_commenti/Commento1.mp4" autoplay muted loop playsinline></video>
                             <div class="card-bg"></div>
                         </div>
                         <div class="comments">
-                            <Comments variant="yellow">Te la sogni 'sta roba in Usa</Comments>
+                            <Comments variant="yellow" user="fuoriditest">Te la sogni ‘sta roba in Usa</Comments>
                         </div>
                     </div>
 
                     <!-- Card 2 -->
                     <div class="v">
                         <div class="video-wrapper">
-                            <video src="/Cucina_Italiana/Video_introduzione/Sp_Intro2.mp4" autoplay muted loop playsinline></video>
+                            <video src="/Cucina_Italiana/Video_commenti/Commento2.mp4" autoplay muted loop playsinline></video>
                             <div class="card-bg"></div>
                         </div>
                         <div class="comments">
-                            <Comments variant="yellow">sono stati creativi in cucina 🇮🇹👏🏻</Comments>
+                            <Comments variant="yellow" user="Roxit">Italian strategy: fill the others with carbs so they get tired and we won 🤭</Comments>
                         </div>
                     </div>
 
                     <!-- Card 3 -->
                     <div class="v">
                         <div class="video-wrapper">
-                            <video src="/Cucina_Italiana/Video_introduzione/Sp_Intro3.mp4" autoplay muted loop playsinline></video>
+                            <video src="/Cucina_Italiana/Video_commenti/Commento3.mp4" autoplay muted loop playsinline></video>
                             <div class="card-bg"></div>
                         </div>
                         <div class="comments">
-                            <Comments variant="yellow">Dude send me some tiramisu that looks so good 🤤😭</Comments>
+                            <Comments variant="yellow" user="IituTiitu">Dude send me some tiramisu that looks so good☹️😔</Comments>
                         </div>
                     </div>
 
                     <!-- Card 4 -->
                     <div class="v">
                         <div class="video-wrapper">
-                            <video src="/Cucina_Italiana/Video_introduzione/Sp_Intro4.mp4" autoplay muted loop playsinline></video>
+                            <video src="/Cucina_Italiana/Video_commenti/Commento4.mp4" autoplay muted loop playsinline></video>
                             <div class="card-bg"></div>
                         </div>
                         <div class="comments">
-                            <Comments variant="yellow">nessuno ha notato che la pasta è a 5 cerchi</Comments>
+                            <Comments variant="yellow" user="userino5519">abbiamo fatto mangiare bene tutto il mondo 🤣🤣😂</Comments>
                         </div>
                     </div>
 
                     <!-- Card 5 -->
                     <div class="v">
                         <div class="video-wrapper">
-                            <video src="/Cucina_Italiana/Video_introduzione/Sp_Intro5.mp4" autoplay muted loop playsinline></video>
+                            <video src="/Cucina_Italiana/Video_commenti/Commento5.mp4" autoplay muted loop playsinline></video>
                             <div class="card-bg"></div>
                         </div>
                         <div class="comments">
-                            <Comments variant="yellow">olympic muffins, olympic tiramisu, and now olympic pasta??</Comments>
+                            <Comments variant="yellow" user="dwnmov">olympians have turned into mukbangers</Comments>
                         </div>
                     </div>
 
                     <!-- Card 6 -->
                     <div class="v">
                         <div class="video-wrapper">
-                            <video src="/Cucina_Italiana/Video_introduzione/Sp_Intro1.mp4" autoplay muted loop playsinline></video>
+                            <video src="/Cucina_Italiana/Video_commenti/Commento6.mp4" autoplay muted loop playsinline></video>
                             <div class="card-bg"></div>
                         </div>
                         <div class="comments">
-                            <Comments variant="yellow">as an italian i want that</Comments>
+                            <Comments variant="yellow" user="Lisa Langlois">WHAT ABOUT THE MUFFINS</Comments>
                         </div>
                     </div>
 
                     <!-- Card 7 -->
                     <div class="v">
                         <div class="video-wrapper">
-                            <video src="/Cucina_Italiana/Video_introduzione/Sp_Intro2.mp4" autoplay muted loop playsinline></video>
+                            <video src="/Cucina_Italiana/Video_commenti/Commento7.mp4" autoplay muted loop playsinline></video>
                             <div class="card-bg"></div>
                         </div>
                         <div class="comments">
-                            <Comments variant="yellow">qui non facciamo fare i menu ai nutrizionisti, ma alle nonne</Comments>
+                            <Comments variant="yellow" user="AlessiaIoana">qui non facciamo fare i menù ai nutrizionisti, ma alle nonne</Comments>
                         </div>
                     </div>
                 </div>
