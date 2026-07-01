@@ -169,19 +169,12 @@
                     const videos = cardContainer.querySelectorAll("video");
                     videos.forEach(v => { v.pause(); v.currentTime = 0; });
                     videos[swiper.activeIndex]?.play().catch(() => {});
-                    
-                    // Stop scrolling through multiple slides in a single gesture
-                    swiper.allowTouchMove = false;
                 },
                 touchStart(swiper) {
                     isSwipingSwiper = true;
                 },
                 touchEnd(swiper) {
                     isSwipingSwiper = false;
-                    // Re-allow drag moves only after user lifts their finger
-                    setTimeout(() => {
-                        swiper.allowTouchMove = true;
-                    }, 50);
                 }
             }
         };
@@ -297,13 +290,13 @@
                 scrub: 1,
                 pin: true,
                 pinSpacing: true,
-                snap: {
+                    snap: {
                     snapTo: (value) => {
-                        const totalD = 20.0;
+                        const totalD = 17.5;
                         // Snapping logic for redirect lock
-                        const lockStart = 17.0 / totalD;
+                        const lockStart = 15.5 / totalD;
                         if (value >= lockStart && value < 1.0) {
-                            if (value < 19.8 / totalD) {
+                            if (value < 17.3 / totalD) {
                                 return lockStart; // Snap back to start of redirect slide
                             } else {
                                 return 1.0; // Snap to homepage redirect
@@ -324,8 +317,8 @@
                             11.2 / totalD, // chart complete end hold
                             11.4 / totalD, // quote transition
                             12.7 / totalD, // comments start
-                            15.2 / totalD, // comments end
-                            17.0 / totalD, // redirect fill start
+                            14.0 / totalD, // comments end
+                            15.5 / totalD, // redirect fill start
                             1
                         ];
 
@@ -346,7 +339,7 @@
 
                         // 3. Comments horizontal scrolling
                         const commentsScrollStart = 12.7 / totalD;
-                        const commentsScrollEnd = 15.2 / totalD;
+                        const commentsScrollEnd = 14.0 / totalD;
                         if (value > commentsScrollStart && value < commentsScrollEnd) {
                             return value;
                         }
@@ -376,8 +369,8 @@
                 onLeaveBack: () => gsap.set(section, { autoAlpha: 0 }),
                 onUpdate: (self) => {
                     const p = self.progress;
-                    const totalD = 20.0;
-                    const startP = 17.0 / totalD;
+                    const totalD = 17.5;
+                    const startP = 15.5 / totalD;
 
                     // If we reached the end, redirect immediately
                     if (p >= 0.999) {
@@ -420,19 +413,28 @@
           .to(galleryContainer, { xPercent: -100, duration: 1.0, ease: "power2.inOut" }, 3.5)
           .to(intermediateContainer, { xPercent: 0, duration: 1.0, ease: "power2.inOut" }, 3.5)
 
-          // 5. PHASE 5: Draw top intermediate curve & staggered text fade in (starts early at 3.6/3.7)
+          // 5. PHASE 5: Draw top intermediate curve & sequential text appearances
+          // 5A: Draw curve and fade in Text 1 ("Il cibo...")
           .to(pathIntermediate, { strokeDashoffset: 0, opacity: 1, ease: "none", duration: 1.0 }, 3.6)
-          .to('#intermediateWrapper .para, .gusto-dharma', { opacity: 1, x: 0, stagger: 0.1, duration: 0.8, ease: "power2.out" }, 3.7)
+          .to('.inter-left-col > p', { opacity: 1, x: 0, duration: 0.6, ease: "power2.out" }, 3.8)
+
+          // 5B: Fade in Text 2 ("Le Olimpiadi... GUSTO")
+          .to('.gusto-block .para, .gusto-dharma', { opacity: 1, x: 0, stagger: 0.1, duration: 0.6, ease: "power2.out" }, 4.4)
+
+          // 5C: Fade out Text 1 & 2 to the left, and fade in Text 3 in center-right of screen
+          .to('.inter-left-col > p', { opacity: 0, x: -150, duration: 0.5, ease: "power2.in" }, 5.0)
+          .to('.gusto-block', { opacity: 0, x: -150, duration: 0.5, ease: "power2.in" }, 5.0)
+          .fromTo('.inter-right-col > p', { opacity: 0, xPercent: 0, x: 100 }, { opacity: 1, xPercent: -40, x: 0, duration: 0.6, ease: "power2.out" }, 5.0)
+
           // Bottom curve starts revealing at Y=1000 near end of Section 4, fading quickly to 100% opacity
-          .to(pathIntermediate2, { opacity: 1, duration: 0.2, ease: "power1.out" }, 4.5)
-          .to(pathIntermediate2, { strokeDashoffset: 0, ease: "none", duration: 1.0 }, 4.5)
+          .to(pathIntermediate2, { opacity: 1, duration: 0.2, ease: "power1.out" }, 5.0)
+          .to(pathIntermediate2, { strokeDashoffset: 0, ease: "none", duration: 1.0 }, 5.0)
 
           // 6. PHASE 6: Transition to Slide 4 - Fused Horizontal Scroll & Parallax
           .set(intermediateContainer, { zIndex: 10 }, 5.5)
           .to(fusedContainer, { xPercent: -50, duration: 1.0, ease: "power2.inOut" }, 5.5)
-          .to('.inter-left-col > p', { xPercent: -50, duration: 1.0, ease: "power2.inOut" }, 5.5)
-          .to('.gusto-block', { xPercent: -80, duration: 1.0, ease: "power2.inOut" }, 5.5)
-          .to('.inter-right-col > p', { xPercent: -110, duration: 1.0, ease: "power2.inOut" }, 5.5)
+          // Parallax movement as Panel 1 scrolls out to the left
+          .to('.inter-right-col > p', { xPercent: -150, opacity: 0, duration: 1.0, ease: "power2.inOut" }, 5.5)
           .fromTo(pastaTitle, { xPercent: -60, opacity: 0 }, { xPercent: 0, opacity: 1, duration: 1.0, ease: "power2.inOut" }, 5.5)
           // Animate PASTA and OLIMPICA almost together, staggered by 400ms
           .to(pastaWordChars, { yPercent: 0, opacity: 1, stagger: 0.04, duration: 0.6, ease: "power3.out" }, 5.6)
@@ -512,15 +514,15 @@
           .to(quoteTextLines, { opacity: 0, stagger: 0.04, ease: "power2.in", duration: 0.5 }, 12.7)
           .to(quotePath, { strokeDashoffset: -lenQuote, duration: 1.0, ease: "power2.inOut" }, 12.7)
           .to(commentsLine, { yPercent: 0, opacity: 1, duration: 1.0, ease: "power2.inOut" }, 12.7)
-          .to(commentsVideoScroll, { x: "-200%", ease: "none", duration: 2.5 }, 12.7)
-          .to(commentsPath, { strokeDashoffset: 0, ease: "none", duration: 2.5, x: "-60%" }, 12.7)
+          .to(commentsVideoScroll, { x: "-200%", ease: "none", duration: 2.0 }, 12.7)
+          .to(commentsPath, { strokeDashoffset: 0, ease: "none", duration: 2.0, x: "-60%" }, 12.7)
 
           // 12. PHASE 12: Transition to Slide 9 (Redirect section)
-          .to(redirectPath, { strokeDashoffset: 0, ease: "none", duration: 1.0 }, 15.2)
-          .to(commentsLine, { yPercent: 100, opacity: 0, duration: 1.5, ease: "power1.inOut" }, 14.7)
-          .to(redirectTextWords, { opacity: 1, y: 0, stagger: 0.08, duration: 0.8, ease: "power2.out" }, 16.0)
-          .fromTo('.circular-progress-container', { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1.0, duration: 0.8, ease: "power2.out" }, 16.0)
-          .to({}, { duration: 20.0 - 17.0 }, 17.0);
+          .to(redirectPath, { strokeDashoffset: 0, ease: "none", duration: 1.0 }, 14.0)
+          .to(commentsLine, { yPercent: 100, opacity: 0, duration: 1.0, ease: "power1.inOut" }, 14.0)
+          .to(redirectTextWords, { opacity: 1, y: 0, stagger: 0.08, duration: 0.8, ease: "power2.out" }, 14.5)
+          .fromTo('.circular-progress-container', { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1.0, duration: 0.8, ease: "power2.out" }, 14.5)
+          .to({}, { duration: 17.5 - 15.5 }, 15.5);
 
         const preventDefaultScroll = (e) => {
             if (isSwipingSwiper) {
@@ -624,8 +626,8 @@
                     </div>
                     <div class="inter-bottom-row">
                         <div class="gusto-block">
-                            <p class="para para-olympic" style="margin-bottom: 0;">
-                                Le Olimpiadi non sono solo medaglie e rigore, ma anche condivisione, curiosità e
+                            <p class="para para-olympic" style="margin-bottom: 0; width: 34rem;">
+                                Le Olimpiadi non sono solo medaglie <br>e rigore, ma anche condivisione, curiosità e
                             </p>
                             <h2 class="gusto-dharma">GUSTO</h2>
                         </div>
@@ -662,35 +664,30 @@
                         <div class="swiper-slide">
                             <div class="overlay"></div>
                             <video src="/Cucina_Italiana/Video_introduzione/Sp_Intro1.mp4" muted loop playsinline></video>
-                            <div class="card-desc">Pasta taste test: gli atleti approvano il puro food porn!</div>
                         </div>
 
                         <!-- Slide 2 -->
                         <div class="swiper-slide">
                             <div class="overlay"></div>
                             <video src="/Cucina_Italiana/Video_introduzione/Sp_Intro2.mp4" muted loop playsinline></video>
-                            <div class="card-desc">Bolognese in villaggio: il piatto più cercato e amato.</div>
                         </div>
 
                         <!-- Slide 3 -->
                         <div class="swiper-slide">
                             <div class="overlay"></div>
                             <video src="/Cucina_Italiana/Video_introduzione/Sp_Intro3.mp4" muted loop playsinline></video>
-                            <div class="card-desc">Tiramisù mania: la ricarica dolce preferita dai campioni.</div>
                         </div>
 
                         <!-- Slide 4 -->
                         <div class="swiper-slide">
                             <div class="overlay"></div>
                             <video src="/Cucina_Italiana/Video_introduzione/Sp_Intro4.mp4" muted loop playsinline></video>
-                            <div class="card-desc">Pizza party: la tradizione italiana conquista tutti.</div>
                         </div>
 
                         <!-- Slide 5 -->
                         <div class="swiper-slide">
                             <div class="overlay"></div>
                             <video src="/Cucina_Italiana/Video_introduzione/Sp_Intro5.mp4" muted loop playsinline></video>
-                            <div class="card-desc">Caffè espresso e colazione: l'energia prima delle gare.</div>
                         </div>
                     </div>
                     <div class="swiper-pagination"></div>
@@ -968,7 +965,6 @@
         font-size: 26px;
         margin: 0 0 1rem 0;
         font-weight: 400;
-        text-transform: uppercase;
         letter-spacing: -0.05rem;
     }
 
@@ -1129,18 +1125,19 @@
 
     .inter-right-col {
         width: 46%;
+        position: relative; 
     }
 
     .inter-bottom-row {
         display: flex;
-        justify-content: flex-start;
+        justify-content: center;
     }
 
     .gusto-block {
         display: flex;
         flex-direction: row;
         align-items: center;
-        gap: 1.8rem;
+        gap: 0rem;
     }
 
     .gusto-dharma {
@@ -1279,6 +1276,9 @@
         height: 100%;
         object-fit: cover;
         border-radius: 16px;
+        pointer-events: none !important;
+        user-select: none !important;
+        -webkit-user-drag: none !important;
     }
 
     .card-desc {
@@ -1334,6 +1334,7 @@
         z-index: 8;
         background-color: transparent !important; /* Transparent background to show cinematic grow card */
         opacity: 0;
+        pointer-events: none;
     }
 
     #svgChartContainer {
@@ -1428,6 +1429,7 @@
         z-index: 9;
         justify-content: center;
         background-color: #ffffff;
+        pointer-events: none;
     }
 
     #quoteSvgContainer {
@@ -1459,9 +1461,10 @@
     }
 
     #commentsContainer {
-        z-index: 11;
+        z-index: 13;
         justify-content: center;
         background-color: transparent;
+        pointer-events: none;
     }
 
     #commentsPerspective, #commentsContent {
@@ -1480,14 +1483,14 @@
         flex-direction: row;
         align-items: center;
         justify-content: center;
-        gap: 16rem;
+        gap: 15rem;
         height: 100%;
     }
 
     #commentsVideoContainer .v {
         position: relative;
-        height: 52vh;
-        width: calc(52vh * 9 / 16);
+        height: 50vh;
+        width: calc(50vh * 9 / 16);
         flex-shrink: 0;
         perspective: 800px; 
     }
@@ -1499,13 +1502,13 @@
         transform-style: preserve-3d;
     }
 
-    #commentsVideoContainer .v:nth-child(1) .video-wrapper { transform: translateZ(0px) rotateY(-25deg) translateY(8%); }
-    #commentsVideoContainer .v:nth-child(2) .video-wrapper { transform: translateZ(0px) rotateY(20deg) translateY(-18%); }
-    #commentsVideoContainer .v:nth-child(3) .video-wrapper { transform: translateZ(0px) rotateY(-15deg) translateY(22%); }
-    #commentsVideoContainer .v:nth-child(4) .video-wrapper { transform: translateZ(0px) rotateY(25deg) translateY(-22%); }
-    #commentsVideoContainer .v:nth-child(5) .video-wrapper { transform: translateZ(0px) rotateY(-10deg) translateY(18%); }
-    #commentsVideoContainer .v:nth-child(6) .video-wrapper { transform: translateZ(0px) rotateY(22deg) translateY(-12%); }
-    #commentsVideoContainer .v:nth-child(7) .video-wrapper { transform: translateZ(0px) rotateY(-25deg) translateY(4%); }
+    #commentsVideoContainer .v:nth-child(1) .video-wrapper { transform: translateZ(0px) rotateY(30deg); }
+    #commentsVideoContainer .v:nth-child(2) .video-wrapper { transform: translateZ(0px) rotateY(-20deg) translateY(-30%); }
+    #commentsVideoContainer .v:nth-child(3) .video-wrapper { transform: translateZ(0px) rotateY(10deg); }
+    #commentsVideoContainer .v:nth-child(4) .video-wrapper { transform: translateZ(0px) rotateY(-30deg) translateY(-30%); }
+    #commentsVideoContainer .v:nth-child(5) .video-wrapper { transform: translateZ(0px) rotateY(10deg); }
+    #commentsVideoContainer .v:nth-child(6) .video-wrapper { transform: translateZ(0px) rotateY(-20deg) translateY(-30%); }
+    #commentsVideoContainer .v:nth-child(7) .video-wrapper { transform: translateZ(0px) rotateY(30deg); }
 
     #commentsVideoContainer .card-bg {
         position: absolute;
@@ -1538,22 +1541,20 @@
 
     #commentsVideoContainer .comments {
         position: absolute;
+        top: 40%;
+        left: 55%;
         width: 90%;
         z-index: 10;
         transform: translateZ(40px);
     }
 
-    #commentsVideoContainer .v:nth-child(1) .comments { top: 35%; left: 55%; }
-    #commentsVideoContainer .v:nth-child(2) .comments { transform: translateZ(40px) translateY(-145%); left: -60%; }
-    #commentsVideoContainer .v:nth-child(3) .comments { top: 22%; left: 55%; }
-    #commentsVideoContainer .v:nth-child(4) .comments { transform: translateZ(40px) translateY(-135%); left: -60%; }
-    #commentsVideoContainer .v:nth-child(5) .comments { top: 42%; left: 55%; }
-    #commentsVideoContainer .v:nth-child(6) .comments { transform: translateZ(40px) translateY(-150%); left: -60%; }
-    #commentsVideoContainer .v:nth-child(7) .comments { top: 50%; left: 55%; }
+    #commentsVideoContainer .v:nth-child(2) .comments { transform: translateZ(40px) translateY(-140%); left: -55%; }
+    #commentsVideoContainer .v:nth-child(4) .comments { transform: translateZ(40px) translateY(-140%); left: -55%; }
+    #commentsVideoContainer .v:nth-child(6) .comments { transform: translateZ(40px) translateY(-140%); left: -55%; }
 
     #commentsSvgContainer {
         position: absolute;
-        bottom: -40%;
+        bottom: -30%;
         left: 0;
         width: 100%;
         height: 100%;
@@ -1568,6 +1569,7 @@
         z-index: 12;
         justify-content: center;
         background-color: transparent;
+        pointer-events: none;
     }
 
     #redirectSvgContainer {
