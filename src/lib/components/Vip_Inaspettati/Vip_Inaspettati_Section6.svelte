@@ -20,22 +20,12 @@
         const len2 = path2.getTotalLength();
         gsap.set(path2, { strokeDasharray: len2, strokeDashoffset: len2 });
 
-        // --- SplitType ---
         const titleLines = new SplitType(titleRight, { types: 'lines', tagName: 'span' }).lines;
-        const textLines = new SplitType(textLeft, { types: 'lines', tagName: 'span' }).lines;
+        const textWords = new SplitType(textLeft, { types: 'words', tagName: 'span' }).words;
 
-        const textEnter = gsap.fromTo(textLines,
-            { x: -200, opacity: 0 },
-            { x: 0, opacity: 1, stagger: 0.08, duration: 0.7, paused: true, ease: 'power2.out', overwrite: 'auto' }
-        );
-        const textExit = gsap.fromTo(textLines,
-            { x: 0, opacity: 1 },
-            { x: -200, opacity: 0, duration: 0.5, paused: true, ease: 'power2.in', overwrite: 'auto' }
-        );
-        const titleEnter = gsap.fromTo(titleLines,
-            { x: 200, opacity: 0 },
-            { x: 0, opacity: 1, stagger: 0.1, duration: 0.8, paused: true, ease: 'power2.out', overwrite: 'auto' }
-        );
+        // Impostiamo gli stati iniziali prima dello scroll
+        gsap.set(textWords, { x: 100, opacity: 0 });
+        gsap.set(titleLines, { x: 120, opacity: 0 });
 
         const tl = gsap.timeline({
             scrollTrigger: {
@@ -45,35 +35,37 @@
                 end: '+=200%',
                 scrub: 1,
                 pin: true,
-                pinSpacing: true,
+                pinSpacing: false,
                 markers: true,
                 onEnter: () => gsap.set(section, { autoAlpha: 1 }),
                 onLeave: () => gsap.set(section, { autoAlpha: 0 }),
                 onEnterBack: () => gsap.set(section, { autoAlpha: 1 }),
                 onLeaveBack: () => gsap.set(section, { autoAlpha: 0 }),
-                onUpdate(self) {
-                    if (self.progress >= 0.1 && self.progress < 0.45) {
-                        textEnter.play();
-                        textExit.reverse();
-                    } else if (self.progress >= 0.45) {
-                        textExit.play();
-                    } else {
-                        textEnter.reverse();
-                    }
-
-                    if (self.progress >= 0.55) {
-                        titleEnter.play();
-                    } else {
-                        titleEnter.reverse();
-                    }
-                }
             }
         });
 
-        // Linea 1 in alto si disegna subito
-        tl.to(path1, { strokeDashoffset: 0, ease: 'none', duration: 0.4 }, 0.1);
-        // Linea 2 in basso si disegna dopo
-        tl.to(path2, { strokeDashoffset: 0, ease: 'none', duration: 0.5 }, 0.25);
+        // 1. Le linee iniziano a disegnarsi subito
+        tl.to(path1, { strokeDashoffset: 0, ease: 'none', duration: 0.5 }, 0);
+        tl.to(path2, { strokeDashoffset: 0, ease: 'none', duration: 0.6 }, 0.40);
+
+        // 2. Il primo testo entra fluidamente parola per parola e RESTA visibile
+        tl.to(textWords, { 
+            x: 0, 
+            opacity: 1, 
+            stagger: 0.03, 
+            ease: 'power1.out', 
+            duration: 0.3 
+        }, 0.2); 
+
+        // 3. Entrata del titolo sulla destra (senza nascondere il primo testo)
+        tl.to(titleLines, { 
+            x: 0, 
+            opacity: 1, 
+            stagger: 0.08, 
+            ease: 'power2.out', 
+            duration: 0.3 
+        }, 0.7);
+
 
         return () => {
             ScrollTrigger.getAll().forEach(t => t.kill());
@@ -134,6 +126,7 @@
         background-color: var(--neutral-50);
         overflow: hidden;
         visibility: hidden;
+        margin-block-start: 200vh;
     }
 
     /* Linea in alto */
@@ -167,52 +160,55 @@
         height: 100%;
     }
 
-    /* Contenuto */
-    #left p,
-    #right h2 {
-    position: absolute;
+    #content {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between; 
+        padding: 0 8vw;
+        box-sizing: border-box;
     }
 
-    #content {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    padding: clamp(3rem, 6vw, 5rem);
-    box-sizing: border-box;
+    #left {
+        width: auto; 
+        flex-grow: 1;
     }
 
     #left p {
         font-family: var(--font-family-text);
-        font-size: clamp(1rem, 1.3vw, 1.5rem);
+        font-size: clamp(0.95rem, 1.1vw, 1.3rem);
         color: var(--neutral-900);
         font-weight: 400;
         margin: 0;
         line-height: 1.5;
+        white-space: nowrap; /* Blocca il testo su una sola linea */
     }
 
     #right {
+        width: 45vw; 
         display: flex;
-        align-items: center;
-        justify-content: flex-start;
+        justify-content: flex-end;
     }
 
     #right h2 {
         font-family: var(--font-family);
-        font-size: clamp(3rem, 6vw, 7rem);
+        font-size: clamp(3.5rem, 5.5vw, 6.5rem);
         font-weight: 900;
         color: var(--brand-vip-500);
         line-height: 0.9;
         margin: 0;
         text-transform: uppercase;
         letter-spacing: -0.02em;
-        right: 30%;
+        text-align: right;
     }
 
     .highlight {
         color: var(--brand-vip-500);
         font-weight: 400;
     }
+
+
 </style>

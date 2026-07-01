@@ -179,6 +179,7 @@
         z-index: 1;
         transform-origin: 90% 90%;
         perspective: 1000px;
+        transform:scale(1.05);
     }
 
     #line-wrapper {
@@ -225,12 +226,5 @@
 
     #inaspettati{
         transform: translateZ(50px);
-    }
-
-    #next
-    {
-        width: 100vw;
-        min-height: 200vh;
-        background-color: var(--neutral-50);
     }
 </style>
