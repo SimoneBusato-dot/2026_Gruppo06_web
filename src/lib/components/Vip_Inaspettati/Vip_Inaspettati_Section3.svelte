@@ -59,7 +59,11 @@
                 scrub: 1,
                 pin: true,
                 pinSpacing: false,
-                markers: true
+                markers: true,
+                onEnter: () => {gsap.set(hScroll, { autoAlpha: 1 })},
+                onLeave: () => gsap.set(hScroll, { autoAlpha: 0 }),
+                onEnterBack: () => gsap.set(hScroll, { autoAlpha: 1 }),
+                onLeaveBack: () => gsap.set(hScroll, { autoAlpha: 0 }),
             },
         });
 
@@ -202,6 +206,7 @@
         width: max-content; /* 120 + 60 + 120 ++100 */
         height: 100vh;
         position: relative;
+        visibility: hidden;
     }
 
     /* ===== PANNELLO 1 — Sezione 2 ===== */
