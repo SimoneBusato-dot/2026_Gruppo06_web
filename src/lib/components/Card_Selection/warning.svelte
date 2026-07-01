@@ -50,8 +50,8 @@
 
                 onUpdate: (self) => {
     const p = self.progress;
-    const totalD = 20.0;
-    const startP = 10.0 / totalD;
+    const totalD = 30.0;
+    const startP = 20.0 / totalD;
 
     const f = p >= startP
         ? Math.max(0, Math.min(1, (p - startP) / (1 - startP)))

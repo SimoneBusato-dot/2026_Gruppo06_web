@@ -29,7 +29,7 @@
                 trigger: "#section3",
                 scroller: window,
                 start: "top top",
-                end: "+=200.1%",
+                end: "+=300.1%",
                 scrub: 1,
                 pin: true,
                 pinSpacing: false,
@@ -83,7 +83,7 @@
 </main>
 
 <style>
-    #section3 { visibility: hidden; background-color: var(--neutral-50); }
+    #section3 { visibility: hidden; background-color: var(--neutral-50); margin-block-start:100dvh}
     
     #background {
         position: relative;

@@ -29,7 +29,7 @@
                 pinSpacing: true,
                 markers: true,
                 onEnter: () => gsap.set(section8, { autoAlpha: 1 }),
-                onLeave: () =>  {goto('/#Categorie'); console.log('onLeave triggered');},
+                onLeave: () =>  {goto('/'); console.log('onLeave triggered');},
                 onEnterBack: () => gsap.set(section8, { autoAlpha: 1 }),
                 onLeaveBack: () => gsap.set(section8, { autoAlpha: 0 }),
                 onUpdate: (self) => {
@@ -71,7 +71,7 @@
         visibility: hidden;
         background-color: var(--neutral-50);
         overflow: hidden;
-        margin-block-start: 100dvh;
+        margin-block-start: 200dvh;
         margin-block-end: 0.1dvh;
     }
 

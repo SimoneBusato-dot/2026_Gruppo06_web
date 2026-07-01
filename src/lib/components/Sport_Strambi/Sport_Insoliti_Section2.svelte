@@ -52,7 +52,7 @@
                 trigger: section,
                 scroller: window,
                 start: "top top",
-                end: "+=101%",
+                end: "+=201%",
                 scrub: 1,
                 pin: true,
                 pinSpacing: false,
@@ -76,7 +76,7 @@
                 trigger: section,
                 scroller: window,
                 start: "top top",       // parte insieme alla prima
-                end: "+=81%",           // finisce all'80% della prima (81% di 101%)
+                end: "+=161%",           // finisce all'80% della prima (81% di 101%)
                 scrub: 1,
                 // NO pin — il pin lo gestisce già tl
             }

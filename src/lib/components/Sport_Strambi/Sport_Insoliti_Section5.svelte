@@ -156,7 +156,7 @@
                 scrollTrigger: {
                     trigger: section,
                     start: 'top top',
-                    end: '+=200%',
+                    end: '+=300%',
                     scrub: 1,
                     pin: true,
                     pinSpacing: false,
@@ -199,7 +199,7 @@
                 trigger: section,
                 scroller: window,
                 start: "top top",       // parte insieme alla prima
-                end: "+=54%",           // finisce all'80% della prima (81% di 101%)
+                end: "+=154%",           // finisce all'80% della prima (81% di 101%)
                 scrub: 1,
                 // NO pin — il pin lo gestisce già tl
             }
@@ -269,6 +269,7 @@
         visibility: hidden;
         background-color: var(--neutral-50);
         overflow: hidden;
+        margin-block-start: 100dvh;
     }
     #svgContainer {
         position: absolute; top: 2%; left: 0;

@@ -43,7 +43,7 @@
                 onUpdate: (self) => {
                     if (self.progress >= 0.1) { text6Enter.play(); UpperEnter.play()} else { text6Enter.reverse(); UpperEnter.reverse()}
                     if (self.progress >= 0.7) { text6Exit.play(); UpperExit.play()} else { text6Exit.reverse(); UpperExit.reverse()}
-                    if (self.progress >= 0.77) { gsap.to('#text6', { opacity: 0, duration: 0.5, ease: "power2.out" }); }
+        
                 }
             }
         })
@@ -80,7 +80,7 @@
         justify-content: center;
         align-items: center;
         visibility: hidden;
-        margin-block-start: 100dvh;
+        margin-block-start: 200dvh;
         background-color: var(--neutral-50);
         overflow: hidden;
     }

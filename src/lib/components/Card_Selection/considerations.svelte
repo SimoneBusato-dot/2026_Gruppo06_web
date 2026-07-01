@@ -7,64 +7,63 @@
         gsap.registerPlugin(ScrollTrigger, SplitText);
 
         let upperEnding;
-        let lineEnding1
+        let lineEnding1;
         let upperEnding2;
         let lineEnding2;
+        let subtitle1;
+        let subtitle2;
 
         onMount(()=>{
             let lengthEd = lineEnding1.getTotalLength();
             let lengthEd2 = lineEnding2.getTotalLength();
-            gsap.set(lineEnding1, {strokeDasharray: lengthEd, strokeDashoffset: lengthEd, y: "-30%"});
-            gsap.set(lineEnding2, {strokeDasharray: lengthEd2, strokeDashoffset: lengthEd2, y: "-30%"});
+            gsap.set(lineEnding1, {strokeDasharray: lengthEd, strokeDashoffset: lengthEd,});
+            gsap.set(lineEnding2, {strokeDasharray: lengthEd2, strokeDashoffset: lengthEd2, y: "-60%"});
 
             const splitUpper = new SplitText(upperEnding, { type: "lines", mask: "lines" });
-            const upperEnter = gsap.fromTo(splitUpper.lines, { y: "120%"}, { y: "0%", duration: 0.6, stagger:0.1, ease:"power2.out", paused: true});
+            const upperEnter = gsap.fromTo(splitUpper.lines, { y: "120%"}, { y: "0%", duration: 0.6, stagger:0.1, ease:"elastic.out(0.5,0.4)", paused: true});
             const splitUpper2 = new SplitText(upperEnding2, { type: "lines", mask: "lines" });
-            const upperEnter2 = gsap.fromTo(splitUpper2.lines, { y: "120%"}, { y: "0%", duration: 0.6, stagger:0.1, ease:"power2.out", paused: true});
+            const upperEnter2 = gsap.fromTo(splitUpper2.lines, { y: "120%"}, { y: "0%", duration: 0.6, stagger:0.1, ease:"elastic.out(0.5,0.4)", paused: true});
+            const splitSubtitle = new SplitText(subtitle1, { type: "lines", mask: "lines" });
+            const subtitleEnter = gsap.fromTo(splitSubtitle.lines, { y: "120%"}, { y: "0%", duration: 0.6,ease:"power2.out", paused: true, delay: 1.5});
+            const splitSubtitle2 = new SplitText(subtitle2, { type: "lines", mask: "lines" });
+            const subtitleEnter2 = gsap.fromTo(splitSubtitle2.lines, { y: "120%"}, { y: "0%", duration: 0.6,ease:"power2.out", paused: true, delay: 1.5});
             let tl = gsap.timeline({
                 scrollTrigger: {
                     trigger: "#firstEnding",
                     start: "top top",
-                    end: "+=200%",
+                    end: "+=100%",
                     scrub: 1,
                     pin: true,
                     pinSpacing: true,
-                    onUpdate(self) {
-                        if(self.progress > 0.1){
-                            upperEnter.play();
-                        } else {
-                            upperEnter.reverse();
-                        }
+                    onEnter() {upperEnter.play(); subtitleEnter.play();},
+                    onLeave() {upperEnter.reverse(); subtitleEnter.reverse();},
+                    onEnterBack() {upperEnter.play(); subtitleEnter.play();},
+                    onLeaveBack() {upperEnter.reverse(); subtitleEnter.reverse();}
 
                     }
 
-                }
+                });
 
-            });
-
-            tl.to(lineEnding1, {strokeDashoffset: 0, duration: 1, ease: "power2.out", y: "-60%"}, 0);
+            tl.to(lineEnding1, {strokeDashoffset: -lengthEd, duration: 2, ease: "power2.out",}, 0);
 
 
             let tl2 = gsap.timeline({
                 scrollTrigger: {
                     trigger: "#secondEnding",
                     start: "top top",
-                    end: "+=150%",
+                    end: "+=100%",
                     scrub: 1,
                     pin: true,
                     pinSpacing: true,
-                    onUpdate(self) {
-                        if(self.progress > 0.1){
-                            upperEnter2.play();
-                        } else {
-                            upperEnter2.reverse();
-                        }
-                    }
+                    onEnter() {upperEnter2.play(); subtitleEnter2.play();},
+                    onLeave() {upperEnter2.reverse(); subtitleEnter2.reverse();},
+                    onEnterBack() {upperEnter2.play(); subtitleEnter2.play();},
+                    onLeaveBack() {upperEnter2.reverse(); subtitleEnter2.reverse();}
 
                 }
         })
 
-        tl2.to(lineEnding2, {strokeDashoffset: 0, duration: 1, ease: "power2.out", y: "-60%"}, 0);
+        tl2.to(lineEnding2, {strokeDashoffset: -lengthEd2, duration: 2, ease: "power2.out"}, 0);
         })
 </script>
 
@@ -77,7 +76,7 @@
         </div>
         <div id="textContainer1">
             <p id="Upper" bind:this={upperEnding}>Questa socialità è uno sviluppo naturale dei massmedia?</p>
-            <p id="paragraph">Le prossime olimpiadi avranno la stessa viralità, o questa è stata solo una eccezione?</p>
+            <p id="paragraph" bind:this={subtitle1}>Le prossime olimpiadi avranno la stessa viralità, o questa è stata solo una eccezione?</p>
         </div>
     </section>
     <section id="secondEnding">
@@ -89,7 +88,7 @@
         </div>
         <div id="textContainer2">
             <p id="Upper2" bind:this={upperEnding2}>SI SONO AVVICINATE LE PERSONE ALLO SPORT?</p>
-            <p id="paragraph2">La gente ha iniziato a seguire gli sport di queste olimpiadi invernali o è stato un fenomeno temporaneo? </p>
+            <p id="paragraph2" bind:this={subtitle2}>La gente ha iniziato a seguire gli sport di queste olimpiadi invernali o è stato un fenomeno temporaneo? </p>
         </div>
     </section>
 </main>
@@ -142,6 +141,7 @@
         height: 100vh;
         position: relative;
         align-items: flex-end;
+        margin-block-end: 100dvh;
     }
 
     #svgContainer2 {

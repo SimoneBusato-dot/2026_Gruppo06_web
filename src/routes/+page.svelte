@@ -4,6 +4,7 @@
 	import Categorie from "$lib/components/Card_Selection/Categorie.svelte";
 	import Warning from "$lib/components/Card_Selection/warning.svelte";
 	import Considerations from "$lib/components/Card_Selection/considerations.svelte";
+	import Footer from "$lib/components/Card_Selection/footer.svelte";
 	import gsap from "gsap";
     import { ScrollTrigger } from "gsap/ScrollTrigger";
 	import SplitType from 'split-type';
@@ -355,6 +356,6 @@
 
  <Warning />
  <Considerations/>
- 
+ <Footer />
 	
 </div>

@@ -72,7 +72,7 @@
                 trigger: section,
                 scroller: window,
                 start: "top top",
-                end: "+=100%",
+                end: "+=200%",
                 scrub: 1,
                 pin: true,
                 pinSpacing: false,
@@ -118,7 +118,7 @@
         position: relative;
         visibility: hidden;
         /* era margin-block-start: 100dvh — mantenuto perché necessario per il pinning */
-        margin-block-start: 100dvh;
+        margin-block-start: 200dvh;
         width: 100vw;
         height: 100vh;
         background-color: var(--neutral-50);
