@@ -1,5 +1,11 @@
+import { createReaction } from './reaction.js';
+import gsap from 'gsap';
+import SplitType from 'split-type';
+
 let activeListeners = [];
 let isAppDestroyed = false;
+let titleSplit = null;
+let descSplit = null;
 
 export function cleanup() {
   isAppDestroyed = true;
@@ -10,12 +16,13 @@ export function cleanup() {
   });
   activeListeners = [];
   
-  // Rimuovi il cursore personalizzato se presente per evitare duplicati
-  if (typeof document !== 'undefined') {
-    const cursor = document.getElementById('custom-cursor');
-    if (cursor) {
-      cursor.remove();
-    }
+  if (titleSplit) {
+    titleSplit.revert();
+    titleSplit = null;
+  }
+  if (descSplit) {
+    descSplit.revert();
+    descSplit = null;
   }
 }
 
@@ -127,7 +134,7 @@ export function init() {
       title: "VISUALIZ-\nZAZIONI",
       number: "22",
       suffix: "MLD",
-      description: "Quasi tre volte l'intera popolazione mondiale. Un flusso ininterrotto di sguardi incollati ai video di queste Olimpiadi Invernali.",
+      description: "<span style=\"color: rgb(83, 62, 220)\">Quasi tre volte l'intera popolazione mondiale.</span> Un flusso ininterrotto di sguardi incollati ai video di queste Olimpiadi Invernali.",
       color: [83, 62, 220],
       viewBox: [609, 378],
       path: parsePath("M83.4264 31.2829C87.2475 17.6812 99.5363 8.19496 113.662 7.94264L558.038 0.00519967C575.234 -0.301956 589.597 13.0383 590.559 30.2101L608.13 343.844C609.175 362.495 594.089 378.072 575.414 377.625L31.2516 364.587C10.3741 364.087 -4.43754 344.047 1.21056 323.942L83.4264 31.2829Z")
@@ -136,7 +143,7 @@ export function init() {
       title: "UTENTI\nATTIVI",
       number: "1.0",
       suffix: "MLD",
-      description: "Un traguardo straordinario raggiunto grazie al coinvolgimento della community in tutto il mondo.",
+      description: "<span style=\"color: rgb(220, 62, 65)\">Un'ondata di commenti, condivisioni e reazioni.</span><br>Il pubblico ha partecipato attivamente a ogni singolo istante dei Giochi.",
       color: [220, 62, 65],
       viewBox: [540, 382],
       path: parsePath("M0.0335474 33.4578C-0.820912 14.7085 14.5698 -0.747219 33.3225 0.0282694L500.709 19.3563C517.469 20.0493 530.849 33.5665 531.371 50.3324L539.964 326.123C540.508 343.582 526.95 358.252 509.502 359.083L47.9735 381.061C30.2949 381.903 15.2903 368.234 14.4845 350.554L0.0335474 33.4578Z")
@@ -145,7 +152,7 @@ export function init() {
       title: "INTER-\nAZIONI",
       number: "27",
       suffix: "MLN",
-      description: "Commenti, condivisioni e reazioni registrati durante la cerimonia di chiusura.",
+      description: "<span style=\"color: rgb(220, 149, 62)\">La voglia di esserci</span> ha inondato i social, tra racconti in prima persona e un'infinita<br>produzione di meme.",
       color: [220, 149, 62],
       viewBox: [526, 408],
       path: parsePath("M49.1307 27.1183C51.6293 10.931 65.9476 -0.756537 82.3074 0.0374486L468.481 18.7795C484.527 19.5583 497.509 32.1137 498.823 48.125L525.507 373.338C527.1 392.756 511.116 409.08 491.668 407.895L30.0603 379.775C11.2573 378.629 -2.49307 361.57 0.380597 342.953L49.1307 27.1183Z")
@@ -552,10 +559,33 @@ export function init() {
     // Manage card text index and contents
     if (state.textIndex !== undefined) {
       if (lastTextIndex !== state.textIndex) {
+        if (titleSplit) {
+          titleSplit.revert();
+          titleSplit = null;
+        }
+        if (descSplit) {
+          descSplit.revert();
+          descSplit = null;
+        }
+
         const cardData = cards[state.textIndex];
-        cardTitle.textContent = cardData.title;
-        cardDescription.textContent = cardData.description;
+        cardTitle.innerHTML = cardData.title.replace(/\n/g, '<br>');
+        cardDescription.innerHTML = cardData.description;
         lastTextIndex = state.textIndex;
+
+        // Inizializza e avvia le animazioni delle righe
+        titleSplit = new SplitType(cardTitle, { types: "lines", tagName: "span" });
+        descSplit = new SplitType(cardDescription, { types: "lines", tagName: "span" });
+
+        gsap.fromTo(titleSplit.lines,
+          { x: -50, opacity: 0 },
+          { x: 0, opacity: 1, stagger: 0.08, duration: 0.45, ease: "power2.out", overwrite: "auto" }
+        );
+
+        gsap.fromTo(descSplit.lines,
+          { x: 50, opacity: 0 },
+          { x: 0, opacity: 1, stagger: 0.08, duration: 0.45, ease: "power2.out", overwrite: "auto" }
+        );
       }
       
       const transformStr = `translate3d(0, ${state.textTranslateY}px, 0)`;
@@ -775,8 +805,8 @@ export function init() {
   const totalPhase1Max = 0.5; // End of Macro Phase 1 scroll progress (0.0 to 0.5)
   const fillPhaseStart = 0.65; // Relative fill start (65% of Phase 1)
   const fillPhaseStart1 = fillPhaseStart * totalPhase1Max; // = 0.325
-  const suspensionEnd = 0.82; // Suspension phase ends (82% of Phase 1)
-  const suspensionEnd1 = suspensionEnd * totalPhase1Max; // = 0.41
+  const suspensionEnd = 0.70; // Suspension phase ends (70% of Phase 1)
+  const suspensionEnd1 = suspensionEnd * totalPhase1Max; // = 0.35
   
   const formatNumber = (num) => {
     return new Intl.NumberFormat('it-IT').format(num);
@@ -819,102 +849,6 @@ export function init() {
   let lastScrollY = window.scrollY;
   let reactionAccumulator = 0;
   let perfSampleCounter = 0;
-
-  // Flat brand colors for reactions (visible across all layers)
-  const colors = {
-    heart: '#ff2d55', // Instagram vibrant red
-    like: '#1877f2'   // Facebook vibrant blue
-  };
-
-  // Helper to compile self-contained SVG with flat colors for each reaction
-  const getReactionSVG = (type) => {
-    const color = colors[type];
-    
-    if (type === 'heart') {
-      return `
-        <svg viewBox="0 0 24 24" style="width: 100%; height: 100%; fill: ${color}; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05));">
-          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-        </svg>
-      `;
-    } else {
-      return `
-        <svg viewBox="0 0 24 24" style="width: 100%; height: 100%; fill: ${color}; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05));">
-          <path d="M2 21h4V9H2v12zM20 8h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L13.17 1 7.58 6.59C7.22 6.95 7 7.45 7 8v11c0 1.1.9 2 2 2h7c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2c0-1.1-.9-2-2-2z"/>
-        </svg>
-      `;
-    }
-  };
-
-  // Create and animate a single floating reaction (rendered on top of all layers)
-  // Can be spawned relative to screen baseline or at custom coordinates (e.g. click/tap)
-  const createReaction = (numberWidth, isBurst = false, spawnX = null, spawnY = null) => {
-    // 50% chance heart, 50% chance like thumb
-    const reactionType = Math.random() < 0.5 ? 'heart' : 'like';
-
-    // Scale: sizing variation (background vs foreground)
-    const scale = isBurst 
-      ? (0.55 + Math.random() * 0.65)
-      : (0.7 + Math.random() * 0.4);
-
-    // Rotation: initial tilt
-    const rotation = (Math.random() - 0.5) * (isBurst ? 45 : 30);
-    
-    // Duration: rise speed
-    const duration = isBurst 
-      ? (0.7 + Math.random() * 0.5) 
-      : (1.4 + Math.random() * 0.6);
-
-    // Sway parameters: horizontal oscillation width and frequency
-    const swayWidth = 12 + Math.random() * 20; // 12px to 32px
-    const swayDuration = 0.6 + Math.random() * 0.6; // 0.6s to 1.2s
-
-    // Drift: how far the reaction drifts horizontally as it rises
-    const drift = (Math.random() - 0.5) * (isBurst ? 100 : 60);
-
-    const containerEl = document.createElement('div');
-    containerEl.className = 'reaction-container';
-    
-    // Position: use custom coordinate if provided (from click/tap), otherwise calculate scroll baseline spawn
-    if (spawnX !== null && spawnY !== null) {
-      containerEl.style.left = `${spawnX}px`;
-      containerEl.style.top = `${spawnY}px`;
-    } else {
-      const randomX = (Math.random() - 0.5) * (numberWidth * 0.95);
-      const randomY = (Math.random() - 0.5) * (isBurst ? 30 : 20);
-      containerEl.style.left = `calc(50% + ${randomX}px)`;
-      containerEl.style.top = `calc(50% + ${randomY}px)`;
-    }
-
-    containerEl.style.setProperty('--drift', `${drift}px`);
-    containerEl.style.setProperty('--scale', scale);
-    containerEl.style.setProperty('--rotation', `${rotation}deg`);
-    containerEl.style.animationDuration = `${duration}s`;
-
-    const swayEl = document.createElement('div');
-    swayEl.className = 'reaction-sway';
-    swayEl.style.setProperty('--sway-width', `${swayWidth}px`);
-    swayEl.style.animationDuration = `${swayDuration}s`;
-
-    // Fill with the flat color SVG content
-    swayEl.innerHTML = getReactionSVG(reactionType);
-
-    containerEl.appendChild(swayEl);
-    // Append to insulated container to avoid layout thrashing the entire page
-    let reactionsContainer = document.getElementById('reactions-container');
-    if (!reactionsContainer) {
-      reactionsContainer = document.createElement('div');
-      reactionsContainer.id = 'reactions-container';
-      document.body.appendChild(reactionsContainer);
-    }
-    reactionsContainer.appendChild(containerEl);
-
-    // DOM Cleanup after completion
-    setTimeout(() => {
-      containerEl.remove();
-    }, duration * 1000);
-  };
-
-
 
   let targetProgress = 0;
   let currentProgress = 0;
@@ -1309,24 +1243,9 @@ export function init() {
     drawFrame();
   });
 
-  // Handle user tap/click interactions to spawn reactions at click coordinates
-  window.addEventListener('pointerdown', (e) => {
-    // Prevent spawning if clicking on interactive elements
-    if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A') return;
-    
-    createReaction(100, false, e.clientX, e.clientY);
-  });
-
-  // Custom cursor with inertia (glassmorphism look)
-  const cursor = document.createElement('div');
-  cursor.id = 'custom-cursor';
-  document.body.appendChild(cursor);
-
   const cardGlare = document.querySelector('.card-glare');
   let mouseX = -100;
   let mouseY = -100;
-  let cursorX = -100;
-  let cursorY = -100;
   let hasMoved = false;
   let mouseInWindow = false;
 
@@ -1342,44 +1261,22 @@ export function init() {
     mouseY = e.clientY;
     mouseInWindow = true;
     if (!hasMoved) {
-      // First move: snap cursor immediately to mouse position and show it
-      cursorX = mouseX;
-      cursorY = mouseY;
-      cursor.classList.add('visible');
       hasMoved = true;
     }
   });
 
-  // Fade out cursor when leaving window
+  // Fade out effect calculations when leaving window
   document.addEventListener('mouseleave', () => {
-    cursor.classList.remove('visible');
     mouseInWindow = false;
   });
   document.addEventListener('mouseenter', () => {
     if (hasMoved) {
-      cursor.classList.add('visible');
       mouseInWindow = true;
     }
   });
 
-  // Shrink cursor on click for visual click feedback
-  window.addEventListener('pointerdown', () => {
-    cursor.style.width = '16px';
-    cursor.style.height = '16px';
-  });
-  window.addEventListener('pointerup', () => {
-    cursor.style.width = '24px';
-    cursor.style.height = '24px';
-  });
-
   const tickCursor = () => {
     if (isAppDestroyed) return;
-    if (hasMoved) {
-      // Lerp logic for smooth organic lag/inertia (0.25 speed)
-      cursorX += (mouseX - cursorX) * 0.25;
-      cursorY += (mouseY - cursorY) * 0.25;
-      cursor.style.transform = `translate3d(calc(${cursorX}px - 50%), calc(${cursorY}px - 50%), 0)`;
-    }
 
     // Calculate dynamic intensities based on scroll progress
     let bgIntensity = 0;

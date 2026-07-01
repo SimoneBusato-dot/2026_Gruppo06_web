@@ -1,23 +1,54 @@
 <script>
 	import favicon from '$lib/assets/favicon.svg';
 	import '$lib/styles/variables.css';
+	import '$lib/styles/reactions.css';
 	import Navbar from '$lib/components/Navbar.svelte';
-import { onNavigate } from '$app/navigation';
+	import { onNavigate } from '$app/navigation';
+	import { onMount } from 'svelte';
+	import { createReaction } from '$lib/reaction.js';
 
 	let { children } = $props();
 
-    onNavigate((navigation) => {
-        if(document.startViewTransition){
-            return new Promise((resolve) => {
-            document.startViewTransition(async () => {
-                resolve();
-                await navigation.complete;
-            })
-        })
-        }
-        
-    
-})
+	onNavigate((navigation) => {
+		// Ripristina l'allineamento del contenitore delle reazioni dello scroll al cambio pagina
+		if (typeof document !== 'undefined') {
+			const rxContainer = document.getElementById('reactions-container');
+			if (rxContainer) {
+				rxContainer.style.transform = '';
+				rxContainer.style.transition = '';
+			}
+		}
+
+		if(document.startViewTransition){
+			return new Promise((resolve) => {
+				document.startViewTransition(async () => {
+					resolve();
+					await navigation.complete;
+				})
+			})
+		}
+	});
+
+	onMount(() => {
+		const handleGlobalClick = (e) => {
+			// Evita lo spawn se l'utente clicca su elementi interattivi come bottoni, link, ecc.
+			if (
+				e.target.tagName === 'BUTTON' || 
+				e.target.tagName === 'A' || 
+				e.target.closest('button') || 
+				e.target.closest('a')
+			) {
+				return;
+			}
+			createReaction(100, false, e.clientX, e.clientY);
+		};
+
+		window.addEventListener('pointerdown', handleGlobalClick);
+
+		return () => {
+			window.removeEventListener('pointerdown', handleGlobalClick);
+		};
+	});
 </script>
 
 <svelte:head>

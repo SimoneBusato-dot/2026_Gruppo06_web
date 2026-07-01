@@ -3,9 +3,14 @@
 	import { init, cleanup } from '$lib/counter-app.js';
 	import Categorie from "$lib/components/Card_Selection/Categorie.svelte";
 	import Warning from "$lib/components/Card_Selection/warning.svelte";
+	import gsap from 'gsap';
+	import { ScrollTrigger } from 'gsap/ScrollTrigger';
+	import SplitType from 'split-type';
 	import '$lib/styles/counter.css';
 
 	let resizeObserver;
+	let blueSplit;
+	let redSplit;
 
 	function adjustPageHeight() {
 		const selezCategorie = document.getElementById('Selezione-Categorie');
@@ -39,10 +44,99 @@
 			});
 			resizeObserver.observe(scrollableSection);
 		}
+
+		// --- ANIMAZIONI GSAP SCROLLTRIGGER ---
+		gsap.registerPlugin(ScrollTrigger);
+
+		// Slide 1 (Blue)
+		const blueText = document.querySelector('#text-blue-slide .slide-subtitle');
+		const blueCard = document.querySelector('.slide-blue .video-card-wrapper');
+		if (blueText) {
+			blueSplit = new SplitType(blueText, { types: "lines", tagName: "span" });
+			const blueLines = blueSplit.lines;
+			gsap.fromTo(blueLines,
+				{ x: 300, opacity: 0 },
+				{
+					x: 0,
+					opacity: 1,
+					stagger: 0.1,
+					duration: 0.6,
+					ease: "power2.out",
+					scrollTrigger: {
+						trigger: "#text-blue-slide",
+						start: "top 85%",
+						toggleActions: "play none none reverse"
+					}
+				}
+			);
+		}
+		if (blueCard) {
+			gsap.fromTo(blueCard,
+				{ x: -150, opacity: 0 },
+				{
+					x: 0,
+					opacity: 1,
+					duration: 0.8,
+					ease: "power2.out",
+					scrollTrigger: {
+						trigger: ".slide-blue",
+						start: "top 80%",
+						toggleActions: "play none none reverse"
+					}
+				}
+			);
+		}
+
+		// Slide 2 (Red)
+		const redText = document.querySelector('#text-red-slide .slide-subtitle');
+		const redCard = document.querySelector('.slide-red .video-card-wrapper');
+		if (redText) {
+			redSplit = new SplitType(redText, { types: "lines", tagName: "span" });
+			const redLines = redSplit.lines;
+			gsap.fromTo(redLines,
+				{ x: 300, opacity: 0 },
+				{
+					x: 0,
+					opacity: 1,
+					stagger: 0.1,
+					duration: 0.6,
+					ease: "power2.out",
+					scrollTrigger: {
+						trigger: "#text-red-slide",
+						start: "top 85%",
+						toggleActions: "play none none reverse"
+					}
+				}
+			);
+		}
+		if (redCard) {
+			gsap.fromTo(redCard,
+				{ x: 150, opacity: 0 },
+				{
+					x: 0,
+					opacity: 1,
+					duration: 0.8,
+					ease: "power2.out",
+					scrollTrigger: {
+						trigger: ".slide-red",
+						start: "top 80%",
+						toggleActions: "play none none reverse"
+					}
+				}
+			);
+		}
 	});
 
 	onDestroy(() => {
 		cleanup();
+		if (blueSplit) blueSplit.revert();
+		if (redSplit) redSplit.revert();
+		if (typeof window !== 'undefined' && window.gsap) {
+			// fallback in case ScrollTrigger is registered globally
+			ScrollTrigger.getAll().forEach(t => t.kill());
+		} else {
+			ScrollTrigger.getAll().forEach(t => t.kill());
+		}
 		if (typeof document !== 'undefined') {
 			document.documentElement.style.backgroundColor = '';
 			document.body.style.minHeight = '';
@@ -213,10 +307,8 @@
 				<div class="slide-text-container" id="text-blue-slide">
 					<p class="slide-subtitle">
 						<span class="highlight-blue">Un'Olimpiade iper-condivisa,</span> in cui il racconto social si è rivelato estremamente
+						<span class="slide-title blue-text">DECENTRALIZZATO<br>DALLO SPORT</span>
 					</p>
-					<h2 class="slide-title blue-text">
-						DECENTRALIZZATO<br>DALLO SPORT
-					</h2>
 				</div>
 			</div>
 		</div>
@@ -229,10 +321,8 @@
 				<div class="slide-text-container" id="text-red-slide">
 					<p class="slide-subtitle">
 						<span class="highlight-red">Persino chi non segue</span> queste discipline si è sentito chiamato in causa a
+						<span class="slide-title red-text">RECENSIRE<br>QUESTO EVENTO</span>
 					</p>
-					<h2 class="slide-title red-text">
-						RECENSIRE<br>QUESTO EVENTO
-					</h2>
 				</div>
 			</div>
 			

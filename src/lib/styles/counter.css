@@ -327,9 +327,9 @@ body {
 }
 
 .column-right {
-  grid-column: 10 / 12;
+  grid-column: 10 / 13;
   text-align: left;
-  max-width: 320px;
+  max-width: 370px; /* Ridotto a circa 2.5 colonne di larghezza */
   justify-self: end;
 }
 
@@ -351,8 +351,8 @@ body {
 .description-text {
   font-family: var(--font-family-text), sans-serif;
   font-weight: 400; /* Allineato alle altre sezioni */
-  font-size: 1.625rem; /* Allineato alle altre sezioni come Villaggio Olimpico */
-  line-height: normal; /* Allineato alle altre sezioni */
+  font-size: 1.3rem; /* Ridotto per contenere le 5 righe */
+  line-height: 1.45; /* Spaziatura verticale allargata */
   color: var(--neutral-700);
   margin: 0;
   /* Transition handled frame-by-frame by JS LERP for maximum smoothness */
@@ -516,7 +516,8 @@ body {
   }
   
   .description-text {
-    font-size: 4vw;
+    font-size: 1.3rem;
+    line-height: 1.45;
   }
   
   .number-digits {
@@ -529,97 +530,8 @@ body {
   }
 }
 
-/* Instagram & FB Style Floating Reactions (Hearts & Likes) */
-#reactions-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-  z-index: 1000;
-  contain: strict; /* Insulates reaction spawns from layout thrashing */
-}
-
-.reaction-container {
-  position: fixed;
-  width: 80px;
-  height: 80px;
-  pointer-events: none;
-  z-index: 1000;
-  opacity: 0;
-  transform: translate(-50%, -50%);
-  animation: floatUp 1.6s cubic-bezier(0.42, 0, 0.58, 1) forwards;
-  will-change: transform, opacity;
-}
-
-.reaction-sway {
-  width: 100%;
-  height: 100%;
-  animation: sway 1s ease-in-out infinite alternate;
-  will-change: transform;
-}
-
-@keyframes floatUp {
-  0% {
-    opacity: 1;
-    transform: translate(-50%, 0) scale(0.4) rotate(var(--rotation));
-  }
-  85% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: translate(calc(-50% + var(--drift)), -65vh) scale(calc(var(--scale) * 0.75)) rotate(calc(var(--rotation) * 1.25));
-  }
-}
-
-@keyframes sway {
-  0% {
-    transform: translateX(calc(-1 * var(--sway-width))) rotate(-6deg);
-  }
-  100% {
-    transform: translateX(var(--sway-width)) rotate(6deg);
-  }
-}
-
-/* Hide default cursor on desktop/mouse pointers and display custom cursor
-@media (pointer: fine) {
-  html, body, a, button, .counter-display, .final-message, .reaction-container {
-    cursor: none !important;
-  } */
-  
-  #custom-cursor {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 24px;
-    height: 24px;
-    background-color: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    border: 1.2px solid rgba(255, 255, 255, 0.5);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 99999;
-    transform: translate3d(-100px, -100px, 0);
-    will-change: transform;
-    opacity: 0;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), inset 0 0 4px rgba(255, 255, 255, 0.25);
-    transition: width 0.15s ease-out, height 0.15s ease-out, opacity 0.15s ease-out;
-  }
-  
-  #custom-cursor.visible {
-    opacity: 1;
-  }
 
 
-/* Hide custom cursor on mobile touch devices */
-@media (pointer: coarse) {
-  #custom-cursor {
-    display: none;
-  }
-}
 
 /* Scroll indicator (non-clickable down arrow + scroll text) */
 .scroll-indicator {
@@ -630,28 +542,40 @@ body {
   z-index: 150;
   pointer-events: none;
   display: flex;
-  flex-direction: column;
+  flex-direction: row; /* Elementi affiancati */
   align-items: center;
-  gap: 8px;
-  color: var(--neutral-900);
+  gap: 10px;
+  
+  /* Stile capsula glassmorphism premium scuro */
+  background: rgba(21, 21, 21, 0.82);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1.2px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  padding: 6px 18px;
+  border-radius: 9999px;
+  
+  color: var(--neutral-50);
   will-change: opacity, transform;
   transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
 .scroll-text {
-  font-family: var(--font-family-text), sans-serif;
-  font-weight: bold;
-  font-variant: small-caps;
-  font-size: 14px;
-  letter-spacing: 0.25em;
-  opacity: 0.8;
+  font-family: var(--font-family), sans-serif; /* Dharma Gothic E */
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 1.6rem;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  color: var(--neutral-50);
 }
 
 .scroll-arrow {
-  width: 20px;
-  height: 20px;
-  opacity: 0.7;
+  width: 15px;
+  height: 15px;
+  opacity: 0.9;
   animation: bounceArrow 2s infinite;
+  display: block;
 }
 
 @keyframes bounceArrow {
@@ -659,10 +583,10 @@ body {
     transform: translate3d(0, 0, 0);
   }
   40% {
-    transform: translate3d(0, 8px, 0);
+    transform: translate3d(0, 4px, 0); /* Bouncing down */
   }
   60% {
-    transform: translate3d(0, 4px, 0);
+    transform: translate3d(0, 2px, 0);
   }
 }
 
@@ -693,7 +617,7 @@ body {
 .final-title {
   font-family: var(--font-family), sans-serif;
   font-weight: 900;
-  font-size: clamp(4rem, 10vw, 13.25rem); /* Allineato alle dimensioni giganti del progetto */
+  font-size: clamp(6rem, 15vw, 19.875rem); /* Reso 150% più grande */
   line-height: 0.85;
   color: #ffffff;
   text-align: center;
@@ -745,7 +669,7 @@ body {
 /* Final Cards Carousel Container */
 .final-cards-container {
   position: absolute;
-  top: 55%;
+  top: 50%;
   left: 50%;
   transform: translate3d(-50%, -30%, 40px); /* Starts lower */
   opacity: 0;
@@ -767,7 +691,7 @@ body {
 /* Animate card container upward on active final state */
 .final-screen.active .final-cards-container {
   opacity: 1;
-  transform: translate3d(-50%, -46%, 40px); /* Centered and overlapping bottom of title */
+  transform: translate3d(-50%, -50%, 40px); /* Centered in the viewport */
   pointer-events: auto;
   transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1), opacity 1s ease-out;
   transition-delay: 1.30s; /* Start precisely after title is complete! */
@@ -786,16 +710,16 @@ body {
 .carousel-card-item {
   position: relative;
   flex: 0 0 auto;
-  width: 16vw;
-  max-width: 250px;
-  min-width: 140px;
-  margin: 0; /* Spaced via gap instead of overlapping negative margins */
+  width: 21.8vw; /* Ridotte del 20% rispetto al valore precedente */
+  max-width: 340px; /* Ridotte del 20% rispetto al valore precedente */
+  min-width: 190px; /* Ridotte del 20% rispetto al valore precedente */
+  margin: 0;
   will-change: transform, opacity;
   z-index: 21;
   
-  /* Initial hidden state for staggered entrance */
+  /* Initial hidden state */
   opacity: 0;
-  transform: rotate(var(--initial-rotation, 0deg)) translate3d(0, 0, 0) scale(0.75);
+  transform: translate3d(0, 0, 0) scale(0.75); /* Senza rotazione */
   
   /* Smooth transitions */
   transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
@@ -808,69 +732,23 @@ body {
   height: auto;
   display: block;
   border-radius: 14px;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
+  /* Rimossa l'ombra dietro (box-shadow) */
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
 
-/* Generalized staggered organic tilts & vertical offsets (cycling every 4 items) */
-.carousel-card-item:nth-child(4n+1) {
-  --organic-rotation: -4deg;
-  --organic-translate-y: 15px;
-  --initial-rotation: -10deg;
-}
-.carousel-card-item:nth-child(4n+2) {
-  --organic-rotation: 2deg;
-  --organic-translate-y: -10px;
-  --initial-rotation: 8deg;
-}
-.carousel-card-item:nth-child(4n+3) {
-  --organic-rotation: -3deg;
-  --organic-translate-y: 12px;
-  --initial-rotation: -8deg;
-}
-.carousel-card-item:nth-child(4n) {
-  --organic-rotation: 4deg;
-  --organic-translate-y: -5px;
-  --initial-rotation: 6deg;
-}
-
-/* When active, transition to organic layout */
+/* When active, transition to non-tilted, straight horizontal layout */
 .final-screen.active .carousel-card-item {
   opacity: 1;
-  transform: rotate(var(--organic-rotation, 0deg)) translate3d(0, var(--organic-translate-y, 0px), 0) scale(1);
+  transform: translate3d(0, 0, 0) scale(1);
 }
 
-
-
-/* Premium Card Hover Effect - pulls hovered card forward and dims/scales the rest */
+/* Hover Effect - pulls hovered card forward slightly without tilt/shadow/opacity changes */
 .carousel-card-item:hover {
-  transform: rotate(0deg) translate3d(0, -25px, 30px) scale(1.08) !important;
+  transform: translate3d(0, -25px, 30px) scale(1.08) !important;
   z-index: 99;
-  filter: drop-shadow(0 20px 45px rgba(0, 0, 0, 0.5)) brightness(1) !important;
-  opacity: 1 !important;
-  /* Reset delay on hover for instant responsiveness */
-  transition: transform 0.4s cubic-bezier(0.25, 1, 0.2, 1),
-              opacity 0.4s ease,
-              filter 0.4s ease !important;
-}
-
-.final-cards-container:hover .carousel-card-item:not(:hover) {
-  filter: brightness(0.6) contrast(0.9) blur(1px);
-  opacity: 0.75;
-}
-
-.final-cards-container:hover .carousel-card-item:not(:hover):nth-child(4n+1) {
-  transform: rotate(-4deg) translate3d(0, 20px, -15px) scale(0.95);
-}
-.final-cards-container:hover .carousel-card-item:not(:hover):nth-child(4n+2) {
-  transform: rotate(2deg) translate3d(0, -5px, -15px) scale(0.95);
-}
-.final-cards-container:hover .carousel-card-item:not(:hover):nth-child(4n+3) {
-  transform: rotate(-3deg) translate3d(0, 17px, -15px) scale(0.95);
-}
-.final-cards-container:hover .carousel-card-item:not(:hover):nth-child(4n) {
-  transform: rotate(4deg) translate3d(0, 0, -15px) scale(0.95);
+  /* Rimossa ombra (filter drop-shadow) e opacità all'hover */
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.2, 1) !important;
 }
 
 /* Card number badge styling */
@@ -888,7 +766,7 @@ body {
   border: 1.5px solid rgba(255, 255, 255, 0.6);
   color: #ffffff;
   font-family: var(--font-family-text), sans-serif;
-  font-weight: 900;
+  font-weight: 400;
   font-size: 1.1rem;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
   pointer-events: none; /* Click-through */
@@ -905,14 +783,14 @@ body {
 
 @media (max-width: 900px) {
   .final-title {
-    font-size: 20vw;
+    font-size: 30vw; /* Reso 150% più grande */
     line-height: 0.85;
     top: 38%;
     transform: translate3d(-50%, -50%, 0);
   }
   
   .final-cards-container {
-    top: 68%;
+    top: 50%;
     transform: translate3d(-50%, -30%, 40px);
     padding: 40px 0;
   }
@@ -926,8 +804,8 @@ body {
   }
   
   .carousel-card-item {
-    width: 22vw;
-    min-width: 80px;
+    width: 30vw; /* Ridotte del 20% rispetto al valore precedente */
+    min-width: 109px; /* Ridotte del 20% rispetto al valore precedente */
     margin: 0;
   }
   
@@ -1362,12 +1240,12 @@ body {
 
 .highlight-blue {
   color: var(--brand-sport-insoliti-500);
-  font-weight: 800;
+  font-weight: 400;
 }
 
 .highlight-red {
   color: var(--brand-villaggio-500);
-  font-weight: 800;
+  font-weight: 400;
 }
 
 .slide-title {
@@ -1375,9 +1253,10 @@ body {
   font-size: clamp(3rem, 6vw, 8.3rem); /* Allineato alle altre sezioni come Villaggio Olimpico */
   font-weight: 900;
   line-height: 1; /* Allineato alle altre sezioni */
-  letter-spacing: -0.15vw;
+  letter-spacing: normal; /* Modificato da -0.15vw per allinearsi a Sport Insoliti */
   text-transform: uppercase;
   margin: 0;
+  display: block; /* Va a capo come blocco all'interno del flusso del paragrafo */
 }
 
 .blue-text {
@@ -1508,7 +1387,7 @@ body {
     max-width: none;
   }
   .slide-subtitle {
-    font-size: 1.35rem;
+    font-size: 1.625rem;
     margin-bottom: 1.2rem;
   }
   .slide-title {
