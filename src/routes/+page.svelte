@@ -3,9 +3,9 @@
 	import { init, cleanup } from '$lib/counter-app.js';
 	import Categorie from "$lib/components/Card_Selection/Categorie.svelte";
 	import Warning from "$lib/components/Card_Selection/warning.svelte";
-	import gsap from 'gsap';
-	import { ScrollTrigger } from 'gsap/ScrollTrigger';
-	import SplitType from 'split-type';
+	import Considerations from "$lib/components/Card_Selection/considerations.svelte";
+	import gsap from "gsap";
+    import { ScrollTrigger } from "gsap/ScrollTrigger";
 	import '$lib/styles/counter.css';
 
 	let resizeObserver;
@@ -351,5 +351,7 @@
 	</div>
 
  <Warning />
+ <Considerations/>
+ 
 	
 </div>

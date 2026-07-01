@@ -1,5 +1,4 @@
 <script>
-    import Cards from "$lib/components/Card_Selection/Cards.svelte";
     import { onMount, onDestroy } from "svelte";
     import gsap from "gsap";
     import { ScrollTrigger } from "gsap/ScrollTrigger";

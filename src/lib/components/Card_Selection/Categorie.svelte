@@ -16,6 +16,11 @@
     const MAX_ROT        = 28;
     const DRAG_THRESHOLD = 8;
 
+    /* ─── durata totale animazione di ingresso ─── */
+    const ENTER_ANIM_DURATION = 2.5; // delay 1.5 + duration 1 (cardEnter, la più lunga)
+    /* quanta "distanza di scroll" (px) vogliamo che il pin consumi mentre gira l'animazione */
+    const PIN_SCROLL_DISTANCE = 600;
+
     /* ─── refs DOM ─── */
     let containerEl = $state(null);
     let trackEl     = $state(null);
@@ -36,7 +41,7 @@
     let isPointerDown   = false;
     let dragStartX      = 0;
     let dragStartScroll = 0;
-    let isDrag          = false;   // diventa true solo dopo DRAG_THRESHOLD px
+    let isDrag          = false;
 
     /* ─── snap ─── */
     let snapTween = null;
@@ -46,9 +51,6 @@
     let svgClip;
     let title;
     let subtitle;
-
-
-   
 
     /* ─────────────────────────────────────────────────
        Utility
@@ -131,41 +133,36 @@
        Navigazione
     ───────────────────────────────────────────────── */
     function goToCard(i) {
-    const slides = getSlides();
-    if (!slides.length) return;
+        const slides = getSlides();
+        if (!slides.length) return;
 
-    // Calcola la posizione X visiva di ogni slide
-    const cx = (containerEl?.offsetWidth ?? window.innerWidth) / 2;
-    const range = TOTAL * STEP;
+        const cx = (containerEl?.offsetWidth ?? window.innerWidth) / 2;
+        const range = TOTAL * STEP;
 
-    const getVisualX = (index) => {
-        const rawX = index * STEP - scrollCurrent;
-        const x = ((rawX % range) + range) % range - range / 2;
-        return x + cx - CARD_W / 2 + CARD_W / 2; // centro della card
-    };
+        const getVisualX = (index) => {
+            const rawX = index * STEP - scrollCurrent;
+            const x = ((rawX % range) + range) % range - range / 2;
+            return x + cx - CARD_W / 2 + CARD_W / 2;
+        };
 
-    const targetX = getVisualX(i);
-    const activeX = getVisualX(activeIndex);
+        const targetX = getVisualX(i);
+        const activeX = getVisualX(activeIndex);
 
-    // Se il target è visivamente a destra, scorri a destra (+), altrimenti a sinistra (-)
-    if (targetX > activeX) {
-        // target è a destra: vogliamo aumentare scrollTarget
-        let delta = (i - activeIndex) * STEP;
-        if (delta < 0) delta += range; // forza direzione destra
-        scrollTarget += delta;
-    } else {
-        // target è a sinistra: vogliamo diminuire scrollTarget
-        let delta = (i - activeIndex) * STEP;
-        if (delta > 0) delta -= range; // forza direzione sinistra
-        scrollTarget += delta;
+        if (targetX > activeX) {
+            let delta = (i - activeIndex) * STEP;
+            if (delta < 0) delta += range;
+            scrollTarget += delta;
+        } else {
+            let delta = (i - activeIndex) * STEP;
+            if (delta > 0) delta -= range;
+            scrollTarget += delta;
+        }
+
+        snapToNearest();
     }
 
-    snapToNearest();
-}
     /* ─────────────────────────────────────────────────
-       Pointer events — NO setPointerCapture
-       Il tracciamento del movimento avviene su window
-       così non rubiamo gli eventi ai figli.
+       Pointer events
     ───────────────────────────────────────────────── */
     function onPointerDown(e) {
         if (e.button !== 0 && e.pointerType === 'mouse') return;
@@ -187,15 +184,11 @@
         if (!isPointerDown) return;
         isPointerDown = false;
         if (isDrag) snapToNearest();
-        // isDrag viene letto dal click handler PRIMA di questo rAF reset
         requestAnimationFrame(() => { isDrag = false; });
     }
 
     /* ─────────────────────────────────────────────────
        Click su slide
-       • card non attiva  → scorri a quella card
-       • card attiva      → lascia passare il click all'<a> (navigazione)
-       • era un drag      → blocca tutto
     ───────────────────────────────────────────────── */
     function onSlideClick(e, index) {
         if (isDrag) {
@@ -208,11 +201,10 @@
             e.stopPropagation();
             goToCard(index);
         }
-        // card attiva + click reale → l'<a> dentro Cards naviga da solo
     }
 
     /* ─────────────────────────────────────────────────
-       Tastiera
+       Tastiera (navigazione tra card)
     ───────────────────────────────────────────────── */
     function onKeyDown(e) {
         if (e.key === 'ArrowRight') { scrollTarget += STEP; snapToNearest(); }
@@ -227,8 +219,6 @@
         const box = svgClip.getBoundingClientRect();
         const width = box.width;
         computeCardW();
-        // Con scroll=0, la card centrata è quella a metà del ring (indice TOTAL/2).
-        // Per centrare l'indice 0 (blue), partiamo indietro di TOTAL/2 * STEP.
         const startOffset = -Math.floor(TOTAL / 2) * STEP;
         scrollCurrent = startOffset;
         scrollTarget  = startOffset;
@@ -242,65 +232,84 @@
         window.addEventListener('pointerup',   onWindowPointerUp);
         window.addEventListener('pointercancel', onWindowPointerUp);
 
+        const loopAnim = gsap.to({}, {
+            duration: 2,
+            repeat: -1,
+            ease: "none",
+            onUpdate() {
+                const t = this.time() / this.duration() * Math.PI * 2;
+                const xPercent = Math.sin(t);
+                const yPercent = Math.sin(t * 0.5);
 
-    // ... setup esistente ...
+                const activeSlide = getSlides()[activeIndex];
+                if (!activeSlide) return;
 
-    const loopAnim = gsap.to({}, {          // ✅ PRIMA del return
-        duration: 2,
-        repeat: -1,
-        ease: "none",
-        onUpdate() {
-            const t = this.time() / this.duration() * Math.PI * 2;
-            const xPercent = Math.sin(t);
-            const yPercent = Math.sin(t * 0.5);
+                gsap.to(activeSlide, {
+                    duration: 0.1,
+                    rotateY: xPercent * 7,
+                    rotateX: -yPercent * 5,
+                    ease: "power2.out",
+                    overwrite: "auto"
+                });
+            }
+        });
 
-            const activeSlide = getSlides()[activeIndex];  // ✅ letto ogni frame
-            if (!activeSlide) return;
+        const titleSplit = new SplitText(title, { type: 'words', mask: 'words'});
+        const subtitleSplit = new SplitText(subtitle, { type: 'lines', mask: 'lines'});
 
-            gsap.to(activeSlide, {
-                duration: 0.1,
-                rotateY: xPercent * 7,
-                rotateX: -yPercent * 5,
-                ease: "power2.out",
-                overwrite: "auto"
-            });
-        }
-    });
+        const titleEnter = gsap.fromTo(titleSplit.words, {y: "100%"}, {y: "0%", stagger: 0.1, duration: 0.6, ease:"elastic.out(0.5,0.4)", paused: true, delay: 1.5});
+        const subtitleEnter = gsap.fromTo(subtitleSplit.lines, {y: "100%"}, {y: "0%", duration: 0.6, ease:"power2.out", paused: true, delay: 2});
+        const cardEnter = gsap.fromTo(trackEl, {y: "100%"}, {y: "0%", duration: 1, ease:"elastic.out(0.5,0.4)", paused: true, delay: 1.5});
 
-    const titleSplit = new SplitText(title, { type: 'words', mask: 'words'});
-    const subtitleSplit = new SplitText(subtitle, { type: 'lines', mask: 'lines'});
+        const clipMove = gsap.fromTo(ClipPath, {width: 0 } , {width: width, duration: 1, ease: "power2.out", paused: true, delay: 1 });
 
-    const titleEnter = gsap.fromTo(titleSplit.words, {y: "100%"}, {y: "0%", stagger: 0.1, duration: 0.6, ease:"elastic.out(0.5,0.4)", paused: true, delay: 1.5});
-    const subtitleEnter = gsap.fromTo(subtitleSplit.lines, {y: "100%"}, {y: "0%", duration: 0.6, ease:"power2.out", paused: true, delay: 2});
-    const cardEnter =gsap.fromTo(trackEl, {y: "100%"}, {y: "0%", duration: 1, ease:"elastic.out(0.5,0.4)", paused: true, delay: 1.5});
-
-    const clipMove = gsap.fromTo(ClipPath, {width: 0 } , {width: width, duration: 1, ease: "power2.out", paused: true, delay: 1 });
-    let tl = gsap.timeline({
-        scrollTrigger: {
+        /* ── ScrollTrigger con pin: la sezione resta fissa a schermo
+           finché l'animazione di ingresso non è terminata ── */
+        let st = ScrollTrigger.create({
             trigger: catMain,
-            onEnter: () => { clipMove.play(); console.log("onEnter"); titleEnter.play(); subtitleEnter.play(); cardEnter.play(); },
-            onLeave: () => { clipMove.reverse(); titleEnter.reverse(); subtitleEnter.reverse(); cardEnter.reverse(); },
-            onEnterBack: () => { clipMove.play(); titleEnter.play(); subtitleEnter.play(); cardEnter.play(); },
-            onLeaveBack: () => { clipMove.reverse(); titleEnter.reverse(); subtitleEnter.reverse(); cardEnter.reverse(); },
-            
-        }
+            start: "top top",              // scatta SOLO quando la sezione riempie tutto il viewport
+            end: `+=${PIN_SCROLL_DISTANCE}`, // quanta "distanza di scroll" viene consumata dal pin
+            pin: true,
+            pinSpacing: true,
+            anticipatePin: 1,
+            onEnter: () => {
+                clipMove.play();
+                titleEnter.play();
+                subtitleEnter.play();
+                cardEnter.play();
+            },
+            onLeave: () => {
+                clipMove.reverse();
+                titleEnter.reverse();
+                subtitleEnter.reverse();
+                cardEnter.reverse();
+            },
+            onEnterBack: () => {
+                clipMove.play();
+                titleEnter.play();
+                subtitleEnter.play();
+                cardEnter.play();
+            },
+            onLeaveBack: () => {
+                clipMove.reverse();
+                titleEnter.reverse();
+                subtitleEnter.reverse();
+                cardEnter.reverse();
+            },
+        });
 
+        return () => {
+            cancelAnimationFrame(rafId);
+            snapTween?.kill();
+            loopAnim.kill();
+            st?.kill();
+            window.removeEventListener('resize', onResize);
+            window.removeEventListener('keydown', onKeyDown);
+            window.removeEventListener('pointermove', onWindowPointerMove);
+            window.removeEventListener('pointerup', onWindowPointerUp);
+            window.removeEventListener('pointercancel', onWindowPointerUp);
+        };
     });
-
-    return () => {                           // ✅ cleanup alla fine
-        cancelAnimationFrame(rafId);
-        snapTween?.kill();
-        loopAnim.kill();                     // ✅ aggiungi anche questo
-        window.removeEventListener('resize', onResize);
-        window.removeEventListener('keydown', onKeyDown);
-        window.removeEventListener('pointermove', onWindowPointerMove);
-        window.removeEventListener('pointerup', onWindowPointerUp);
-        window.removeEventListener('pointercancel', onWindowPointerUp);
-    };
-});
-
-    
-
 
 </script>
 
@@ -332,9 +341,7 @@
         role="group"
         aria-label="Carousel categorie"
     >
-        <!-- arco decorativo di sfondo -->
         <svg id="arc-bg" viewBox="0 0 1512 1014" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid meet">
-            
             <path d="M1756 1013.5C1756 460.939 1308.06 13 755.5 13C202.939 13 -245 460.939 -245 1013.5" stroke-width="26" stroke-dasharray="2 18" />
         </svg>
 
@@ -488,19 +495,17 @@
         cursor: pointer;
     }
 
-    /* card non attiva: blocca l'<a> dentro, ci pensa onSlideClick */
     .slide:not(.is-active) :global(a) {
         pointer-events: none;
     }
 
     .slide :global(a),
     .slide :global(img) {
-    -webkit-user-drag: none;
-    pointer-events: none; /* già gestiti dal JS */
+        -webkit-user-drag: none;
+        pointer-events: none;
+    }
 
-}
-
-.slide.is-active :global(a) {
-    pointer-events: all;
-}
+    .slide.is-active :global(a) {
+        pointer-events: all;
+    }
 </style>
