@@ -2,6 +2,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { init, cleanup } from '$lib/counter-app.js';
 	import Categorie from "$lib/components/Card_Selection/Categorie.svelte";
+	import Warning from "$lib/components/Card_Selection/warning.svelte";
 	import '$lib/styles/counter.css';
 
 	let resizeObserver;
@@ -255,5 +256,10 @@
 		</div>
 	</div>
 	
-	<Categorie />
+	<div id="Categorie">
+		<Categorie />
+	</div>
+
+ <Warning />
+	
 </div>

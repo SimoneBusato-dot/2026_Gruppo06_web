@@ -102,7 +102,7 @@
                         <div class="card-bg"></div>
                     </div>
                     <div class="comments">
-                        <Comments variant="yellow">Te la sogni 'sta roba in Usa</Comments>
+                        <Comments variant="yellow" user="ciaone.44">Te la sogni 'sta roba in Usa</Comments>
                     </div>
                 </div>
 
@@ -113,7 +113,7 @@
                         <div class="card-bg"></div>
                     </div>
                     <div class="comments">
-                        <Comments variant="yellow">sono stati creativi in cucina 🇮🇹👏🏻</Comments>
+                        <Comments variant="yellow" user="franca_tina">sono stati creativi in cucina 🇮🇹👏🏻</Comments>
                     </div>
                 </div>
 
@@ -124,7 +124,7 @@
                         <div class="card-bg"></div>
                     </div>
                     <div class="comments">
-                        <Comments variant="yellow">Dude send me some tiramisu that looks so good 🤤😭</Comments>
+                        <Comments variant="yellow" user="carb.fan">Dude send me some tiramisu that looks so good 🤤😭</Comments>
                     </div>
                 </div>
 
@@ -135,7 +135,7 @@
                         <div class="card-bg"></div>
                     </div>
                     <div class="comments">
-                        <Comments variant="yellow">nessuno ha notato che la pasta è a 5 cerchi</Comments>
+                        <Comments variant="yellow" user="panemolle">nessuno ha notato che la pasta è a 5 cerchi</Comments>
                     </div>
                 </div>
 
@@ -146,7 +146,7 @@
                         <div class="card-bg"></div>
                     </div>
                     <div class="comments">
-                        <Comments variant="yellow">olympic muffins, olympic tiramisu, and now olympic pasta??</Comments>
+                        <Comments variant="yellow" user="tacocat_02">olympic muffins, olympic tiramisu, and now olympic pasta??</Comments>
                     </div>
                 </div>
 
@@ -157,7 +157,7 @@
                         <div class="card-bg"></div>
                     </div>
                     <div class="comments">
-                        <Comments variant="yellow">as an italian i want that</Comments>
+                        <Comments variant="yellow" user="gatto.grasso">as an italian i want that</Comments>
                     </div>
                 </div>
 
@@ -168,7 +168,7 @@
                         <div class="card-bg"></div>
                     </div>
                     <div class="comments">
-                        <Comments variant="yellow">qui non facciamo fare i menu ai nutrizionisti, ma alle nonne</Comments>
+                        <Comments variant="yellow" user="elii_s.99">qui non facciamo fare i menu ai nutrizionisti, ma alle nonne</Comments>
                     </div>
                 </div>
             </div>

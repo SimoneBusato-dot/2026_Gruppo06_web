@@ -2,6 +2,10 @@
     import Cards from "$lib/components/Card_Selection/Cards.svelte";
     import { onMount } from "svelte";
     import gsap from "gsap";
+    import { ScrollTrigger } from "gsap/ScrollTrigger";
+    import SplitText from 'gsap/SplitText';
+
+    gsap.registerPlugin(ScrollTrigger,SplitText);
 
     /* ─── costanti ─── */
     const VARIANTS       = ['blue', 'purple', 'red', 'yellow'];
@@ -36,6 +40,13 @@
 
     /* ─── snap ─── */
     let snapTween = null;
+
+    let catMain;
+    let ClipPath;
+    let svgClip;
+    let title;
+    let subtitle;
+
 
    
 
@@ -212,6 +223,9 @@
        Lifecycle
     ───────────────────────────────────────────────── */
     onMount(() => {
+
+        const box = svgClip.getBoundingClientRect();
+        const width = box.width;
         computeCardW();
         // Con scroll=0, la card centrata è quella a metà del ring (indice TOTAL/2).
         // Per centrare l'indice 0 (blue), partiamo indietro di TOTAL/2 * STEP.
@@ -228,7 +242,7 @@
         window.addEventListener('pointerup',   onWindowPointerUp);
         window.addEventListener('pointercancel', onWindowPointerUp);
 
-onMount(() => {
+
     // ... setup esistente ...
 
     const loopAnim = gsap.to({}, {          // ✅ PRIMA del return
@@ -253,6 +267,26 @@ onMount(() => {
         }
     });
 
+    const titleSplit = new SplitText(title, { type: 'words', mask: 'words'});
+    const subtitleSplit = new SplitText(subtitle, { type: 'lines', mask: 'lines'});
+
+    const titleEnter = gsap.fromTo(titleSplit.words, {y: "100%"}, {y: "0%", stagger: 0.1, duration: 0.6, ease:"elastic.out(0.5,0.4)", paused: true, delay: 1.5});
+    const subtitleEnter = gsap.fromTo(subtitleSplit.lines, {y: "100%"}, {y: "0%", duration: 0.6, ease:"power2.out", paused: true, delay: 2});
+    const cardEnter =gsap.fromTo(trackEl, {y: "100%"}, {y: "0%", duration: 1, ease:"elastic.out(0.5,0.4)", paused: true, delay: 1.5});
+
+    const clipMove = gsap.fromTo(ClipPath, {width: 0 } , {width: width, duration: 1, ease: "power2.out", paused: true, delay: 1 });
+    let tl = gsap.timeline({
+        scrollTrigger: {
+            trigger: catMain,
+            onEnter: () => { clipMove.play(); console.log("onEnter"); titleEnter.play(); subtitleEnter.play(); cardEnter.play(); },
+            onLeave: () => { clipMove.reverse(); titleEnter.reverse(); subtitleEnter.reverse(); cardEnter.reverse(); },
+            onEnterBack: () => { clipMove.play(); titleEnter.play(); subtitleEnter.play(); cardEnter.play(); },
+            onLeaveBack: () => { clipMove.reverse(); titleEnter.reverse(); subtitleEnter.reverse(); cardEnter.reverse(); },
+            
+        }
+
+    });
+
     return () => {                           // ✅ cleanup alla fine
         cancelAnimationFrame(rafId);
         snapTween?.kill();
@@ -265,16 +299,16 @@ onMount(() => {
     };
 });
 
-            
+    
 
-    });
+
 </script>
 
-<main id="Selezione-Categorie">
+<main id="Selezione-Categorie" bind:this={catMain}>
 
     <div id="text">
-        <h1 id="title">scegli un trend</h1>
-        <p id="description">
+        <h1 id="title" bind:this={title}>scegli un trend</h1>
+        <p id="description" bind:this={subtitle}>
             Dai un'occhiata alle categorie qui sotto e inizia da quella
             che ti incuriosisce di più.
         </p>
@@ -300,7 +334,16 @@ onMount(() => {
     >
         <!-- arco decorativo di sfondo -->
         <svg id="arc-bg" viewBox="0 0 1512 1014" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid meet">
-            <path d="M1756 1013.5C1756 460.939 1308.06 13 755.5 13C202.939 13 -245 460.939 -245 1013.5" stroke-width="26" stroke-dasharray="2 18"/>
+            
+            <path d="M1756 1013.5C1756 460.939 1308.06 13 755.5 13C202.939 13 -245 460.939 -245 1013.5" stroke-width="26" stroke-dasharray="2 18" />
+        </svg>
+
+        <svg bind:this={svgClip} id="clip" width="100vw" height="100vh" viewBox="0 0 1512 1014" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid meet">
+            <defs>
+                <clipPath id="clipPath" >
+                    <rect width="0" height="100%" bind:this={ClipPath}/>
+                </clipPath>
+            </defs>
         </svg>
 
         <div id="track" bind:this={trackEl}>
@@ -419,6 +462,14 @@ onMount(() => {
         pointer-events: none;
         z-index: 0;
         stroke: #dbdbdb;
+        clip-path: url(#clipPath);
+    }
+
+    #clip {
+        position: absolute;
+        width: 100vw;
+        height: 100vh;
+        pointer-events: none;
     }
 
     #track {

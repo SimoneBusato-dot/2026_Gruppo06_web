@@ -583,11 +583,11 @@ body {
   }
 }
 
-/* Hide default cursor on desktop/mouse pointers and display custom cursor */
+/* Hide default cursor on desktop/mouse pointers and display custom cursor
 @media (pointer: fine) {
   html, body, a, button, .counter-display, .final-message, .reaction-container {
     cursor: none !important;
-  }
+  } */
   
   #custom-cursor {
     position: fixed;
@@ -612,7 +612,7 @@ body {
   #custom-cursor.visible {
     opacity: 1;
   }
-}
+
 
 /* Hide custom cursor on mobile touch devices */
 @media (pointer: coarse) {

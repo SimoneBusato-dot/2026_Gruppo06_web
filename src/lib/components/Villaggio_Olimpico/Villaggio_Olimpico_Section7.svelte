@@ -251,7 +251,7 @@
     position: absolute;
     width: 100%;
     height: 100%;
-    background-color: var(--brand-villaggio-400);
+    background-color: var(--brand-villaggio-300);
     border-radius: 12px;
     z-index: -1;
     transform-style: preserve-3d;

@@ -88,27 +88,26 @@ export function init() {
 
   const lerp = (start, end, t) => start + (end - start) * t;
 
+  // --- MODIFICATO: funzione resa simmetrica, così anche il numero PRECEDENTE (d < 0)
+  // riceve lo stesso trattamento grigio del numero successivo (d > 0), invece di restare bianco/invisibile ---
   function getReelItemStyle(d) {
+    const absD = Math.abs(d);
     let opacity = 0;
     let r = 255, g = 255, b = 255;
-    if (d <= -0.5) {
+
+    if (absD > 1.2) {
       opacity = 0;
-    } else if (d < 0) {
-      const t = (d - (-0.5)) / 0.5;
-      opacity = t;
-      r = 255; g = 255; b = 255;
-    } else if (d <= 1) {
-      opacity = 1.0 - 0.75 * d; // lerp from 1.0 to 0.25
-      r = 255 - 95 * d; // lerp from 255 to 160
-      g = 255 - 95 * d;
-      b = 255 - 95 * d;
-    } else if (d <= 1.2) {
-      const t = (d - 1) / 0.2;
-      opacity = 0.25 * (1 - t);
-      r = 160; g = 160; b = 160;
+    } else if (absD <= 1) {
+      opacity = 1.0 - 0.75 * absD; // lerp da 1.0 (al centro) a 0.25
+      r = 255 - 130 * absD; // scende fino a un grigio deciso, sia sopra che sotto
+      g = 255 - 130 * absD;
+      b = 255 - 130 * absD;
     } else {
-      opacity = 0;
+      const t = (absD - 1) / 0.2;
+      opacity = 0.25 * (1 - t);
+      r = 125; g = 125; b = 125;
     }
+
     return { opacity, color: `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)})` };
   }
 
@@ -603,13 +602,18 @@ export function init() {
         if (digits) digits.style.color = style.color;
         if (suffix) suffix.style.color = style.color;
 
-        // Apply skew and scale distortion based on the distance d from the active center
+        // --- MODIFICATO: rotazione prospettica sull'asse X + spaziatura maggiore tra le righe ---
+        // Prima: skewX(...) scale(...)  -->  Ora: perspective + rotateX + translateY extra
         const wrapper = item.querySelector('.number-wrapper');
         if (wrapper) {
-          const skewAngle = d * -12; // Slant to the right (negative skewX)
-          const scaleVal = 1 - 0.05 * Math.abs(d); // Scale slightly down
-          wrapper.style.transform = `skewX(${skewAngle}deg) scale(${scaleVal})`;
+          const rotateAngle = d * -40;              // inclinazione prospettica sull'asse X (regola per più/meno effetto)
+          const scaleVal = 1 - 0.08 * Math.abs(d);   // leggero rimpicciolimento man mano che si allontanano dal centro
+          const spacingOffset = d * 50;              // px extra di distanza verticale tra le righe (regola per più/meno spazio)
+
+          wrapper.style.transform =
+            `perspective(600px) translateY(${spacingOffset}px) rotateX(${rotateAngle}deg) scale(${scaleVal})`;
           wrapper.style.transformOrigin = 'center center';
+          wrapper.style.backfaceVisibility = 'hidden';
         }
       });
     }
