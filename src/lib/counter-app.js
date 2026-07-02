@@ -46,7 +46,16 @@ export function init() {
   if ('scrollRestoration' in history) {
     history.scrollRestoration = 'manual';
   }
-  window.scrollTo(0, 0);
+  
+  let backToCards = false;
+  if (typeof window !== 'undefined') {
+    const urlParams = new URLSearchParams(window.location.search);
+    backToCards = urlParams.has('back') || urlParams.has('from') || window.location.hash === '#Categorie';
+  }
+
+  if (!backToCards) {
+    window.scrollTo(0, 0);
+  }
 
   const presentationMultiplier = 18;
 
@@ -1392,6 +1401,37 @@ export function init() {
   }
   drawFrame();
   
+  if (backToCards) {
+    activeStep = 4;
+    currentProgress = 1.0;
+    currentProgressTop = 1.0;
+    currentProgressBottom = 1.0;
+    targetProgress = 1.0;
+    isAutonomousActive = true;
+    autonomousFillProgress = 1.0;
+    isCardAnimationFinished = true;
+    currentSlideProgress = 1.0;
+    
+    // Instantly scroll way past the presentation layers to avoid flash of the top page
+    const estOffset = 22 * window.innerHeight;
+    window.scrollTo(0, estOffset);
+    
+    // Fine-tune the scroll position to target once the layout height calculations are finished
+    setTimeout(() => {
+      const el = document.getElementById('Categorie') || document.getElementById('Selezione-Categorie');
+      if (el) {
+        let offsetTop = 0;
+        let currentEl = el;
+        while (currentEl) {
+          offsetTop += currentEl.offsetTop;
+          currentEl = currentEl.offsetParent;
+        }
+        window.scrollTo(0, offsetTop);
+        drawFrame();
+      }
+    }, 250);
+  }
+
   // Kick off the continuous animation loop if loaded directly at Step 4
   if (targetProgress >= 0.91) {
     isAnimating = true;

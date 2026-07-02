@@ -373,7 +373,7 @@
                 },
                 onEnter: () => gsap.set(section, { autoAlpha: 1 }),
                 onLeave: () => {
-                    goto('/');
+                    goto('/?from=trend', { noScroll: true });
                     console.log('onLeave triggered');
                 },
                 onEnterBack: () => gsap.set(section, { autoAlpha: 1 }),
@@ -385,7 +385,7 @@
 
                     // If we reached the end, redirect immediately
                     if (p >= 0.999) {
-                        goto('/');
+                        goto('/?from=trend', { noScroll: true });
                         return;
                     }
 
