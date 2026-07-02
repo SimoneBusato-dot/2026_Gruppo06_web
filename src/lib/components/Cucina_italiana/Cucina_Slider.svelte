@@ -144,7 +144,7 @@
 }
 
 :global(.swiper-pagination-bullet-active) {
-    background: var(--brand-cibo-500);
+    background-color: var(--brand-cibo-500);
     width: 16px;
     border-radius: 4px;
 }

@@ -88,7 +88,7 @@
 
     :global(.swiper-pagination-bullet) { transition: all 0.3s ease; }
     :global(.swiper-pagination-bullet-active) {
-        background: var(--brand-sport-insoliti-500);
+        background-color: var(--brand-sport-insoliti-500);
         width: 16px;
         border-radius: 4px;
     }

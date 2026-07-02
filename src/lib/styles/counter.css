@@ -178,7 +178,7 @@ html {
 
 /* Scroll height to link the counter value directly to scroll */
 body {
-  min-height: 2400vh;
+  min-height: 2500vh;
   position: relative;
   font-family: var(--font-family-text), sans-serif;
   overflow-x: hidden;
@@ -1104,6 +1104,7 @@ body {
   padding: 15vh 0 0 0; /* Rimossa la spaziatura orizzontale e verticale interna */
   box-sizing: border-box;
   z-index: 2000; /* Sopra tutti i layer fissi */
+  margin-block-end: 50dvh;
 }
 
 .scrollable-content-section .content-wrapper {

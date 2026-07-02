@@ -1,13 +1,10 @@
 <script>
 	import { onMount, onDestroy } from 'svelte';
 	import { init, cleanup } from '$lib/counter-app.js';
-	import Categorie from "$lib/components/Card_Selection/Categorie.svelte";
-	import Warning from "$lib/components/Card_Selection/warning.svelte";
-	import Considerations from "$lib/components/Card_Selection/considerations.svelte";
-	import Footer from "$lib/components/Card_Selection/footer.svelte";
 	import gsap from "gsap";
     import { ScrollTrigger } from "gsap/ScrollTrigger";
 	import SplitType from 'split-type';
+	import { goto } from '$app/navigation';
 	import '$lib/styles/counter.css';
 
 	let resizeObserver;
@@ -128,6 +125,16 @@
 				}
 			);
 		}
+
+
+		ScrollTrigger.create({
+			trigger: document.body, // non #intro
+			start: "top top",
+			end: "max",             // fine reale dello scroll del documento
+			onLeave: () => {
+				goto('/Categorie');
+			}
+		});
 	});
 
 	onDestroy(() => {
@@ -158,6 +165,7 @@
 	<meta name="description" content="Contatore interattivo legato direttamente allo scroll, con design grafico split-color da 0 a 22 miliardi." />
 </svelte:head>
 
+<main id="intro">
 <!-- Mask Defs for Brush effect -->
 <svg width="0" height="0" style="position: absolute; pointer-events: none;">
 	<defs>
@@ -349,12 +357,6 @@
 		</div>
 	</div>
 	
-	<div id="Categorie">
-		<Categorie />
-	</div>
-
- <Warning />
- <Considerations/>
- <Footer />
 	
 </div>
+</main>

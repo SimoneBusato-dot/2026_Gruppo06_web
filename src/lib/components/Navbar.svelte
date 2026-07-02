@@ -45,7 +45,7 @@
 <!-- Main floating Navbar header -->
 <header class="navbar-header" class:menu-open={isOpen}>
     <!-- Brand Logo Capsule -->
-    <a href="/" class="logo-capsule" onclick={closeMenu}>
+    <a href="/Categorie" class="logo-capsule" onclick={closeMenu}>
         22MLD
     </a>
 
