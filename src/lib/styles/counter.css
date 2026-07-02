@@ -297,7 +297,7 @@ body {
   grid-template-columns: repeat(12, 1fr);
   align-items: center;
   padding: 0 4vw;
-  z-index: 100;
+  z-index: 2100;
   pointer-events: none; /* Make container click-through to allow background reactions */
   will-change: transform, opacity;
   transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease;
@@ -540,7 +540,7 @@ body {
   bottom: 4vh;
   left: 50%;
   transform: translate3d(-50%, 0, 0);
-  z-index: 150;
+  z-index: 2200;
   pointer-events: none;
   display: flex;
   flex-direction: row; /* Elementi affiancati */

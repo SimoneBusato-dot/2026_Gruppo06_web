@@ -88,6 +88,23 @@
 			);
 		}
 
+		// Animazione disegno linea ondulata blu
+		const blueWavyPath = document.querySelector('.line-blue-slide path');
+		if (blueWavyPath) {
+			const length = blueWavyPath.getTotalLength();
+			gsap.set(blueWavyPath, { strokeDasharray: length, strokeDashoffset: length });
+			gsap.to(blueWavyPath, {
+				strokeDashoffset: 0,
+				ease: "none",
+				scrollTrigger: {
+					trigger: ".slide-blue",
+					start: "top 95%",
+					end: "top 15%",
+					scrub: 0.1
+				}
+			});
+		}
+
 		// Slide 2 (Red)
 		const redText = document.querySelector('#text-red-slide .slide-subtitle');
 		const redCard = document.querySelector('.slide-red .video-card-wrapper');
@@ -136,6 +153,23 @@
 				goto('/Categorie');
 			}
 		});
+		// Animazione disegno linea ondulata rossa
+		const redWavyPath = document.querySelector('.line-red-slide path');
+		if (redWavyPath) {
+			const length = redWavyPath.getTotalLength();
+			gsap.set(redWavyPath, { strokeDasharray: length, strokeDashoffset: -length });
+			gsap.to(redWavyPath, {
+				strokeDashoffset: 0,
+				ease: "none",
+				scrollTrigger: {
+					trigger: ".slide-red",
+					start: "top 95%",
+					end: "top 15%",
+					scrub: 0.1
+				}
+			});
+		}
+
 		// --- INTERSECTION OBSERVER PER CAROSELLO VIDEO ---
 		const videoElements = document.querySelectorAll('.carousel-video');
 		const observerOptions = {
@@ -304,7 +338,7 @@
 
 <!-- Decorative Line 1 (prima_linea.svg shifted to X=0 and reversed) -->
 <svg id="prima-linea" class="decor-line" viewBox="0 0 620 225" fill="none" xmlns="http://www.w3.org/2000/svg">
-	<path d="M0 19.3828C0 19.3828 115.943 118.632 202.5 111.383C271.783 105.58 290.633 23.6943 360 28.3828C452.445 34.6312 521.5 141.883 606.5 203.883" stroke="#533EDC" stroke-width="51"/>
+	<path d="M0 19.3828C0 19.3828 115.943 118.632 202.5 111.383C271.783 105.58 290.633 23.6943 360 28.3828C452.445 34.6312 521.5 141.883 606.5 203.883" stroke="#533EDC" stroke-width="51" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
 
 
@@ -314,7 +348,9 @@
 		
 		<!-- Slide 1: Blue -->
 		<div class="video-slide slide-blue">
-			<img class="slide-wavy-line line-blue-slide" src="/assets/svg/seconda_linea.svg" alt="" />
+			<svg class="slide-wavy-line line-blue-slide" viewBox="0 0 965 624" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path d="M33.3964 12.7461C33.3964 12.7461 -14.1036 94.7461 123.896 175.746C261.896 256.746 760.397 221.746 736.397 400.246C712.397 578.746 796.897 604.246 963.397 596.246" stroke="#533EDC" stroke-width="51" stroke-linecap="round" stroke-linejoin="round"/>
+			</svg>
 			
 			<div class="slide-content-left">
 				<div class="video-card-wrapper">
@@ -335,7 +371,9 @@
 
 		<!-- Slide 2: Red -->
 		<div class="video-slide slide-red">
-			<img class="slide-wavy-line line-red-slide" src="/assets/svg/quarta_linea.svg" alt="" />
+			<svg class="slide-wavy-line line-red-slide" viewBox="0 0 774 1096" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path d="M107.399 1070.33C508.033 1065.51 778.02 932.824 744.998 809.825C711.975 686.826 399.837 707.41 330.314 606.609C260.791 505.808 504.222 328.962 423.047 178.295C339.754 23.6947 0.124064 25.5009 0.124064 25.5009" stroke="#DC3E41" stroke-width="51" stroke-linecap="round" stroke-linejoin="round"/>
+			</svg>
 			
 			<div class="slide-content-left">
 				<div class="slide-text-container" id="text-red-slide">
