@@ -33,7 +33,6 @@
 	}
 
 	onMount(() => {
-		document.documentElement.style.backgroundColor = '#ffffff';
 		init();
 		
 		// Esegui il calcolo iniziale e aggiungi il listener di resize

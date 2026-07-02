@@ -47,7 +47,7 @@
         </div>
     </div>
     <div id="designedBy">
-        <p>Design by: Luca Assinnato, Simone Busato, Nicola Castriotta, Edoardo Cicerone, Filippo Esposito, Mattia Lampugnani</p>
+        <p>Designed by: Luca Assinnato, Simone Busato, Nicola Castriotta, Edoardo Cicerone, Filippo Esposito, Mattia Lampugnani</p>
     </div>
     </div>
 </footer>

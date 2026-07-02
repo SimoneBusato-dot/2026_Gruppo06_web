@@ -16,6 +16,20 @@
     const MAX_ROT        = 28;
     const DRAG_THRESHOLD = 8;
 
+    /* ─── persistenza ultima card attiva ─── */
+    const STORAGE_KEY = 'categorie.lastActiveIndex';
+
+    function getSavedIndex() {
+        if (typeof sessionStorage === 'undefined') return null;
+        const raw = Number(sessionStorage.getItem(STORAGE_KEY));
+        return Number.isInteger(raw) && raw >= 0 && raw < TOTAL ? raw : null;
+    }
+
+    function saveIndex(i) {
+        if (typeof sessionStorage === 'undefined') return;
+        sessionStorage.setItem(STORAGE_KEY, String(i));
+    }
+
     /* ─── durata totale animazione di ingresso ─── */
     const ENTER_ANIM_DURATION = 2.5; // delay 1.5 + duration 1 (cardEnter, la più lunga)
     /* quanta "distanza di scroll" (px) vogliamo che il pin consumi mentre gira l'animazione */
@@ -51,6 +65,15 @@
     let svgClip;
     let title;
     let subtitle;
+
+    let hasRestored = false; // guardia: NON è $state, serve solo come flag interno
+
+    $effect(() => {
+        const idx = activeIndex; // ⚠️ lettura SEMPRE eseguita → dipendenza sempre tracciata
+        if (!hasRestored) return;
+        saveIndex(idx);
+    });
+
 
     /* ─────────────────────────────────────────────────
        Utility
@@ -219,11 +242,16 @@
         const box = svgClip.getBoundingClientRect();
         const width = box.width;
         computeCardW();
-        const startOffset = -Math.floor(TOTAL / 2) * STEP;
+
+        const CENTER_OFFSET = Math.floor(TOTAL / 2);
+        const initialIndex  = getSavedIndex() ?? 0;
+        const startOffset   = (initialIndex - CENTER_OFFSET) * STEP;
         scrollCurrent = startOffset;
         scrollTarget  = startOffset;
         positionCards();
+        hasRestored = true; // da qui in poi ok salvare
         rafId = requestAnimationFrame(tick);
+            
 
         const onResize = () => { computeCardW(); positionCards(); };
         window.addEventListener('resize', onResize);

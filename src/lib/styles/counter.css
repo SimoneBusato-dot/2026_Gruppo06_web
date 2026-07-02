@@ -1099,7 +1099,7 @@ body {
   top: 2138vh; /* Inizia esattamente al termine della presentazione fissa */
   width: 100vw;
   min-height: 150vh;
-  background-color: #ffffff;
+  background-color: var(--neutral-50);
   color: var(--neutral-900);
   padding: 15vh 0 0 0; /* Rimossa la spaziatura orizzontale e verticale interna */
   box-sizing: border-box;
@@ -1303,7 +1303,7 @@ body {
   margin-top: 10vh;
   padding: 5vh 0 10vh 0; /* Spaziatura elegante prima del carosello */
   box-sizing: border-box;
-  background-color: #ffffff; /* Rende l'intero blocco finale bianco come le slide */
+  background-color: var(--neutral-50); /* Rende l'intero blocco finale bianco come le slide */
 }
 
 .fine-card-wrapper {
