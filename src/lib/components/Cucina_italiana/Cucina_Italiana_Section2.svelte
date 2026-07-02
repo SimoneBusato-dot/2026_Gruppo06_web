@@ -486,7 +486,7 @@
                 },
                 onEnter: () => gsap.set(section, { autoAlpha: 1 }),
                 onLeave: () => {
-                    goto('/?from=trend', { noScroll: true });
+                    goto('/Categorie');
                     console.log('onLeave triggered');
                 },
                 onEnterBack: () => gsap.set(section, { autoAlpha: 1 }),

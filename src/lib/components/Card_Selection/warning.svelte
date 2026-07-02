@@ -8,7 +8,6 @@
 
     let warning;
     let fillBar;
-    let idleTimeout;
     let st; // riferimento allo scrollTrigger per pulizia
     let triangle;
     let EM;
@@ -16,84 +15,187 @@
     let Wsubtitle;
     let svgBar;
 
+    // --- LOGICA DI GATING (presa dal componente ScrollBackProgress) ---
+    const TRIGGER_DELAY = 350; // ms di attesa prima che parta l'accumulo
+    const FILL_RATE_WHEEL = 0.4;
+    const FILL_RATE_TOUCH = 0.3;
+    const DECAY_STEP = 6;
+    const DECAY_INTERVAL = 16;
+    const DECAY_TIMEOUT = 400;
+
+    let fillProgress = 0; // 0 -> 100, stato "sorgente di verità" della barra
+    let isPinned = false;  // true quando siamo dentro la sezione pinnata
+    let unlocked = false;  // true quando la barra ha raggiunto il 100%
+
+    let holdTimer = null;
+    let holding = false;
+    let delayPassed = false;
+    let decayTimeout = null;
+    let decayInterval = null;
+
+    function startHold() {
+        if (holding) return;
+        holding = true;
+        holdTimer = setTimeout(() => {
+            delayPassed = true;
+        }, TRIGGER_DELAY);
+    }
+
+    function cancelHold() {
+        holding = false;
+        delayPassed = false;
+        clearTimeout(holdTimer);
+    }
+
+    function scheduleDecay() {
+        clearTimeout(decayTimeout);
+        decayTimeout = setTimeout(() => {
+            startDecay();
+            cancelHold();
+        }, DECAY_TIMEOUT);
+    }
+
+    function startDecay() {
+        clearInterval(decayInterval);
+        decayInterval = setInterval(() => {
+            fillProgress = Math.max(0, fillProgress - DECAY_STEP);
+            setFillVisual(fillProgress);
+            if (fillProgress <= 0) {
+                clearInterval(decayInterval);
+            }
+        }, DECAY_INTERVAL);
+    }
+
+    function setFillVisual(value) {
+        if (!fillBar) return;
+        gsap.killTweensOf(fillBar);
+        gsap.set(fillBar, { scaleX: value / 100 });
+    }
+
+    function accumulate(amount) {
+        if (!delayPassed || unlocked) return;
+
+        clearInterval(decayInterval); // stiamo riempiendo, niente decadimento
+        fillProgress = Math.min(100, fillProgress + amount);
+        setFillVisual(fillProgress);
+
+        if (fillProgress >= 100 && !unlocked) {
+            completeGate();
+        }
+    }
+
+    function completeGate() {
+        unlocked = true;
+        cancelHold();
+        clearTimeout(decayTimeout);
+        clearInterval(decayInterval);
+
+        // piccolo delay per far vedere la barra piena, poi si sblocca lo scroll
+        setTimeout(() => {
+            window.scrollBy({ top: window.innerHeight, behavior: "smooth" });
+        }, 200);
+    }
+
+    function handleWheel(e) {
+        if (!isPinned || unlocked) return;
+
+        // Blocchiamo solo lo scroll "in avanti" (verso il basso)
+        if (e.deltaY > 0) {
+            e.preventDefault();
+            startHold();
+            accumulate(Math.abs(e.deltaY) * FILL_RATE_WHEEL);
+            scheduleDecay();
+        }
+    }
+
+    let touchStartY = 0;
+    function handleTouchStart(e) {
+        touchStartY = e.touches[0].clientY;
+    }
+    function handleTouchMove(e) {
+        if (!isPinned || unlocked) return;
+
+        const deltaY = touchStartY - e.touches[0].clientY; // positivo = dito verso l'alto = scroll avanti
+
+        if (deltaY > 0) {
+            e.preventDefault();
+            startHold();
+            accumulate(deltaY * FILL_RATE_TOUCH);
+            scheduleDecay();
+            touchStartY = e.touches[0].clientY; // aggiorna per delta incrementali
+        }
+    }
+    // --- FINE LOGICA DI GATING ---
 
     onMount(() => {
         const moveElements = (e) => {
             const xPercent = (e.clientX / window.innerWidth - 0.5) * 2;
             const yPercent = (e.clientY / window.innerHeight - 0.5) * 2;
             gsap.to(triangle, { duration: 1.2, rotateY: xPercent * 30, rotateX: -yPercent * 15, scale: 1, ease: "power2.out", overwrite: "auto" });
-            
         };
 
         const splitTitle = new SplitText(Wtitle, { type: "lines", mask: "lines" });
         const splitSubtitle = new SplitText(Wsubtitle, { type: "lines", mask: "lines" });
         gsap.set(fillBar, { scaleX: 0, transformOrigin: "left center" });
-       const triangleEnter=gsap.fromTo(triangle, { y: "110%"}, { y: "0%", duration: 1, ease:"elastic.out(0.5,0.4)", paused: true, delay: 0.3});
-       const EmEnter=gsap.fromTo(EM, { y: "110%"}, { y: "0%", duration: 1, ease:"elastic.out(0.5,0.4)", paused: true, delay: 0.5});
-       const enterTitle =gsap.fromTo(splitTitle.lines, { y: "110%"}, { y: "0%", duration: 0.6, ease:"power2.out", paused: true, delay: 0.5});
-       const enterSubtitle =gsap.fromTo(splitSubtitle.lines, { y: "110%"}, { y: "0%", duration: 0.5, ease:"power2.out", paused: true, delay: 0.7});
-       const enterSvg =gsap.fromTo(svgBar, { y: "100%"}, { y: "0%", duration: 0.5, ease:"power2.out", paused: true, delay: 0.7});
 
-        const tl = gsap.timeline({
-            scrollTrigger: {
-                trigger: warning,
-                scroller: window,
-                start: "top top",
-                end: "+=100%",
-                scrub: 1,
-                pin: true,
-                pinSpacing: true,
-                onEnter: () => {triangleEnter.play(); EmEnter.play(); enterTitle.play(); enterSubtitle.play(); enterSvg.play();},
-                onLeave: () => {triangleEnter.reverse(); EmEnter.reverse(); enterTitle.reverse(); enterSubtitle.reverse(); enterSvg.reverse();},
-                onEnterBack: () => {triangleEnter.play(); EmEnter.play(); enterTitle.play(); enterSubtitle.play(); enterSvg.play();},
-                onLeaveBack: () => {triangleEnter.reverse(); EmEnter.reverse(); enterTitle.reverse(); enterSubtitle.reverse(); enterSvg.reverse();},
+        const triangleEnter = gsap.fromTo(triangle, { y: "110%" }, { y: "0%", duration: 1, ease: "elastic.out(0.5,0.4)", paused: true, });
+        const EmEnter = gsap.fromTo(EM, { y: "110%" }, { y: "0%", duration: 1, ease: "elastic.out(0.5,0.4)", paused: true, delay: 0.2});
+        const enterTitle = gsap.fromTo(splitTitle.lines, { y: "110%" }, { y: "0%", duration: 0.6, ease: "power2.out", paused: true, delay: 0.2});
+        const enterSubtitle = gsap.fromTo(splitSubtitle.lines, { y: "110%" }, { y: "0%", duration: 0.5, ease: "power2.out", paused: true, delay: 0.3});
+        const enterSvg = gsap.fromTo(svgBar, { y: "100%" }, { y: "0%", duration: 0.5, ease: "power2.out", paused: true, delay: 0.3});
 
-                onUpdate: (self) => {
-    const p = self.progress;
-    const totalD = 30.0;
-    const startP = 20.0 / totalD;
+        // Pin "puro": niente scrub, la sezione resta ferma finché non la sblocchiamo noi
+        st = ScrollTrigger.create({
+            trigger: warning,
+            scroller: window,
+            start: "top top",
+            end: "+=100%",
+            pin: true,
+            pinSpacing: true,
+            onEnter: () => {
+                isPinned = true;
+                triangleEnter.play(); EmEnter.play(); enterTitle.play(); enterSubtitle.play(); enterSvg.play();
+            },
+            onLeave: () => {
+                isPinned = false;
+                triangleEnter.reverse(); EmEnter.reverse(); enterTitle.reverse(); enterSubtitle.reverse(); enterSvg.reverse();
+            },
+            onEnterBack: () => {
+                isPinned = true;
+                triangleEnter.play(); EmEnter.play(); enterTitle.play(); enterSubtitle.play(); enterSvg.play();
+            },
+            onLeaveBack: () => {
+                isPinned = false;
+                triangleEnter.reverse(); EmEnter.reverse(); enterTitle.reverse(); enterSubtitle.reverse(); enterSvg.reverse();
 
-    const f = p >= startP
-        ? Math.max(0, Math.min(1, (p - startP) / (1 - startP)))
-        : 0;
-
-    if (fillBar) {
-        gsap.killTweensOf(fillBar); // <-- uccide il tween di "ritorno a 0" se ancora attivo
-        gsap.set(fillBar, { scaleX: f });
-    }
-
-    clearTimeout(idleTimeout);
-
-    if (f > 0 && f < 1) {
-        idleTimeout = setTimeout(() => {
-            gsap.to(fillBar, {
-                scaleX: 0,
-                duration: 0.6,
-                ease: "power2.out"
-            });
-        }, 300);
-    }
-}
-            }
+                // Se l'utente torna indietro sopra la sezione, ri-armiamo il gate
+                // (rimuovi queste 3 righe se preferisci che resti sbloccato per sempre)
+                unlocked = false;
+                fillProgress = 0;
+                setFillVisual(0);
+            },
         });
 
-        st = tl.scrollTrigger;
-
         window.addEventListener("mousemove", moveElements);
+        window.addEventListener("wheel", handleWheel, { passive: false });
+        window.addEventListener("touchstart", handleTouchStart, { passive: true });
+        window.addEventListener("touchmove", handleTouchMove, { passive: false });
+
         return () => {
             window.removeEventListener("mousemove", moveElements);
+            window.removeEventListener("wheel", handleWheel);
+            window.removeEventListener("touchstart", handleTouchStart);
+            window.removeEventListener("touchmove", handleTouchMove);
             ScrollTrigger.getAll().forEach(t => t.kill());
         };
-
-    })
-
-    
-
-    onDestroy(() => {
-        clearTimeout(idleTimeout);
-        if (st) st.kill();
     });
 
+    onDestroy(() => {
+        clearTimeout(holdTimer);
+        clearTimeout(decayTimeout);
+        clearInterval(decayInterval);
+        if (st) st.kill();
+    });
 </script>
 
 
@@ -187,5 +289,6 @@
         fill: var(--brand-villaggio-500);
         position: absolute;
         top: 0;
+        transition: fill 0.2s ease;
     }
 </style>

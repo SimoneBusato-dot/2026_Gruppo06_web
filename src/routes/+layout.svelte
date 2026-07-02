@@ -29,8 +29,8 @@
 
         // 👇 Rileva la coppia di route specifica per l'SVG
         const isCounterToCategorie =
-            navigation.from?.route.id === '/' && 
-            navigation.to?.route.id === '/Categorie';
+            (navigation.from?.route.id === '/' && navigation.to?.route.id === '/Categorie') ||
+            (navigation.from?.route.id === '/Categorie' && navigation.to?.route.id === '/');
 
         // GESTIONE CAMBIO PAGINA VERSO CATEGORIE (Usa l'animazione SVG)
         if (isCounterToCategorie) {
@@ -48,9 +48,9 @@
                     setTimeout(() => {
                         isTransitioningSvg = false;
                         isAnimatingClass = false;
-                    }, 1000); // Il restante 50% del tempo per far uscire la linea
+                    }, 1500); // Il restante 50% del tempo per far uscire la linea
                     
-                }, 1000); 
+                }, 1500); 
             });
         }
 
@@ -246,7 +246,7 @@
 
 /* Attiva il disegno dell'onda */
 .transition-curtain.is-animating path {
-    animation: 2s draw-and-grow cubic-bezier(0.76, 0, 0.24, 1) forwards;
+    animation: 3s draw-and-grow cubic-bezier(0.76, 0, 0.24, 1) forwards;
 }
 
 @keyframes draw-and-grow {

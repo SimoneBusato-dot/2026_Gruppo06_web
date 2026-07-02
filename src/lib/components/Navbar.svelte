@@ -182,6 +182,25 @@
         transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1);
     }
 
+    .logo-capsule::after{
+        content: 'Clicca per andare alle Categorie!';
+        position: absolute;
+        bottom: -37px;
+        right: -40px;
+        font-family: var(--font-family-text);
+        font-size: 0.5rem;
+        padding: 0.5rem 1rem;
+        color: var(--neutral-50);
+        background-color: var(--neutral-800);
+        opacity: 0;
+        border-radius: 10px;
+        transition: opacity 0.2s ease;
+    }
+
+    .logo-capsule:hover::after{
+        opacity: 1;
+    }
+
     /* Slides the logo capsule background out of the viewport to the left when open */
     .navbar-header.menu-open .logo-capsule::before {
         transform: skewX(-10deg) translateX(-110%);
