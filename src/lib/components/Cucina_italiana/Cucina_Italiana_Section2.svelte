@@ -8,6 +8,50 @@
     import SplitType from "split-type";
     import Comments from "../Comments.svelte";
     import { goto } from '$app/navigation';
+    // =========================================================================
+    // CONFIGURAZIONE SNAP E SCROLL - SEZIONE CUCINA ITALIANA (PER VSCODE)
+    // Modifica questi valori per cambiare i punti di calamita (snapping) e i
+    // range di scroll libero in questa sezione.
+    // =========================================================================
+    const totalD = 24.0; // Durata temporale logica della timeline GSAP
+    const SECTION_SNAP_CONFIG = {
+        // Punti di Snap per i Testi Iniziali (Slide 1)
+        slide1Text1: 1.4 / totalD,   // Snap al primo testo ("Non c'è creator...")
+        slide1Text2: 2.2 / totalD,   // Snap al secondo testo ("I feed sono stati...")
+        slide1Text3: 3.05 / totalD,  // Snap al terzo testo ("Ogni pasto l'ha trasformato...")
+        
+        // Transizioni di scorrimento
+        galleryTransition: 3.5 / totalD, // Inizio comparsa galleria verticale
+        galleryScrollStart: 4.5 / totalD, // Inizio scroll libero galleria verticale
+        intermediateTransition: 6.0 / totalD, // Transizione ai testi intermedi (Slide 3)
+
+        // Punti di Snap per i Testi Intermedi (Slide 3)
+        slide3Text1: 7.2 / totalD,   // Snap al quarto testo ("Il cibo si è...")
+        slide3Text2: 8.0 / totalD,   // Snap al quinto testo ("Le Olimpiadi non...")
+        slide3Text3: 8.9 / totalD,   // Snap al sesto testo ("Ma la vera mascotte...")
+
+        // Nuovi punti di snap per gli step del carosello/grafici
+        pastaOlimpicaSnap: 10.5 / totalD,  // Snap con PASTA OLIMPICA completamente a schermo e animata (Hold)
+        swiperDeckSnap: 12.5 / totalD,     // Snap al carosello di card (Hold statico per consentire interazione)
+        chartPeak1Snap: 15.3 / totalD,     // Snap al picco 1 del grafico con testo completato
+        chartPeak2Snap: 16.2 / totalD,     // Snap al picco 2 del grafico con testo completato
+        quoteSnap: 19.4 / totalD,          // Snap alla citazione (linea finita in alto a destra, prima dei commenti)
+
+        // Altre transizioni di sezione
+        deckTransition: 11.0 / totalD,     // Inizio transizione Swiper deck
+        chartTransition: 14.6 / totalD,    // Inizio transizione grafico D3
+        quoteTransition: 17.4 / totalD,    // Inizio transizione citazione grande
+        commentsTransition: 19.9 / totalD, // Inizio transizione commenti
+        redirectTransition: 21.9 / totalD, // Inizio contatore di caricamento finale
+
+        // Range di Scroll Libero (senza calamita)
+        freeScroll: {
+            gallery: { start: 4.5 / totalD, end: 6.0 / totalD },
+            swiper: { start: 12.0 / totalD, end: 13.5 / totalD },
+            chart: { start: 14.7 / totalD, end: 17.2 / totalD },
+            comments: { start: 19.9 / totalD, end: 21.9 / totalD }
+        }
+    };
 
     gsap.registerPlugin(ScrollTrigger);
 
@@ -28,11 +72,20 @@
     let chartPath;
 
     // Slide 1 elements
-    let p1;
-    let p2Container;
+    let introText1;
+    let introText2;
+    let introText3;
 
     // Slide 3 elements
-    let intermediateParagraphs;
+    let interText1;
+    let interText2;
+    let interText3;
+
+    // SplitType lines arrays
+    let intro1Lines, intro2Lines, intro3Lines;
+    let inter1Lines, inter2Lines, inter3Lines;
+    let pastaDescLines;
+    let chartText1Lines, chartText2Lines;
 
     // Slide 4 elements
     let pastaTitle;
@@ -213,7 +266,7 @@
         gsap.set(progressCircle, { strokeDasharray: 188.5, strokeDashoffset: 188.5 });
 
         // Initialize states
-        gsap.set('.intro-grid .left-col, .intro-grid .right-col', { opacity: 0, y: 100 });
+        gsap.set([introText1, introText2, introText3], { opacity: 1, y: 0 });
         gsap.set(galleryContainer, { xPercent: 100 });
         gsap.set(intermediateContainer, { xPercent: 100 });
         gsap.set(fusedContainer, { xPercent: 0 });
@@ -221,17 +274,47 @@
         gsap.set(chartContainer, { xPercent: 100, opacity: 0 });
         gsap.set(quoteContainer, { xPercent: 0, opacity: 0 });
         gsap.set(commentsContainer, { xPercent: 0 });
-        gsap.set(commentsLine, { yPercent: 100 });
+        gsap.set(commentsLine, { yPercent: 0, opacity: 0, x: 0 });
         gsap.set(commentsVideoScroll, { x: "180%" });
         gsap.set(redirectContainer, { xPercent: 0 });
         gsap.set('.circular-progress-container', { opacity: 0, scale: 0.8 });
         gsap.set('.gallery-col', { y: 0 });
-        gsap.set('#intermediateWrapper .para, .gusto-dharma', { opacity: 0, x: 100 });
+        gsap.set([interText1, interText2, interText3], { opacity: 1, y: 0 });
+
+        // Split texts into lines
+        const intro1Split = new SplitType(introText1.querySelector('.para'), { types: 'lines', tagName: 'span' });
+        intro1Lines = intro1Split.lines;
+
+        const intro2Split = new SplitType(introText2.querySelector('.para'), { types: 'lines', tagName: 'span' });
+        intro2Lines = intro2Split.lines;
+
+        const intro3Split = new SplitType(introText3, { types: 'lines', tagName: 'span' });
+        intro3Lines = intro3Split.lines;
+
+        const inter1Split = new SplitType(interText1.querySelector('.para'), { types: 'lines', tagName: 'span' });
+        inter1Lines = inter1Split.lines;
+
+        const inter2Split = new SplitType(interText2, { types: 'lines', tagName: 'span' });
+        inter2Lines = inter2Split.lines;
+
+        const inter3Split = new SplitType(interText3, { types: 'lines', tagName: 'span' });
+        inter3Lines = inter3Split.lines;
+
+        const pastaDescSplit = new SplitType(document.getElementById('pastaDesc'), { types: 'lines', tagName: 'span' });
+        pastaDescLines = pastaDescSplit.lines;
+
+        const chartText1Split = new SplitType(document.getElementById('chartParagraph'), { types: 'lines', tagName: 'span' });
+        chartText1Lines = chartText1Split.lines;
+
+        const chartText2Split = new SplitType(document.getElementById('chartParagraph2'), { types: 'lines', tagName: 'span' });
+        chartText2Lines = chartText2Split.lines;
+
+        gsap.set([intro1Lines, intro2Lines, intro3Lines, inter1Lines, inter2Lines, inter3Lines, pastaDescLines, chartText1Lines, chartText2Lines], { opacity: 0, x: 300 });
 
         // Split quote text into lines
         const quoteSplit = new SplitType(quoteTextElement, { types: 'lines', tagName: 'span' });
         const quoteTextLines = quoteSplit.lines;
-        gsap.set(quoteTextLines, { opacity: 0, x: 200 });
+        gsap.set(quoteTextLines, { opacity: 0, x: 300 });
 
         // Split redirect text into words
         const redirectSplit = new SplitType(redirectTextElement, { types: 'words', tagName: 'span' });
@@ -243,33 +326,66 @@
             const xPercent = (e.clientX / window.innerWidth - 0.5) * 2;
             const yPercent = (e.clientY / window.innerHeight - 0.5) * 2;
 
-            if (commentsCards) {
-                gsap.to(commentsCards, {
+            // 1. Rotate the mosaic video cards (Slide 2)
+            gsap.to('.video-card', {
+                duration: 1.2,
+                rotateY: xPercent * 15,
+                rotateX: -yPercent * 15,
+                ease: "power2.out",
+                overwrite: "auto",
+                stagger: 0.01
+            });
+
+            // 2. Rotate the Swiper container card deck (Slide 5)
+            if (cardContainer) {
+                gsap.to(cardContainer, {
                     duration: 1.2,
-                    rotateY: xPercent * 25,
-                    rotateX: -yPercent * 25,
+                    rotateY: xPercent * 15,
+                    rotateX: -yPercent * 7,
                     ease: "power2.out",
-                    overwrite: "auto",
-                    stagger: 0.04,
+                    overwrite: "auto"
                 });
             }
 
-            gsap.to('#commentsContainer .comments', {
+            // 3. Rotate the cinematic card (Slide 5 expansion)
+            if (cinematicCard) {
+                gsap.to(cinematicCard, {
+                    duration: 1.2,
+                    rotateY: xPercent * 15,
+                    rotateX: -yPercent * 7,
+                    ease: "power2.out",
+                    overwrite: "auto"
+                });
+            }
+
+            // 4. Rotate comments section video wrapper (Slide 8)
+            gsap.to('#commentsVideoContainer .video-wrapper', {
                 duration: 1.2,
-                rotateY: -xPercent * 35,
-                rotateX: yPercent * 35,
+                rotateY: xPercent * 15,
+                rotateX: -yPercent * 15,
                 ease: "power2.out",
                 overwrite: "auto",
-                stagger: 0.04,
+                stagger: 0.01
             });
 
-            gsap.to('#commentsContainer .card-bg', {
+            // 5. Rotate comments section cards overlay (Slide 8)
+            gsap.to('#commentsVideoContainer .comments', {
                 duration: 1.2,
-                rotateY: xPercent * 18,
-                rotateX: -yPercent * 18,
+                rotateY: -xPercent * 30,
+                rotateX: yPercent * 30,
                 ease: "power2.out",
                 overwrite: "auto",
-                stagger: 0.04,
+                stagger: 0.01
+            });
+
+            // 6. Rotate comments section background cards (Slide 8)
+            gsap.to('#commentsVideoContainer .card-bg', {
+                duration: 1.2,
+                rotateY: xPercent * 15,
+                rotateX: -yPercent * 15,
+                ease: "power2.out",
+                overwrite: "auto",
+                stagger: 0.01
             });
         };
         window.addEventListener("mousemove", moveElements);
@@ -285,7 +401,7 @@
         gsap.set(textLeft, { xPercent: 0, opacity: 1 });
         gsap.set(cardContainer, { scale: 1.0, opacity: 1, y: 0 });
         gsap.set(cinematicCard, { scale: 0.8, opacity: 0, rotate: -15, x: 40, y: 10, borderRadius: 20, zIndex: 1 });
-        gsap.set([chartText1, chartText2], { opacity: 0, y: 50 });
+        gsap.set([chartText1, chartText2], { opacity: 1, y: 0 });
         gsap.set(chartClipRect, { attr: { width: 0 } });
         gsap.set([chartFirstCircle, chartLastCircle], { scale: 0, xPercent: -50, yPercent: -50, transformOrigin: "center center", opacity: 1 });
         gsap.set('.chart-area', { opacity: 1 });
@@ -297,61 +413,58 @@
                 trigger: section,
                 scroller: window,
                 start: "top top",
-                end: "+=2600%", // Extended scroll height for slide 7, 8 and 9
+                end: "+=3200%", // Extended scroll height for slide 7, 8 and 9
                 scrub: 1,
                 pin: true,
                 pinSpacing: true,
-                    snap: {
+                snap: {
                     snapTo: (value) => {
-                        const totalD = 17.5;
                         // Snapping logic for redirect lock
-                        const lockStart = 15.5 / totalD;
-                        if (value >= lockStart && value < 1.0) {
-                            if (value < 17.3 / totalD) {
-                                return lockStart; // Snap back to start of redirect slide
-                            } else {
-                                return 1.0; // Snap to homepage redirect
-                            }
+                        const lockStart = 23.3 / totalD;
+                        const commentsEnd = 21.9 / totalD;
+                        if (value > commentsEnd && value < 0.999) {
+                            return lockStart; // Snap to start of redirect slide (before loading begins)
                         }
 
                         const points = [
                             0,
-                            1.0 / totalD,  // gallery transition
-                            1.9 / totalD,  // gallery scroll start
-                            3.5 / totalD,  // intermediate transition
-                            4.5 / totalD,  // intermediate end
-                            5.5 / totalD,  // pasta transition
-                            6.5 / totalD,  // deck transition
-                            7.5 / totalD,  // cinematic card transition
-                            8.8 / totalD,  // chart section start
-                            10.0 / totalD, // chart complete start hold
-                            11.2 / totalD, // chart complete end hold
-                            11.4 / totalD, // quote transition
-                            12.7 / totalD, // comments start
-                            14.0 / totalD, // comments end
-                            15.5 / totalD, // redirect fill start
+                            SECTION_SNAP_CONFIG.slide1Text1,
+                            SECTION_SNAP_CONFIG.slide1Text2,
+                            SECTION_SNAP_CONFIG.slide1Text3,
+                            SECTION_SNAP_CONFIG.galleryTransition,
+                            SECTION_SNAP_CONFIG.galleryScrollStart,
+                            SECTION_SNAP_CONFIG.intermediateTransition,
+                            SECTION_SNAP_CONFIG.slide3Text1,
+                            SECTION_SNAP_CONFIG.slide3Text2,
+                            SECTION_SNAP_CONFIG.slide3Text3,
+                            SECTION_SNAP_CONFIG.pastaOlimpicaSnap,
+                            SECTION_SNAP_CONFIG.swiperDeckSnap,
+                            SECTION_SNAP_CONFIG.chartPeak1Snap,
+                            SECTION_SNAP_CONFIG.chartPeak2Snap,
+                            SECTION_SNAP_CONFIG.quoteSnap,
+                            SECTION_SNAP_CONFIG.commentsTransition,
+                            SECTION_SNAP_CONFIG.redirectTransition,
                             1
                         ];
 
                         // Free scroll ranges:
                         // 1. Vertical video gallery
-                        const galleryStart = 1.9 / totalD;
-                        const galleryEnd = 3.5 / totalD;
-                        if (value > galleryStart && value < galleryEnd) {
+                        if (value > SECTION_SNAP_CONFIG.freeScroll.gallery.start && value < SECTION_SNAP_CONFIG.freeScroll.gallery.end) {
                             return value;
                         }
 
-                        // 2. D3 chart drawing animation (extending to end of hold)
-                        const chartStart = 8.8 / totalD;
-                        const chartEnd = 11.2 / totalD;
-                        if (value > chartStart && value < chartEnd) {
+                        // 2. Swiper cards deck hold
+                        if (value > SECTION_SNAP_CONFIG.freeScroll.swiper.start && value < SECTION_SNAP_CONFIG.freeScroll.swiper.end) {
                             return value;
                         }
 
-                        // 3. Comments horizontal scrolling
-                        const commentsScrollStart = 12.7 / totalD;
-                        const commentsScrollEnd = 14.0 / totalD;
-                        if (value > commentsScrollStart && value < commentsScrollEnd) {
+                        // 3. D3 chart drawing animation (extending to end of hold)
+                        if (value > SECTION_SNAP_CONFIG.freeScroll.chart.start && value < SECTION_SNAP_CONFIG.freeScroll.chart.end) {
+                            return value;
+                        }
+
+                        // 4. Comments horizontal scrolling
+                        if (value > SECTION_SNAP_CONFIG.freeScroll.comments.start && value < SECTION_SNAP_CONFIG.freeScroll.comments.end) {
                             return value;
                         }
 
@@ -367,9 +480,9 @@
                         }
                         return closest;
                     },
-                    duration: { min: 0.1, max: 0.2 },
-                    delay: 0.1,
-                    ease: "power3.out"
+                    duration: { min: 0.2, max: 0.6 },
+                    delay: 0.05,
+                    ease: "power2.out"
                 },
                 onEnter: () => gsap.set(section, { autoAlpha: 1 }),
                 onLeave: () => {
@@ -380,8 +493,24 @@
                 onLeaveBack: () => gsap.set(section, { autoAlpha: 0 }),
                 onUpdate: (self) => {
                     const p = self.progress;
-                    const totalD = 17.5;
-                    const startP = 15.5 / totalD;
+                    const totalD = 24.0;
+                    const startP = 23.3 / totalD;
+
+                    // Dynamically disable snapping in the comments range to preserve browser momentum
+                    const commentsStart = 19.8 / totalD;
+                    const commentsEnd = 22.0 / totalD;
+                    if (p >= commentsStart && p <= commentsEnd) {
+                        if (self.vars.snap) {
+                            if (!self.originalSnapConfig) {
+                                self.originalSnapConfig = self.vars.snap;
+                            }
+                            self.vars.snap = null;
+                        }
+                    } else {
+                        if (!self.vars.snap && self.originalSnapConfig) {
+                            self.vars.snap = self.originalSnapConfig;
+                        }
+                    }
 
                     // If we reached the end, redirect immediately
                     if (p >= 0.999) {
@@ -405,60 +534,66 @@
             }
         });
         // 1. PHASE 1: Slide 1 - Figma intro texts grid
-        tl.to(path, { strokeDashoffset: 0, ease: "none", duration: 1.0 }, 0)
-          .to(path2, { strokeDashoffset: 0, ease: "none", duration: 1.0 }, 0.1)
-          .to('.intro-grid .left-col, .intro-grid .right-col', { opacity: 1, y: 0, stagger: 0.1, duration: 0.8, ease: "power2.out" }, 0.1)
+        tl.to(path, { strokeDashoffset: 0, ease: "none", duration: 2.0 }, 0)
+          .to(path2, { strokeDashoffset: 0, ease: "none", duration: 2.0 }, 0.1)
+          .fromTo(intro1Lines, { opacity: 0, x: 300 }, { opacity: 1, x: 0, stagger: 0.05, duration: 0.3, ease: "power2.out" }, 1.0)
+          .to(intro1Lines, { opacity: 0, x: -200, stagger: 0.05, duration: 0.2, ease: "power2.in" }, 1.5)
+          .fromTo(intro2Lines, { opacity: 0, x: 300 }, { opacity: 1, x: 0, stagger: 0.05, duration: 0.3, ease: "power2.out" }, 1.8)
+          .to(intro2Lines, { opacity: 0, x: -200, stagger: 0.05, duration: 0.2, ease: "power2.in" }, 2.3)
+          .fromTo(intro3Lines, { opacity: 0, x: 300 }, { opacity: 1, x: 0, stagger: 0.05, duration: 0.35, ease: "power2.out" }, 2.6)
+          .to(intro3Lines, { opacity: 0, x: -200, stagger: 0.05, duration: 0.25, ease: "power2.in" }, 3.25)
           
           // 2. PHASE 2: Transition to Slide 2 - Fullscreen phone vertical gallery (slides left on top of Slide 1)
-          .to(galleryContainer, { xPercent: 0, duration: 1.0, ease: "power2.inOut" }, 1.0)
-          .set(introTextsContainer, { opacity: 0 }, 2.0)
+          .to(galleryContainer, { xPercent: 0, duration: 1.0, ease: "power2.inOut" }, 3.5)
+          .set(introTextsContainer, { opacity: 0 }, 4.5)
 
           // 3. PHASE 3: Portrait Video mosaic parallax scrolling
-          .to('.col-0', { y: -800, ease: "none", duration: 1.5 }, 2.0)
-          .to('.col-1', { y: 650, ease: "none", duration: 1.5 }, 2.0)
-          .to('.col-2', { y: -1000, ease: "none", duration: 1.5 }, 2.0)
-          .to('.col-3', { y: 550, ease: "none", duration: 1.5 }, 2.0)
-          .to('.col-4', { y: -750, ease: "none", duration: 1.5 }, 2.0)
+          .to('.col-0', { y: -800, ease: "none", duration: 1.5 }, 4.5)
+          .to('.col-1', { y: 650, ease: "none", duration: 1.5 }, 4.5)
+          .to('.col-2', { y: -1000, ease: "none", duration: 1.5 }, 4.5)
+          .to('.col-3', { y: 550, ease: "none", duration: 1.5 }, 4.5)
+          .to('.col-4', { y: -750, ease: "none", duration: 1.5 }, 4.5)
 
           // 4. PHASE 4: Transition to Slide 3 - Figma Intermediate Texts (slides left)
-          .to(galleryContainer, { xPercent: -100, duration: 1.0, ease: "power2.inOut" }, 3.5)
-          .to(intermediateContainer, { xPercent: 0, duration: 1.0, ease: "power2.inOut" }, 3.5)
+          .to(galleryContainer, { xPercent: -100, duration: 1.0, ease: "power2.inOut" }, 6.0)
+          .to(intermediateContainer, { xPercent: 0, duration: 1.0, ease: "power2.inOut" }, 6.0)
 
           // 5. PHASE 5: Draw top intermediate curve & sequential text appearances
           // 5A: Draw curve and fade in Text 1 ("Il cibo...")
-          .to(pathIntermediate, { strokeDashoffset: 0, opacity: 1, ease: "none", duration: 1.0 }, 3.6)
-          .to('.inter-left-col > p', { opacity: 1, x: 0, duration: 0.6, ease: "power2.out" }, 3.8)
-
-          // 5B: Fade in Text 2 ("Le Olimpiadi... GUSTO")
-          .to('.gusto-block .para, .gusto-dharma', { opacity: 1, x: 0, stagger: 0.1, duration: 0.6, ease: "power2.out" }, 4.4)
-
-          // 5C: Fade out Text 1 & 2 to the left, and fade in Text 3 in center-right of screen
-          .to('.inter-left-col > p', { opacity: 0, x: -150, duration: 0.5, ease: "power2.in" }, 5.0)
-          .to('.gusto-block', { opacity: 0, x: -150, duration: 0.5, ease: "power2.in" }, 5.0)
-          .fromTo('.inter-right-col > p', { opacity: 0, xPercent: 0, x: 100 }, { opacity: 1, xPercent: -40, x: 0, duration: 0.6, ease: "power2.out" }, 5.0)
+          .to(pathIntermediate, { strokeDashoffset: 0, opacity: 1, ease: "none", duration: 1.5 }, 6.0)
+          .fromTo(inter1Lines, { opacity: 0, x: 300 }, { opacity: 1, x: 0, stagger: 0.05, duration: 0.3, ease: "power2.out" }, 6.8)
+          .to(inter1Lines, { opacity: 0, x: -200, stagger: 0.05, duration: 0.2, ease: "power2.in" }, 7.3)
+          .fromTo(inter2Lines, { opacity: 0, x: 300 }, { opacity: 1, x: 0, stagger: 0.05, duration: 0.3, ease: "power2.out" }, 7.6)
+          .to(inter2Lines, { opacity: 0, x: -200, stagger: 0.05, duration: 0.2, ease: "power2.in" }, 8.1)
+          .fromTo(inter3Lines, { opacity: 0, x: 300 }, { opacity: 1, x: 0, stagger: 0.05, duration: 0.35, ease: "power2.out" }, 8.4)
 
           // Bottom curve starts revealing at Y=1000 near end of Section 4, fading quickly to 100% opacity
-          .to(pathIntermediate2, { opacity: 1, duration: 0.2, ease: "power1.out" }, 5.0)
-          .to(pathIntermediate2, { strokeDashoffset: 0, ease: "none", duration: 1.0 }, 5.0)
+          .to(pathIntermediate2, { opacity: 1, duration: 0.2, ease: "power1.out" }, 8.5)
+          .to(pathIntermediate2, { strokeDashoffset: 0, ease: "none", duration: 1.0 }, 8.5)
 
           // 6. PHASE 6: Transition to Slide 4 - Fused Horizontal Scroll & Parallax
-          .set(intermediateContainer, { zIndex: 10 }, 5.5)
-          .to(fusedContainer, { xPercent: -50, duration: 1.0, ease: "power2.inOut" }, 5.5)
+          .set(intermediateContainer, { zIndex: 10 }, 9.0)
+          .to(fusedContainer, { xPercent: -50, duration: 1.0, ease: "power2.inOut" }, 9.0)
           // Parallax movement as Panel 1 scrolls out to the left
-          .to('.inter-right-col > p', { xPercent: -150, opacity: 0, duration: 1.0, ease: "power2.inOut" }, 5.5)
-          .fromTo(pastaTitle, { xPercent: -60, opacity: 0 }, { xPercent: 0, opacity: 1, duration: 1.0, ease: "power2.inOut" }, 5.5)
+          .to('.inter-right-col > p', { xPercent: -150, opacity: 0, duration: 1.0, ease: "power2.inOut" }, 9.0)
+          .fromTo(pastaTitle, { xPercent: -60, opacity: 0 }, { xPercent: 0, opacity: 1, duration: 1.0, ease: "power2.inOut" }, 9.0)
           // Animate PASTA and OLIMPICA almost together, staggered by 400ms
-          .to(pastaWordChars, { yPercent: 0, opacity: 1, stagger: 0.04, duration: 0.6, ease: "power3.out" }, 5.6)
-          .to(olimpicaWordChars, { yPercent: 0, opacity: 1, stagger: 0.04, duration: 0.6, ease: "power3.out" }, 6.0)
+          .to(pastaWordChars, { yPercent: 0, opacity: 1, stagger: 0.04, duration: 0.6, ease: "power3.out" }, 9.1)
+          .to(olimpicaWordChars, { yPercent: 0, opacity: 1, stagger: 0.04, duration: 0.6, ease: "power3.out" }, 9.5)
+          // Hold PASTA OLIMPICA visible on screen (Hold snap)
+          .to({}, { duration: 1.0 }, 10.0)
 
           // 7. PHASE 7: Transition to Slide 5 - Figma Cards Deck (left texts, right Swiper slider)
-          .set(intermediateContainer, { zIndex: 5 }, 6.5)
-          .to(intermediateContainer, { xPercent: -100, duration: 1.0, ease: "power2.inOut" }, 6.5)
-          .to(swiperDeckContainer, { xPercent: 0, duration: 1.0, ease: "power2.inOut" }, 6.5)
+          .set(intermediateContainer, { zIndex: 5 }, 11.0)
+          .to(intermediateContainer, { xPercent: -100, duration: 1.0, ease: "power2.inOut" }, 11.0)
+          .to(swiperDeckContainer, { xPercent: 0, duration: 1.0, ease: "power2.inOut" }, 11.0)
+          .fromTo(pastaDescLines, { opacity: 0, x: 300 }, { opacity: 1, x: 0, stagger: 0.05, duration: 0.6, ease: "power2.out" }, 11.3)
+          // Swiper active/hold state (Hold snap)
+          .to({}, { duration: 1.5 }, 12.0)
 
           // 8. PHASE 8: Cinematic Card Expansion (one card grows to cover the screen)
-          .set(cinematicCard, { opacity: 0 }, 7.5)
-          .to(cinematicCard, { opacity: 1, duration: 0.1, ease: "power1.out" }, 7.5)
+          .set(cinematicCard, { opacity: 0 }, 13.5)
+          .to(cinematicCard, { opacity: 1, duration: 0.1, ease: "power1.out" }, 13.5)
           .to(cinematicCard, { 
               x: 260, 
               y: -30, 
@@ -466,7 +601,7 @@
               rotate: -5, 
               duration: 0.3, 
               ease: "power2.out" 
-          }, 7.5)
+          }, 13.5)
           .to(cinematicCard, { 
               x: 0, 
               y: 0, 
@@ -475,9 +610,10 @@
               zIndex: 100, 
               duration: 0.3, 
               ease: "power2.out" 
-          }, 7.8)
-          .to(textLeft, { xPercent: -150, opacity: 0, duration: 0.3, ease: "power2.in" }, 8.0)
-          .to(cardContainer, { scale: 0.8, xPercent: -100, opacity: 0, duration: 0.3, ease: "power2.in" }, 8.0)
+          }, 13.8)
+          .to(textLeft, { xPercent: -150, opacity: 0, duration: 0.3, ease: "power2.in" }, 14.0)
+          .to(pastaDescLines, { opacity: 0, x: -200, stagger: 0.05, duration: 0.3, ease: "power2.in" }, 14.0)
+          .to(cardContainer, { scale: 0.8, xPercent: -100, opacity: 0, duration: 0.3, ease: "power2.in" }, 14.0)
           .to(cinematicCard, { 
               scaleX: 5.5, 
               scaleY: 3.5, 
@@ -485,55 +621,61 @@
               borderRadius: 0, 
               duration: 0.6, 
               ease: "power2.inOut" 
-          }, 8.1)
+          }, 14.1)
 
           // 9. PHASE 9: Slide 6 - New Chart Section
-          .to(chartContainer, { xPercent: 0, opacity: 1, duration: 0.1 }, 8.6)
+          .to(chartContainer, { xPercent: 0, opacity: 1, duration: 0.1 }, 14.6)
           // Phase 9A: Draw peaks (0.6 duration) and fade in first text
-          .to(chartClipRect, { attr: { width: 540 }, ease: "none", duration: 0.6 }, 8.7)
-          .to(chartFirstCircle, { scale: 1, duration: 0.2, ease: "back.out(1.7)" }, 8.7)
-          .to(chartText1, { opacity: 1, y: 0, ease: "power2.out", duration: 0.3 }, 8.8)
+          .to(chartClipRect, { attr: { width: 540 }, ease: "none", duration: 0.6 }, 14.7)
+          .to(chartFirstCircle, { scale: 1, duration: 0.2, ease: "back.out(1.7)" }, 14.7)
+          .fromTo(chartText1Lines, { opacity: 0, x: 300 }, { opacity: 1, x: 0, stagger: 0.05, duration: 0.4, ease: "power2.out" }, 14.8)
           // Parallax horizontal scroll of graph
-          .to('#svgChartContainer', { x: "0vw", ease: "none", duration: 0.6 }, 8.7)
+          .to('#svgChartContainer', { x: "0vw", ease: "none", duration: 0.6 }, 14.7)
 
           // Phase 9B: Fast transition to post-Olympic section (0.3 duration)
-          .to(chartText1, { opacity: 0, y: -50, ease: "power2.in", duration: 0.2 }, 9.3)
-          .to('#svgChartContainer', { x: "-30vw", ease: "power2.inOut", duration: 0.3 }, 9.3)
+          .to(chartText1Lines, { opacity: 0, x: -200, stagger: 0.05, duration: 0.3, ease: "power2.in" }, 15.3)
+          .to('#svgChartContainer', { x: "-30vw", ease: "power2.inOut", duration: 0.3 }, 15.3)
 
           // Phase 9C: Draw second section (post-Olympic ripples) (0.4 duration) and fade in second text
-          .to(chartClipRect, { attr: { width: 2035 }, ease: "none", duration: 0.4 }, 9.6)
-          .to(chartLastCircle, { scale: 1, duration: 0.2, ease: "back.out(1.7)" }, 9.8)
-          .to(chartText2, { opacity: 1, y: 0, ease: "power2.out", duration: 0.3 }, 9.7)
+          .to(chartClipRect, { attr: { width: 2035 }, ease: "none", duration: 0.4 }, 15.6)
+          .to(chartLastCircle, { scale: 1, duration: 0.2, ease: "back.out(1.7)" }, 15.8)
+          .fromTo(chartText2Lines, { opacity: 0, x: 300 }, { opacity: 1, x: 0, stagger: 0.05, duration: 0.4, ease: "power2.out" }, 15.7)
           // Parallax continued scroll slightly
-          .to('#svgChartContainer', { x: "-35vw", ease: "none", duration: 0.4 }, 9.6)
+          .to('#svgChartContainer', { x: "-35vw", ease: "none", duration: 0.4 }, 15.6)
+          // Hold Peak 2 visible (Hold snap)
+          .to({}, { duration: 1.1 }, 16.1)
 
           // Phase 9D: Zoom Circle Transition to Slide 7 (0.2 duration - extremely quick!)
-          .to(chartText2, { opacity: 0, y: -30, ease: "power1.in", duration: 0.1 }, 11.2)
-          .to([chartFirstCircle, '.chart-area', '.chart-main-line'], { opacity: 0, duration: 0.1 }, 11.2)
-          .to(cinematicCard, { backgroundColor: "#ffffff", duration: 0.2, ease: "power2.inOut" }, 11.2)
-          .to(chartLastCircle, { scale: 350, fill: "#ffffff", duration: 0.2, ease: "power2.in" }, 11.2)
-          .set(chartContainer, { opacity: 0 }, 11.4)
+          .to(chartText2Lines, { opacity: 0, x: -200, stagger: 0.05, duration: 0.3, ease: "power2.in" }, 17.2)
+          .to([chartFirstCircle, '.chart-area', '.chart-main-line'], { opacity: 0, duration: 0.1 }, 17.2)
+          .to(cinematicCard, { backgroundColor: "#ffffff", duration: 0.2, ease: "power2.inOut" }, 17.2)
+          .to(chartLastCircle, { scale: 350, fill: "#ffffff", duration: 0.2, ease: "power2.in" }, 17.2)
+          .set(chartContainer, { opacity: 0 }, 17.4)
 
           // 10. PHASE 10: Transition to Slide 7 (Quote section) with opacity cross-fade (no sliding)
-          .to(chartContainer, { opacity: 0, duration: 1.0, ease: "power2.inOut" }, 11.4)
-          .to(cinematicCard, { opacity: 0, duration: 1.0, ease: "power2.inOut" }, 11.4)
-          .to(quoteContainer, { opacity: 1, duration: 1.0, ease: "power2.inOut" }, 11.4)
-          .to(quotePath, { strokeDashoffset: 0, duration: 1.0, ease: "none" }, 11.9)
-          .to(quoteTextLines, { opacity: 1, x: 0, stagger: 0.08, ease: "power2.out", duration: 0.8 }, 11.9)
+          .to(chartContainer, { opacity: 0, duration: 1.0, ease: "power2.inOut" }, 17.4)
+          .to(cinematicCard, { opacity: 0, duration: 1.0, ease: "power2.inOut" }, 17.4)
+          .to(quoteContainer, { opacity: 1, duration: 1.0, ease: "power2.inOut" }, 17.4)
+          .to(quotePath, { strokeDashoffset: 0, duration: 1.0, ease: "none" }, 17.9)
+          .fromTo(quoteTextLines, { opacity: 0, x: 300 }, { opacity: 1, x: 0, stagger: 0.05, ease: "power2.out", duration: 0.6 }, 17.9)
+          // Hold Quote page visible (line exited top right, text fully read) (Hold snap)
+          .to({}, { duration: 1.0 }, 18.9)
 
           // 11. PHASE 11: Transition to Slide 8 (Comments section) with quote retraction and comments line bottom entrance
-          .to(quoteTextLines, { opacity: 0, stagger: 0.04, ease: "power2.in", duration: 0.5 }, 12.7)
-          .to(quotePath, { strokeDashoffset: -lenQuote, duration: 1.0, ease: "power2.inOut" }, 12.7)
-          .to(commentsLine, { yPercent: 0, opacity: 1, duration: 1.0, ease: "power2.inOut" }, 12.7)
-          .to(commentsVideoScroll, { x: "-200%", ease: "none", duration: 2.0 }, 12.7)
-          .to(commentsPath, { strokeDashoffset: 0, ease: "none", duration: 2.0, x: "-60%" }, 12.7)
+          .to(quoteTextLines, { opacity: 0, x: -200, stagger: 0.05, ease: "power2.in", duration: 0.4 }, 19.9)
+          .to(quotePath, { strokeDashoffset: -lenQuote, duration: 1.0, ease: "power2.inOut" }, 19.9)
+          .to(commentsLine, { opacity: 1, duration: 1.0, ease: "power2.inOut" }, 19.9)
+          .to(commentsLine, { x: "-60vw", ease: "none", duration: 2.0 }, 19.9)
+          .to(commentsVideoScroll, { x: "-200%", ease: "none", duration: 2.0 }, 19.9)
+          .to(commentsPath, { strokeDashoffset: 0, ease: "none", duration: 2.0 }, 19.9)
 
           // 12. PHASE 12: Transition to Slide 9 (Redirect section)
-          .to(redirectPath, { strokeDashoffset: 0, ease: "none", duration: 1.0 }, 14.0)
-          .to(commentsLine, { yPercent: 100, opacity: 0, duration: 1.0, ease: "power1.inOut" }, 14.0)
-          .to(redirectTextWords, { opacity: 1, y: 0, stagger: 0.08, duration: 0.8, ease: "power2.out" }, 14.5)
-          .fromTo('.circular-progress-container', { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1.0, duration: 0.8, ease: "power2.out" }, 14.5)
-          .to({}, { duration: 17.5 - 15.5 }, 15.5);
+          .to(redirectPath, { strokeDashoffset: 0, ease: "none", duration: 1.0 }, 21.9)
+          .to(commentsPath, { strokeDashoffset: -lenComments - 500, ease: "power2.inOut", duration: 0.8 }, 21.5)
+          .set(commentsLine, { opacity: 0 }, 22.3)
+          .to(redirectTextWords, { opacity: 1, y: 0, stagger: 0.08, duration: 0.8, ease: "power2.out" }, 22.4)
+          .fromTo('.circular-progress-container', { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1.0, duration: 0.8, ease: "power2.out" }, 22.4)
+          .to({}, { duration: 24.0 - 23.0 }, 23.0);
 
         const preventDefaultScroll = (e) => {
             if (isSwipingSwiper) {
@@ -572,14 +714,14 @@
             </svg>
         </div>
 
-        <div class="intro-grid">
-            <div class="left-col" bind:this={p1}>
-                <p class="para">
-                    Non c'è creator, atleta o turista che non abbia ripreso i piatti della cucina italiana. <br><br>
-                    I feed <span class="highlight">sono stati invasi</span> da atleti di ogni nazione intenti a scoprire pizza, pasta e dolci tipici, in un trionfo di tradizione e puro <span class="highlight">food porn.</span>
-                </p>
+        <div class="intro-wrapper-center">
+            <div class="intro-text-block text-1" bind:this={introText1}>
+                <p class="para">Non c'è creator, atleta o turista che non abbia ripreso i piatti della cucina italiana.</p>
             </div>
-            <div class="right-col" bind:this={p2Container}>
+            <div class="intro-text-block text-2" bind:this={introText2}>
+                <p class="para">I feed <span class="highlight">sono stati invasi</span> da atleti di ogni nazione intenti a scoprire pizza, pasta e dolci tipici, in un trionfo di tradizione e puro <span class="highlight">food porn.</span></p>
+            </div>
+            <div class="intro-text-block text-3" bind:this={introText3}>
                 <p class="p2-sub">Ogni pasto l'ha trasformato in un</p>
                 <h1 class="p2-dharma">TREND DA <br> MILIONI DI <br> LIKE</h1>
             </div>
@@ -622,26 +764,22 @@
                         <path bind:this={pathIntermediate} d="M-300 41 C-150 41, 188.61 290.8, 336.882 119.501 C434.382 6.85782, 618.882 193.001, 786.882 193.001 C927.882 193.001, 1062.88 -21, 1600 -21" stroke="#DC953E" stroke-width="51" stroke-linecap="round"/>
                     </svg>
                 </div>
-                <div id="intermediateWrapper" bind:this={intermediateParagraphs}>
-                    <div class="inter-top-row">
-                        <div class="inter-left-col">
-                            <p class="para para-olympic">
-                                Il cibo si è trasformato in un'esperienza <span class="highlight">non solo da assaggiare, ma da raccontare.</span> Gli atleti hanno filmato tutto, ogni boccone diventava una mini-recensione social.
-                            </p>
-                        </div>
-                        <div class="inter-right-col">
-                            <p class="para para-olympic">
-                                Ma la vera <span class="highlight">mascotte gastronomica</span> di Milano Cortina è stata...
-                            </p>
-                        </div>
+                <div id="intermediateWrapper" class="inter-wrapper-center">
+                    <div class="inter-text-block inter-text-1" bind:this={interText1}>
+                        <p class="para para-olympic">
+                            Il cibo si è trasformato in un'esperienza <span class="highlight">non solo da assaggiare, ma da raccontare.</span> Gli atleti hanno filmato tutto, ogni boccone diventava una mini-recensione social.
+                        </p>
                     </div>
-                    <div class="inter-bottom-row">
-                        <div class="gusto-block">
-                            <p class="para para-olympic" style="margin-bottom: 0; width: 34rem;">
-                                Le Olimpiadi non sono solo medaglie <br>e rigore, ma anche condivisione, curiosità e
-                            </p>
-                            <h2 class="gusto-dharma">GUSTO</h2>
-                        </div>
+                    <div class="inter-text-block inter-text-2" bind:this={interText2}>
+                        <p class="para para-olympic" style="margin-bottom: 0.5rem;">
+                            Le Olimpiadi non sono solo medaglie e rigore, ma anche condivisione, curiosità e
+                        </p>
+                        <h2 class="gusto-dharma">GUSTO</h2>
+                    </div>
+                    <div class="inter-text-block inter-text-3" bind:this={interText3}>
+                        <p class="para para-olympic">
+                            Ma la vera <span class="highlight">mascotte gastronomica</span> di Milano Cortina è stata...
+                        </p>
                     </div>
                 </div>
             </div>
@@ -752,7 +890,7 @@
         </div>
 
         <div id="quoteText">
-            <p bind:this={quoteTextElement} id="quoteParagraph">Vederli godersi questi piatti con la nostra stessa voglia ha fatto <span class="highlight">crollare l'immagine</span> dell'atleta distante, freddo e rigoroso.</p>
+            <p bind:this={quoteTextElement} id="quoteParagraph">Vederli godersi questi piatti con la nostra stessa voglia ha fatto <br><span class="highlight">crollare l'immagine</span> dell'atleta distante, freddo e rigoroso.</p>
         </div>
     </div>
 
@@ -935,29 +1073,34 @@
         background-color: var(--neutral-50);
     }
 
-    .intro-grid {
-        position: relative;
-        z-index: 10;
+    .intro-wrapper-center,
+    .inter-wrapper-center {
+        position: absolute;
+        top: 50%;
+        left: 35vw;
+        transform: translateY(-50%);
+        width: 60%;
+        max-width: 800px;
+        height: 400px;
         display: flex;
-        flex-direction: row;
-        justify-content: space-between;
         align-items: center;
-        width: 90%;
-        max-width: 1400px;
-        margin: 0 auto;
-        gap: 8rem;
+        justify-content: flex-start;
+        z-index: 10;
+        pointer-events: none;
     }
 
-    .left-col {
-        width: 48%;
+    .intro-text-block,
+    .inter-text-block {
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 100%;
         text-align: left;
-    }
-
-    .right-col {
-        width: 48%;
-        text-align: left;
+        opacity: 0;
         display: flex;
         flex-direction: column;
+        justify-content: center;
         align-items: flex-start;
     }
 
@@ -1004,6 +1147,8 @@
         box-sizing: border-box;
         align-items: flex-start;
         justify-content: center;
+        perspective: 1000px;
+        transform-style: preserve-3d;
     }
 
     .gallery-col {
@@ -1025,7 +1170,6 @@
         border-radius: 12px;
         overflow: hidden;
         position: relative;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.35);
         border: none !important; /* No borders allowed */
         outline: none !important;
         width: 100%;
@@ -1111,45 +1255,7 @@
         z-index: 10;
     }
 
-    #intermediateWrapper {
-        width: 85%;
-        max-width: 1400px;
-        z-index: 10;
-        position: relative;
-        padding-left: 6rem; /* Shift text safe from the top-left curve! */
-        display: flex;
-        flex-direction: column;
-        gap: 6rem;
-    }
 
-    .inter-top-row {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 12rem;
-    }
-
-    .inter-left-col {
-        width: 46%;
-    }
-
-    .inter-right-col {
-        width: 46%;
-        position: relative; 
-    }
-
-    .inter-bottom-row {
-        display: flex;
-        justify-content: center;
-    }
-
-    .gusto-block {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 0rem;
-    }
 
     .gusto-dharma {
         font-family: var(--font-family);
@@ -1265,7 +1371,6 @@
         overflow: hidden;
         border: none !important;
         outline: none !important;
-        box-shadow: 0 15px 35px rgba(0,0,0,0.25);
         background: var(--neutral-900);
     }
 
@@ -1335,7 +1440,6 @@
         background-color: var(--brand-cibo-500);
         pointer-events: none;
         opacity: 0;
-        box-shadow: 0 15px 35px rgba(0,0,0,0.3);
         transform-origin: center center;
         z-index: 100;
     }
@@ -1391,22 +1495,25 @@
     .chart-paragraph {
         position: absolute;
         top: 12vh;
-        width: 40vw;
+        width: 28vw;
         font-size: 26px;
         color: var(--neutral-50) !important;
         font-weight: 400;
         font-family: var(--font-family-text);
         line-height: 140%;
+        text-align: left;
     }
 
     #chartText1 {
-        left: 10vw;
+        left: 60vw;
         right: auto;
+        top: 24vh;
     }
 
     #chartText2 {
-        right: 10vw;
-        left: auto;
+        left: 65vw;
+        right: auto;
+        top: 24vh;
     }
 
     .chart-area {
@@ -1467,7 +1574,8 @@
         font-weight: 400;
         line-height: 145%;
         letter-spacing: -0.06rem;
-        width: 72.625rem;
+        width: 46rem;
+        text-align: left;
         pointer-events: none;
     }
 
@@ -1547,7 +1655,6 @@
         position: relative;
         z-index: 2;
         transform: translateZ(20px); 
-        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
     }
 
     #commentsVideoContainer .comments {

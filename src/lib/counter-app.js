@@ -1,6 +1,22 @@
 import { createReaction } from './reaction.js';
 import gsap from 'gsap';
 import SplitType from 'split-type';
+// =========================================================================
+// CONFIGURAZIONE SNAP E SCROLL - HOMEPAGE (PER VSCODE)
+// Modifica questi valori decimali (da 0.0 a 1.0) per cambiare dove
+// lo scroll si blocca e calamita tra le varie slide del contatore.
+// =========================================================================
+export const COUNTER_SNAP_CONFIG = {
+  // Soglia di scroll per far scattare lo snap (in pixel)
+  threshold: 35,
+  
+  // Posizioni di snap (percentuale di scroll totale della pagina)
+  step0_end: 0.325,  // Fine scorrimento iniziale contatore (corrisponde a fillPhaseStart1)
+  step1: 0.50,       // Snap Card 1 (Visualizzazioni)
+  step2: 0.68,       // Snap Card 2 (Utenti Attivi)
+  step3: 0.84,       // Snap Card 3 (Interazioni)
+  step4: 0.91,       // Snap Fine Carosello / Inizio sezioni sottostanti
+};
 
 let activeListeners = [];
 let isAppDestroyed = false;
@@ -1136,47 +1152,46 @@ export function init() {
     if (!isAutoscrolling && !cooldownActive) {
       const presentationScrollHeight = presentationMultiplier * window.innerHeight;
       if (presentationScrollHeight > 0) {
-        const threshold = 35; // Impostato a 35px per far avviare immediatamente lo scatto appena l'utente inizia a scorrere
-        const y0 = fillPhaseStart1 * presentationScrollHeight; // threshold to trigger Step 1 from Step 0
-        const y1 = 0.50 * presentationScrollHeight;
-        const y2 = 0.68 * presentationScrollHeight;
-        const y3 = 0.84 * presentationScrollHeight;
-        const y4 = 1.00 * presentationScrollHeight;
+        const threshold = COUNTER_SNAP_CONFIG.threshold;
+        const y0 = COUNTER_SNAP_CONFIG.step0_end * presentationScrollHeight;
+        const y1 = COUNTER_SNAP_CONFIG.step1 * presentationScrollHeight;
+        const y2 = COUNTER_SNAP_CONFIG.step2 * presentationScrollHeight;
+        const y3 = COUNTER_SNAP_CONFIG.step3 * presentationScrollHeight;
 
         if (activeStep === 0) {
           if (scrollPosition > y0) {
             activeStep = 1;
-            triggerAutoscrollTo(0.50);
+            triggerAutoscrollTo(COUNTER_SNAP_CONFIG.step1);
           }
         } else if (activeStep === 1) {
           if (scrollPosition > y1 + threshold) {
             activeStep = 2;
-            triggerAutoscrollTo(0.68);
+            triggerAutoscrollTo(COUNTER_SNAP_CONFIG.step2);
           } else if (scrollPosition < y1 - threshold) {
             activeStep = 0;
-            triggerAutoscrollTo(fillPhaseStart1 - 0.02);
+            triggerAutoscrollTo(COUNTER_SNAP_CONFIG.step0_end - 0.02);
           }
         } else if (activeStep === 2) {
           if (scrollPosition > y2 + threshold) {
             activeStep = 3;
-            triggerAutoscrollTo(0.84);
+            triggerAutoscrollTo(COUNTER_SNAP_CONFIG.step3);
           } else if (scrollPosition < y2 - threshold) {
             activeStep = 1;
-            triggerAutoscrollTo(0.50);
+            triggerAutoscrollTo(COUNTER_SNAP_CONFIG.step1);
           }
         } else if (activeStep === 3) {
           if (scrollPosition > y3 + threshold) {
             activeStep = 4;
-            triggerAutoscrollTo(0.91); // Auto scroll to the START of Step 4 (0.91)
+            triggerAutoscrollTo(COUNTER_SNAP_CONFIG.step4); // Auto scroll to the START of Step 4
           } else if (scrollPosition < y3 - threshold) {
             activeStep = 2;
-            triggerAutoscrollTo(0.68);
+            triggerAutoscrollTo(COUNTER_SNAP_CONFIG.step2);
           }
         } else if (activeStep === 4) {
           // Only snap back to Step 3 if scrollPosition falls below the entry threshold of Step 4 (y3 - threshold)
           if (scrollPosition < y3 - threshold) {
             activeStep = 3;
-            triggerAutoscrollTo(0.84);
+            triggerAutoscrollTo(COUNTER_SNAP_CONFIG.step3);
           }
         }
       }
@@ -1191,10 +1206,10 @@ export function init() {
     const presentationScrollHeight = presentationMultiplier * window.innerHeight;
     if (presentationScrollHeight > 0) {
       let targetP = 0;
-      if (activeStep === 1) targetP = 0.50;
-      else if (activeStep === 2) targetP = 0.68;
-      else if (activeStep === 3) targetP = 0.84;
-      else if (activeStep === 4) targetP = 0.91;
+      if (activeStep === 1) targetP = COUNTER_SNAP_CONFIG.step1;
+      else if (activeStep === 2) targetP = COUNTER_SNAP_CONFIG.step2;
+      else if (activeStep === 3) targetP = COUNTER_SNAP_CONFIG.step3;
+      else if (activeStep === 4) targetP = COUNTER_SNAP_CONFIG.step4;
       else {
         const currentP = window.scrollY / presentationScrollHeight;
         targetP = Math.min(Math.max(currentP, 0), fillPhaseStart1);
