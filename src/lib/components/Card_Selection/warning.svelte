@@ -28,11 +28,11 @@
         const splitTitle = new SplitText(Wtitle, { type: "lines", mask: "lines" });
         const splitSubtitle = new SplitText(Wsubtitle, { type: "lines", mask: "lines" });
         gsap.set(fillBar, { scaleX: 0, transformOrigin: "left center" });
-       const triangleEnter=gsap.fromTo(triangle, { y: "110%"}, { y: "0%", duration: 1, ease:"elastic.out(0.5,0.4)", paused: true, delay: 1});
-       const EmEnter=gsap.fromTo(EM, { y: "110%"}, { y: "0%", duration: 1, ease:"elastic.out(0.5,0.4)", paused: true, delay: 1});
-       const enterTitle =gsap.fromTo(splitTitle.lines, { y: "110%"}, { y: "0%", duration: 0.6, ease:"power2.out", paused: true, delay: 1.2});
-       const enterSubtitle =gsap.fromTo(splitSubtitle.lines, { y: "110%"}, { y: "0%", duration: 0.5, ease:"power2.out", paused: true, delay: 1.5});
-       const enterSvg =gsap.fromTo(svgBar, { y: "100%"}, { y: "0%", duration: 0.5, ease:"power2.out", paused: true, delay: 1.5});
+       const triangleEnter=gsap.fromTo(triangle, { y: "110%"}, { y: "0%", duration: 1, ease:"elastic.out(0.5,0.4)", paused: true, delay: 0.3});
+       const EmEnter=gsap.fromTo(EM, { y: "110%"}, { y: "0%", duration: 1, ease:"elastic.out(0.5,0.4)", paused: true, delay: 0.5});
+       const enterTitle =gsap.fromTo(splitTitle.lines, { y: "110%"}, { y: "0%", duration: 0.6, ease:"power2.out", paused: true, delay: 0.5});
+       const enterSubtitle =gsap.fromTo(splitSubtitle.lines, { y: "110%"}, { y: "0%", duration: 0.5, ease:"power2.out", paused: true, delay: 0.7});
+       const enterSvg =gsap.fromTo(svgBar, { y: "100%"}, { y: "0%", duration: 0.5, ease:"power2.out", paused: true, delay: 0.7});
 
         const tl = gsap.timeline({
             scrollTrigger: {

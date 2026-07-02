@@ -96,6 +96,10 @@
     pointer-events: auto;
 }
 
+:global(h1, h2, h3, p){
+    user-select: none;
+}
+
 @keyframes stacked-slide-out {
     0% {
         transform: translateY(0);

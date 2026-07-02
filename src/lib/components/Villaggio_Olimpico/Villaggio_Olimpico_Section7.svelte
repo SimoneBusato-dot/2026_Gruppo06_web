@@ -108,7 +108,7 @@
             <div id="videoContainer" bind:this={videoScroll}>
                 <div class="v" >
                     <div class="video-wrapper">
-                        <video src="/Sport_Insoliti/Video_Commenti/Curling_Commenti1.mp4" autoplay muted loop></video>
+                        <video src="/Villaggio_Olimpico/Video_Commenti/Villaggio_Commenti1.mp4" autoplay muted loop></video>
                         <div class="card-bg"></div>
                     </div>
                     <div class="comments">
@@ -117,7 +117,7 @@
                 </div>
                 <div class="v">
                     <div class="video-wrapper">
-                        <video src="/Sport_Insoliti/Video_Commenti/Curling_Commenti2.mp4" autoplay muted loop></video>
+                        <video src="/Villaggio_Olimpico/Video_Commenti/Villaggio_Commenti2.mp4" autoplay muted loop></video>
                         <div class="card-bg"></div>
                     </div>
                     <div class="comments">
@@ -126,7 +126,7 @@
                 </div>
                 <div class="v">
                     <div class="video-wrapper">
-                        <video src="/Sport_Insoliti/Video_Commenti/Curling_Commenti3.mp4" autoplay muted loop></video>
+                        <video src="/Villaggio_Olimpico/Video_Commenti/Villaggio_Commenti3.mp4" autoplay muted loop></video>
                         <div class="card-bg"></div>
                     </div>
                     <div class="comments">
@@ -135,7 +135,7 @@
                 </div>
                 <div class="v">
                     <div class="video-wrapper">
-                        <video src="/Sport_Insoliti/Video_Commenti/Curling_Commenti4.mp4" autoplay muted loop></video>
+                        <video src="/Villaggio_Olimpico/Video_Commenti/Villaggio_Commenti4.mp4" autoplay muted loop></video>
                         <div class="card-bg"></div>
                     </div>
                     <div class="comments">
@@ -144,7 +144,7 @@
                 </div>
                 <div class="v">
                     <div class="video-wrapper">
-                        <video src="/Sport_Insoliti/Video_Commenti/Curling_Commenti5.mp4" autoplay muted loop></video>
+                        <video src="/Villaggio_Olimpico/Video_Commenti/Villaggio_Commenti5.mp4" autoplay muted loop></video>
                         <div class="card-bg"></div>
                     </div>
                     <div class="comments">
@@ -153,7 +153,7 @@
                 </div>
                 <div class="v">
                     <div class="video-wrapper">
-                        <video src="/Sport_Insoliti/Video_Commenti/Curling_Commenti6.mp4" autoplay muted loop></video>
+                        <video src="/Villaggio_Olimpico/Video_Commenti/Villaggio_Commenti6.mp4" autoplay muted loop></video>
                         <div class="card-bg"></div>
                     </div>
                     <div class="comments">
@@ -162,7 +162,7 @@
                 </div>
                 <div class="v">
                     <div class="video-wrapper">
-                        <video src="/Sport_Insoliti/Video_Commenti/Curling_Commenti7.mp4" autoplay muted loop></video>
+                        <video src="/Villaggio_Olimpico/Video_Commenti/Villaggio_Commenti7.mp4" autoplay muted loop></video>
                         <div class="card-bg"></div>
                     </div>
                     <div class="comments">

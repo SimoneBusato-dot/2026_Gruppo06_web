@@ -29,7 +29,7 @@
                 pinSpacing: true,
                 markers: true,
                 onEnter: () => gsap.set(section8, { autoAlpha: 1 }),
-                onLeave: () =>  {goto('/?from=trend', { noScroll: true }); console.log('onLeave triggered');},
+                onLeave: () =>  {goto('/?from=trend', { noScroll: true })},
                 onEnterBack: () => gsap.set(section8, { autoAlpha: 1 }),
                 onLeaveBack: () => gsap.set(section8, { autoAlpha: 0 }),
                 onUpdate: (self) => {

@@ -389,7 +389,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        background-color: #ffffff;
+        background-color: var(--neutral-50);
     }
 
     #text {
