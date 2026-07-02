@@ -69,7 +69,7 @@
                 trigger: section,
                 scroller: window,
                 start: "top top",
-                end: "+=200%",
+                end: "+=300%",
                 scrub: 1,
                 pin: true,
                 pinSpacing: false,

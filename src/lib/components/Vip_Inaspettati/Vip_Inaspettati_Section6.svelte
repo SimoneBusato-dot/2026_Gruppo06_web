@@ -27,6 +27,7 @@
         gsap.set(textWords, { x: 100, opacity: 0 });
         gsap.set(titleLines, { x: 120, opacity: 0 });
 
+
         const tl = gsap.timeline({
             scrollTrigger: {
                 trigger: section,
@@ -45,7 +46,7 @@
         });
 
         // 1. Le linee iniziano a disegnarsi subito
-        tl.to(path1, { strokeDashoffset: 0, ease: 'none', duration: 0.5 }, 0);
+        tl.to(path1, { strokeDashoffset: 0, ease: 'power2.out', duration: 0.5 }, 0);
         tl.to(path2, { strokeDashoffset: 0, ease: 'none', duration: 0.6 }, 0.40);
 
         // 2. Il primo testo entra fluidamente parola per parola e RESTA visibile
@@ -54,8 +55,8 @@
             opacity: 1, 
             stagger: 0.03, 
             ease: 'power1.out', 
-            duration: 0.3 
-        }, 0.2); 
+            duration: 0.20 
+        }, 0.3); 
 
         // 3. Entrata del titolo sulla destra (senza nascondere il primo testo)
         tl.to(titleLines, { 
@@ -63,8 +64,9 @@
             opacity: 1, 
             stagger: 0.08, 
             ease: 'power2.out', 
-            duration: 0.3 
-        }, 0.7);
+            duration: 0.20 
+        }, 0.5);
+
 
 
         return () => {

@@ -143,7 +143,7 @@
                 <p bind:this={s2P1}>o potremmo anche dire...</p>
             </div>
             <div id="titlePanel">
-                <p bind:this={s2P2}><mark>INASPETTATAMENTE VIP</mark></p>
+                <p bind:this={s2P2}>INASPETTATAMENTE VIP</p>
             </div>
         </div>
     </main>
@@ -177,7 +177,8 @@
                 <h2 id="titleMain" bind:this={titleMain}>SENTIRSI PARTE DELLA STESSA STORIA</h2>
             </div>
             <p id="textDesc" bind:this={textRight}>
-                Il successo di questi personaggi nasce da un meccanismo semplice: <span class="highlight">chi guarda si riconosce.</span> Non ammira soltanto, partecipa.<br>
+                Il successo di questi personaggi nasce da un meccanismo semplice: <span class="highlight">chi guarda si riconosce.</span> <br>
+                Non ammira soltanto, partecipa.
                 E in quella partecipazione si crea un legame che supera lo schermo.
             </p>
         </div>
@@ -186,8 +187,8 @@
 </div>
 
     <div id="transitionOverlay">
-        <svg id="transitionSvg" viewBox="0 0 1986 688" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
-            <ellipse bind:this={transitionEllipse} cx="1974" cy=88 rx="0" ry="0" fill="var(--brand-vip-500)"/>
+        <svg id="transitionSvg" viewBox="0 0 1974 688" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+            <ellipse bind:this={transitionEllipse} cx="1974" cy="148" rx="0" ry="0" fill="var(--brand-vip-500)"/>
         </svg>
     </div>
 
@@ -258,9 +259,9 @@
     #text {
         position: relative;
         color: var(--neutral-900);
-        font-size: clamp(0.95rem, 1.1vw, 1.3rem);
+        font-size: clamp(1.5rem, 1.3vw, 1.5rem);
         font-family: var(--font-family-text);
-        gap: 1.5rem;
+        gap: 2.5rem;
         pointer-events: none;
         font-weight: 400;
         justify-content: flex-start;
@@ -281,17 +282,6 @@
         text-transform: uppercase;
         letter-spacing: -0.02em;
         white-space: nowrap;
-    }
-
-    mark {
-        color: var(--brand-vip-500);
-        font-weight: 900;
-        font-size: clamp(4rem, 9vw, 9rem);
-        font-family: var(--font-family);
-        background-color: transparent;
-        display: inline;
-        white-space: nowrap;
-        line-height: 0.85;
     }
 
     /* ===== PANNELLO 2 — Sezione 3 rosa ===== */
@@ -329,7 +319,7 @@
     #lineContainer {
         position: absolute;
         top: 20%;
-        right: auto;
+        right: 0;
         left: 0;
         width: 100%;
         height: 100%;
@@ -372,7 +362,7 @@
         margin: 0;
         line-height: 1.5;
         font-family: var(--font-family-text);
-        font-size: clamp(0.95rem, 1.1vw, 1.3rem);
+        font-size: clamp(1.5rem, 1.3vw, 1.5rem);
         color: var(--neutral-900);
         font-weight: 400;
         white-space: normal; /* Permette al testo di andare a capo */
@@ -387,7 +377,7 @@
 
     #titleMain {
         font-family: var(--font-family);
-        font-size: clamp(3rem, 5.5vw, 7rem);
+        font-size: clamp(3rem, 6vw, 8.3rem);
         font-weight: 900;
         color: var(--brand-vip-500);
         line-height: 0.9;
@@ -404,7 +394,7 @@
         margin: 0;
         line-height: 1.6;
         font-family: var(--font-family-text);
-        font-size: clamp(0.95rem, 1.1vw, 1.3rem);
+        font-size: clamp(1.5rem, 1.3vw, 1.5rem);
         color: var(--neutral-900);
         font-weight: 400;
         white-space: normal; /* Permette al testo di andare a capo */
