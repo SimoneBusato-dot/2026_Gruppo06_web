@@ -10,6 +10,7 @@
 	let resizeObserver;
 	let blueSplit;
 	let redSplit;
+	let videoObserver;
 
 	gsap.registerPlugin(ScrollTrigger);
 
@@ -135,6 +136,28 @@
 				goto('/Categorie');
 			}
 		});
+		// --- INTERSECTION OBSERVER PER CAROSELLO VIDEO ---
+		const videoElements = document.querySelectorAll('.carousel-video');
+		const observerOptions = {
+			root: null,
+			threshold: 0.5 // Attiva quando visibile almeno al 50%
+		};
+
+		videoObserver = new IntersectionObserver((entries) => {
+			entries.forEach(entry => {
+				const video = entry.target;
+				if (entry.isIntersecting) {
+					video.play().catch(err => {
+						// Ignora errori da policy autoplay se non c'è interazione
+						console.log("Autoplay interrotto o bloccato:", err);
+					});
+				} else {
+					video.pause();
+				}
+			});
+		}, observerOptions);
+
+		videoElements.forEach(video => videoObserver.observe(video));
 	});
 
 	onDestroy(() => {
@@ -156,6 +179,9 @@
 		}
 		if (typeof window !== 'undefined') {
 			window.removeEventListener('resize', adjustPageHeight);
+		}
+		if (videoObserver) {
+			videoObserver.disconnect();
 		}
 	});
 </script>
@@ -239,36 +265,19 @@
 				
 				<div class="final-cards-container">
 					<div class="final-cards-track">
-						<div class="carousel-card-item"><img src="/assets/svg/carosello.svg" alt="Video 1"><span class="card-number">1</span></div>
-						<div class="carousel-card-item"><img src="/assets/svg/carosello.svg" alt="Video 2"><span class="card-number">2</span></div>
-						<div class="carousel-card-item"><img src="/assets/svg/carosello.svg" alt="Video 3"><span class="card-number">3</span></div>
-						<div class="carousel-card-item"><img src="/assets/svg/carosello.svg" alt="Video 4"><span class="card-number">4</span></div>
-						<div class="carousel-card-item"><img src="/assets/svg/carosello.svg" alt="Video 5"><span class="card-number">5</span></div>
-						<div class="carousel-card-item"><img src="/assets/svg/carosello.svg" alt="Video 6"><span class="card-number">6</span></div>
-						<div class="carousel-card-item"><img src="/assets/svg/carosello.svg" alt="Video 7"><span class="card-number">7</span></div>
-						<div class="carousel-card-item"><img src="/assets/svg/carosello.svg" alt="Video 8"><span class="card-number">8</span></div>
-						<div class="carousel-card-item"><img src="/assets/svg/carosello.svg" alt="Video 9"><span class="card-number">9</span></div>
-						<div class="carousel-card-item"><img src="/assets/svg/carosello.svg" alt="Video 10"><span class="card-number">10</span></div>
-						<div class="carousel-card-item"><img src="/assets/svg/carosello.svg" alt="Video 11"><span class="card-number">11</span></div>
-						<div class="carousel-card-item"><img src="/assets/svg/carosello.svg" alt="Video 12"><span class="card-number">12</span></div>
-						<div class="carousel-card-item"><img src="/assets/svg/carosello.svg" alt="Video 13"><span class="card-number">13</span></div>
-						<div class="carousel-card-item"><img src="/assets/svg/carosello.svg" alt="Video 14"><span class="card-number">14</span></div>
-						<div class="carousel-card-item"><img src="/assets/svg/carosello.svg" alt="Video 15"><span class="card-number">15</span></div>
-						<div class="carousel-card-item"><img src="/assets/svg/carosello.svg" alt="Video 16"><span class="card-number">16</span></div>
-						<div class="carousel-card-item"><img src="/assets/svg/carosello.svg" alt="Video 17"><span class="card-number">17</span></div>
-						<div class="carousel-card-item"><img src="/assets/svg/carosello.svg" alt="Video 18"><span class="card-number">18</span></div>
-						<div class="carousel-card-item"><img src="/assets/svg/carosello.svg" alt="Video 19"><span class="card-number">19</span></div>
-						<div class="carousel-card-item"><img src="/assets/svg/carosello.svg" alt="Video 20"><span class="card-number">20</span></div>
-						<div class="carousel-card-item"><img src="/assets/svg/carosello.svg" alt="Video 21"><span class="card-number">21</span></div>
-						<div class="carousel-card-item"><img src="/assets/svg/carosello.svg" alt="Video 22"><span class="card-number">22</span></div>
-						<div class="carousel-card-item"><img src="/assets/svg/carosello.svg" alt="Video 23"><span class="card-number">23</span></div>
-						<div class="carousel-card-item"><img src="/assets/svg/carosello.svg" alt="Video 24"><span class="card-number">24</span></div>
-						<div class="carousel-card-item"><img src="/assets/svg/carosello.svg" alt="Video 25"><span class="card-number">25</span></div>
-						<div class="carousel-card-item"><img src="/assets/svg/carosello.svg" alt="Video 26"><span class="card-number">26</span></div>
-						<div class="carousel-card-item"><img src="/assets/svg/carosello.svg" alt="Video 27"><span class="card-number">27</span></div>
-						<div class="carousel-card-item"><img src="/assets/svg/carosello.svg" alt="Video 28"><span class="card-number">28</span></div>
-						<div class="carousel-card-item"><img src="/assets/svg/carosello.svg" alt="Video 29"><span class="card-number">29</span></div>
-						<div class="carousel-card-item"><img src="/assets/svg/carosello.svg" alt="Video 30"><span class="card-number">30</span></div>
+						{#each Array(30) as _, i}
+							<div class="carousel-card-item">
+								<video
+									src="/assets/carousel_videos/video_{i + 1}.mp4"
+									poster="/assets/carousel_videos/poster_{i + 1}.jpg"
+									muted
+									loop
+									playsinline
+									preload="none"
+									class="carousel-video"
+								></video>
+							</div>
+						{/each}
 					</div>
 				</div>
 			</div>

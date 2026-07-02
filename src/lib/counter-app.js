@@ -350,20 +350,9 @@ export function init() {
       numChars = 2;
       fontSize = isMobile ? 22 : 12.5;
       
-      if (progress2 < 0.15) {
-        // Card 1 Static
-        path = cards[0].path;
-        color = cards[0].color;
-        width = cards[0].viewBox[0];
-        height = cards[0].viewBox[1];
-        
-        textIndex = 0;
-        textOpacity = 1;
-        textTranslateY = 0;
-        activeIndex = 0;
-      } else if (progress2 < 0.30) {
-        // Transition 1 -> 2
-        const t = (progress2 - 0.15) / 0.15;
+      if (progress2 <= 0.36) {
+        // Transition 1 -> 2 (Card 1 to Card 2, mapped completely between scroll progress 0.50 and 0.68)
+        const t = progress2 / 0.36;
         path = lerpArray(cards[0].path, cards[1].path, t);
         color = lerpArray(cards[0].color, cards[1].color, t);
         width = lerp(cards[0].viewBox[0], cards[1].viewBox[0], t);
@@ -385,20 +374,9 @@ export function init() {
           textOpacity = fadeT;
           textTranslateY = 30 * (1 - fadeT);
         }
-      } else if (progress2 < 0.45) {
-        // Card 2 Static
-        path = cards[1].path;
-        color = cards[1].color;
-        width = cards[1].viewBox[0];
-        height = cards[1].viewBox[1];
-        
-        textIndex = 1;
-        textOpacity = 1;
-        textTranslateY = 0;
-        activeIndex = 1;
-      } else if (progress2 < 0.60) {
-        // Transition 2 -> 3
-        const t = (progress2 - 0.45) / 0.15;
+      } else if (progress2 <= 0.68) {
+        // Transition 2 -> 3 (Card 2 to Card 3, mapped completely between scroll progress 0.68 and 0.84)
+        const t = (progress2 - 0.36) / 0.32;
         path = lerpArray(cards[1].path, cards[2].path, t);
         color = lerpArray(cards[1].color, cards[2].color, t);
         width = lerp(cards[1].viewBox[0], cards[2].viewBox[0], t);
@@ -420,20 +398,9 @@ export function init() {
           textOpacity = fadeT;
           textTranslateY = 30 * (1 - fadeT);
         }
-      } else if (progress2 < 0.75) {
-        // Card 3 Static
-        path = cards[2].path;
-        color = cards[2].color;
-        width = cards[2].viewBox[0];
-        height = cards[2].viewBox[1];
-        
-        textIndex = 2;
-        textOpacity = 1;
-        textTranslateY = 0;
-        activeIndex = 2;
       } else if (progress2 < 0.82) {
-        // Transition 3 -> 4 (Full Screen) - completes at progress = 0.91 (progress2 = 0.82)
-        const t = (progress2 - 0.75) / 0.07;
+        // Transition 3 -> 4 (Card 3 to Full Screen, mapped completely between scroll progress 0.84 and 0.91)
+        const t = (progress2 - 0.68) / 0.14;
         const easedT = bezierEase(t);
         
         // Piecewise corner morphing (Rounded rectangle first, then slowly sharpening at the end)
@@ -470,11 +437,11 @@ export function init() {
         finalScreenOpacity = 1;
       }
       
-      if (progress2 < 0.75) {
+      if (progress2 <= 0.68) {
         cardWidth = width * scale;
         cardHeight = height * scale;
       } else if (progress2 < 0.82) {
-        const t = (progress2 - 0.75) / 0.07;
+        const t = (progress2 - 0.68) / 0.14;
         const easedT = bezierEase(t);
         cardWidth = lerp(cards[2].viewBox[0] * scale, startWidth * 1.1, easedT);
         cardHeight = lerp(cards[2].viewBox[1] * scale, startHeight * 1.1, easedT);
@@ -888,7 +855,7 @@ export function init() {
   let isAutoscrolling = false;
   let autoscrollStartTime = null;
   let autoscrollStartScrollY = 0;
-  const autoscrollDuration = 700; // Durata autoscroll impostata a 700ms per una transizione fluida ed elegante, ma non pesante
+  const autoscrollDuration = 1800; // Rallentato a 1800ms per una transizione molto più fluida ed elegante
 
 
   // activeStep is initialized to 0 because we force scroll to top on page load.
@@ -1067,7 +1034,7 @@ export function init() {
     const diffBottom = targetProgress - currentProgressBottom;
     
     // Dynamic LERP coefficients: fast/responsive during manual scroll, smooth/inertial during autoscroll snapping
-    const lerpRate = isAutoscrolling ? 0.18 : 0.22; // Aumentato da 0.08 a 0.18 durante autoscroll per rendere l'animazione della card molto più reattiva e sincrona
+    const lerpRate = isAutoscrolling ? 0.18 : 0.22; // Ripristinato per eliminare il ritardo/lag di input, lasciando che la lentezza sia gestita dall'autoscroll (1800ms)
     currentProgress += diff * lerpRate;
     currentProgressTop += diffTop * (lerpRate * 0.85);
     currentProgressBottom += diffBottom * (lerpRate * 0.65);
@@ -1082,8 +1049,8 @@ export function init() {
     // Check if we should trigger the autonomous final expansion (referencing Phase 1)
     if (targetProgress >= fillPhaseStart1) {
       isAutonomousActive = true;
-      // Increment autonomous progress based on 850ms duration
-      autonomousFillProgress += deltaTime / 850;
+      // Increment autonomous progress based on 2000ms duration (slowing down the expansion)
+      autonomousFillProgress += deltaTime / 2000;
       if (autonomousFillProgress >= 1) {
         autonomousFillProgress = 1;
         isCardAnimationFinished = true;
