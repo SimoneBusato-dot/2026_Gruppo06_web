@@ -728,7 +728,8 @@ body {
               filter 0.5s ease;
 }
 
-.carousel-card-item img {
+.carousel-card-item img,
+.carousel-card-item video {
   width: 100%;
   height: auto;
   display: block;
