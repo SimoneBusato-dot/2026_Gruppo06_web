@@ -95,11 +95,13 @@
 
 
 <style>
+ 
     #firstEnding {
         display: flex;
         width: 100vw;
         height: 100vh;
         position: relative;
+        
     }
 
     #svgContainer1 {

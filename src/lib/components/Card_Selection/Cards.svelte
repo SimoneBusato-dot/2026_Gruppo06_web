@@ -1,6 +1,8 @@
 <script>
 import gsap from "gsap"
 import { goto } from '$app/navigation'
+import { hasNavigatedCategory } from '$lib/store/categoryNav.js';
+
     let {variant = 'blue'} = $props()
     let cardEl = $state(null)
 
@@ -11,14 +13,9 @@ import { goto } from '$app/navigation'
         yellow: '/Cucina_Italiana',
     };
 
-    /*function handleClick(e){
-        e.preventDefault();
-        gsap.to(cardEl, {
-            duration: 0.3,
-            y: -20,
-            ease: "power2.out",
-            onComplete: () => goto(routes[variant])})
-    }*/
+   function handleClick(){
+    hasNavigatedCategory.markNavigated();
+}
 </script>
 <!---->
 <div class={`card card-${variant}`} bind:this={cardEl} >

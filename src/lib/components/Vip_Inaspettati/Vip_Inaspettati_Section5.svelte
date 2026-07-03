@@ -3,6 +3,7 @@
     import { gsap } from 'gsap';
     import { ScrollTrigger } from 'gsap/ScrollTrigger';
     import SplitType from 'split-type';
+    import { easeLinear } from 'd3';
 
     gsap.registerPlugin(ScrollTrigger);
 
@@ -16,6 +17,7 @@
 
         const titleChars = new SplitType(snoopTitle, { types: 'chars', tagName: 'span' }).chars;
         gsap.set(titleChars, { opacity: 0, x: 120 });
+
 
 
         const tl = gsap.timeline({
@@ -32,6 +34,7 @@
                 onLeave: () => gsap.set(snoopSection, { autoAlpha: 0 }),
                 onEnterBack: () => gsap.set(snoopSection, { autoAlpha: 1 }),
                 onLeaveBack: () => gsap.set(snoopSection, { autoAlpha: 0 }),
+                
             }
         });
 
