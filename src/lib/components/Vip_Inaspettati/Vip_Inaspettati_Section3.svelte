@@ -82,19 +82,19 @@
         tl.to(path, { strokeDashoffset: 0, ease: "none", duration: 0.37 }, 0.57);
         
         // TESTO 1: Entra a 0.68, esce a 0.75
-        tl.fromTo(textLeft, { x: 50, opacity: 0 }, { x: 0, opacity: 1, duration: 0.03, ease: "power2.out" }, 0.57)
-          .to(textLeft, { x: -50, opacity: 0, duration: 0.03, ease: "power2.in" }, 0.65);
+        tl.fromTo(textLeft, { x: 50, opacity: 0 }, { x: 0, opacity: 1, duration: 0.03, ease: "power2.out" }, 0.65)
+          .to(textLeft, { x: -50, opacity: 0, duration: 0.03, ease: "power2.in" }, 0.70);
 
         // TESTO 2: Entra a 0.75 (appena esce il primo), esce a 0.82
-        tl.fromTo(titleMain, { x: 50, opacity: 0 }, { x: 0, opacity: 1, duration: 0.03, ease: "power2.out" }, 0.72)
-          .to(titleMain, { x: -50, opacity: 0, duration: 0.03, ease: "power2.in" }, 0.80);
+        tl.fromTo(titleMain, { x: 50, opacity: 0 }, { x: 0, opacity: 1, duration: 0.03, ease: "power2.out" }, 0.78)
+          .to(titleMain, { x: -50, opacity: 0, duration: 0.03, ease: "power2.in" }, 0.83);
 
         // TESTO 3: Entra a 0.82 e resta visibile fino alla fine dello scroll
-        tl.fromTo(textRight, { x: 50, opacity: 0 }, { x: 0, opacity: 1, duration: 0.04, ease: "power2.out" }, 0.81)
-            .to(textRight, { x: -50, opacity: 0, duration: 0.03, ease: "power2.in" }, 0.91);
+        tl.fromTo(textRight, { x: 50, opacity: 0 }, { x: 0, opacity: 1, duration: 0.04, ease: "power2.out" }, 0.88)
+            .to(textRight, { x: -50, opacity: 0, duration: 0.03, ease: "power2.in" }, 0.93);
 
         // --- TRANSIZIONE FINALE (Anticipata a 0.88 per coincidere con la fine della linea) ---
-        tl.to(transitionEllipse, { attr: { rx: 3000, ry: 3000 }, ease: "power2.inOut", duration: 0.08 }, 0.92);
+        tl.to(transitionEllipse, { attr: { rx: 3000, ry: 3000 }, ease: "power2.inOut", duration: 0.05 }, 0.95);
         tl.to("#transitionOverlay", { autoAlpha: 0, duration: 0 }, 1.0);
 
 

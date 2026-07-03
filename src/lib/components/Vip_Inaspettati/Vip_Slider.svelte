@@ -2,11 +2,12 @@
     import { onMount } from "svelte";
     import Swiper from "swiper/bundle";
     import "swiper/css/bundle";
+    import gsap from "gsap";
 
     let cardContainer;
     let {el = $bindable()} = $props();
 
-    const colors = [null, "#533ddc", "#7069ec", "#8687f3", "#a8b0f9", "#c9cffc"];
+    const colors = [null, "#ee84e3", "#f5b2ef", "#fbd4f8", "#fdeafd" ];
 
     onMount(() => {
         el = cardContainer;
@@ -28,8 +29,17 @@
         const swiper = new Swiper(cardContainer, {
             effect: "cards",
             grabCursor: true,
+            centeredSlides: true,
+            initialSlide: 2,
             pagination: { el: ".swiper-pagination", clickable: true },
-            cardsEffect: { perSlideOffset: 20, perSlideRotate: -15, rotate: true, slideShadows: false },
+            cardsEffect: {
+                perSlideOffset: 33,
+                perSlideRotate: -2.5,
+                rotate: true,
+                slideShadows: false,
+                
+
+            },
             on: {
                 init(swiper) { applyColors(swiper); cardContainer.querySelectorAll("video")[swiper.activeIndex]?.play(); },
                 slideChange(swiper) {
@@ -37,6 +47,7 @@
                     const videos = cardContainer.querySelectorAll("video");
                     videos.forEach(v => { v.pause(); v.currentTime = 0; });
                     videos[swiper.activeIndex]?.play();
+
                 }
             }
         });
@@ -49,7 +60,7 @@
         {#each [1,2,3,4,5] as n}
             <div class="swiper-slide">
                 <div class="overlay"></div>
-                <video src="/Sport_Insoliti/Video_introduzione/Sp_Intro{n}.mp4" muted loop></video>
+                <video src="/Vip_Inaspettati/Video_SliderSezione3/Vip_Slid{n}.mp4" muted loop></video>
             </div>
         {/each}
     </div>
@@ -59,9 +70,9 @@
 <style>
     .swiper {
         /* scala con il viewport: su MBP14 1512px → 26.4vw ≈ 400px */
-        width: clamp(100px, 26.4vw, 400px);
+        width: clamp(220px, 55vw, 400px);
         /* rapporto 400:711 = 0.5626 → height = width / 0.5626 */
-        height: clamp(177px, 47vw, 711px);
+        height: clamp(391px, 97vw, 711px);
         padding-bottom: clamp(3.5rem, 3vh, 5rem); /* spazio per la pagination */
         box-sizing: content-box;
     }
@@ -69,7 +80,10 @@
     .swiper-slide {
         position: relative;
         border-radius: 10px;
-        overflow: hidden;
+        overflow: hidden;;
+        flex-shrink: 0;  
+        
+        
     }
 
     .overlay {
@@ -82,14 +96,17 @@
         pointer-events: none;
     }
 
+
+
     video { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
 
     .swiper-pagination { position: absolute; bottom: 0; }
 
     :global(.swiper-pagination-bullet) { transition: all 0.3s ease; }
     :global(.swiper-pagination-bullet-active) {
-        background-color: var(--brand-vip-500);
+        background: var(--brand-vip-200);
         width: 16px;
         border-radius: 4px;
     }
+
 </style>

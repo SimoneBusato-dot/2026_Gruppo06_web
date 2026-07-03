@@ -15,7 +15,8 @@
         gsap.set(snoopSection, { autoAlpha: 0 });
 
         const titleChars = new SplitType(snoopTitle, { types: 'chars', tagName: 'span' }).chars;
-        gsap.set(titleChars, { opacity: 0, y: 120, rotate: 8 });
+        gsap.set(titleChars, { opacity: 0, x: 120 });
+
 
         const tl = gsap.timeline({
             scrollTrigger: {
@@ -37,12 +38,12 @@
         // 1. Animazione del titolo (Entrata)
         tl.to(titleChars, {
             opacity: 1,
-            y: 0,
+            x: 0,
             rotate: 0,
-            stagger: 0.04,
-            ease: 'power3.out',
+            ease: 'none',
             duration: 0.8,
-        }, 0.1);
+        }, 0.20);
+
 
         // 2. Scroll Orizzontale
         tl.to(scrollContainer, {
@@ -232,7 +233,7 @@
     }
 
     .highlight-text, .sub-text {
-        font-size: clamp(1.15rem, 1.25vw, 1.45rem);
+        font-size: clamp(1.5rem, 1.3vw, 1.5rem);
         line-height: 1.45;
         font-weight: 400;
     }

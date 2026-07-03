@@ -12,6 +12,7 @@
     let textLeft;
     let titleRight;
 
+
     onMount(() => {
         // --- Linee SVG ---
         const len1 = path1.getTotalLength();
@@ -68,7 +69,6 @@
         }, 0.5);
 
 
-
         return () => {
             ScrollTrigger.getAll().forEach(t => t.kill());
         };
@@ -81,7 +81,7 @@
     <div id="content">
         <div id="left">
             <p bind:this={textLeft}>
-                Un flusso continuo di <span class="highlight">momenti spontanei</span> che hanno trasformato ogni apparizione in...
+                Un flusso continuo di <span class="highlight">momenti spontanei</span> <br> che hanno trasformato ogni apparizione in...
             </p>
         </div>
         <div id="right">
@@ -181,7 +181,7 @@
 
     #left p {
         font-family: var(--font-family-text);
-        font-size: clamp(0.95rem, 1.1vw, 1.3rem);
+        font-size: clamp(1.5rem, 1.3vw, 1.5rem);
         color: var(--neutral-900);
         font-weight: 400;
         margin: 0;
@@ -197,7 +197,7 @@
 
     #right h2 {
         font-family: var(--font-family);
-        font-size: clamp(3.5rem, 5.5vw, 6.5rem);
+        font-size: clamp(3rem, 6vw, 8.3rem);
         font-weight: 900;
         color: var(--brand-vip-500);
         line-height: 0.9;
@@ -211,6 +211,7 @@
         color: var(--brand-vip-500);
         font-weight: 400;
     }
+
 
 
 </style>

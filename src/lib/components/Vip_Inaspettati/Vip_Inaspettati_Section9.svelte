@@ -185,7 +185,7 @@
     width: 100vw;
     height: 100vh;
     visibility: hidden;
-    margin-block-start: 100vh ;
+    margin-block-start: 200vh ;
     background-color: var(--neutral-50);
     position: relative;
 }
