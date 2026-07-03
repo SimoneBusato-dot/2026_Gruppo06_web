@@ -3,6 +3,7 @@
     import '$lib/styles/variables.css';
     import '$lib/styles/reactions.css';
     import Navbar from '$lib/components/Navbar.svelte';
+    import BouncyLoader from '$lib/components/BouncyLoader.svelte';
     import { onNavigate } from '$app/navigation';
     import { onMount, tick } from 'svelte';
     import { createReaction } from '$lib/reaction.js';
@@ -94,6 +95,8 @@
 <Navbar />
 
 {@render children()}
+
+<BouncyLoader />
 
 {#if isTransitioningSvg}
     <div class="transition-curtain {isAnimatingClass ? 'is-animating' : ''}">
