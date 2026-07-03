@@ -173,41 +173,38 @@
             duration: 0.25,
             ease: 'power2.out'
         })
-        // 2. Il rettangolo esterno (loader-track) si espande a tutto schermo e diventa Blu Counter
-        .to('.loader-content', {
-            width: '100vw',
-            maxWidth: '100vw',
-            height: '100vh',
-            gap: 0,
-            duration: 0.85,
-            ease: 'power3.inOut'
-        })
-        .to('.loader-track', {
-            height: '100vh',
-            borderRadius: '0px',
-            borderWidth: '0px',
-            backgroundColor: 'var(--neutral-50)', // Colore del counter (#f3f3f3)
-            boxShadow: 'none',
-            duration: 0.85,
+        // 2. La maschera (il foro con box-shadow) si allarga a tutto schermo rivelando la pagina sotto
+        .to('.loader-curtain-hole', {
+            width: '3000px',
+            height: '3000px',
+            borderRadius: '1500px',
+            duration: 1.15,
             ease: 'power3.inOut'
         }, '<')
-        // 3. Escono lo 0, lo scroll e i menu superiori
+        // 3. Il tracciato esterno si allarga leggermente e sfuma
+        .to('.loader-track', {
+            scale: 1.15,
+            opacity: 0,
+            duration: 0.6,
+            ease: 'power2.out'
+        }, '<')
+        // 4. Escono lo 0, lo scroll e i menu superiori della pagina sotto
         .to(navbar, {
             y: 0,
             opacity: 1,
-            duration: 0.75,
+            duration: 0.85,
             ease: 'power2.out'
-        }, '>-0.45')
+        }, '>-0.8')
         .to(counterZero, {
             scale: 1,
             opacity: 1,
-            duration: 0.85,
+            duration: 0.95,
             ease: 'back.out(1.5)'
         }, '<')
         .to(scrollIndicator, {
             y: 0,
             opacity: 1,
-            duration: 0.75,
+            duration: 0.85,
             ease: 'power2.out'
         }, '<');
     });
@@ -222,6 +219,10 @@
 
 {#if isVisible}
     <div class="loader-overlay" style="--loader-color: {colors[activePhase]}">
+        <!-- Tenda con foro in box-shadow che si allarga per rivelare il sito -->
+        <div class="loader-curtain-hole"></div>
+
+        <!-- Contenuto sopra la tenda (barra e percentuale) -->
         <div class="loader-content">
             <div class="loader-track">
                 <div class="loader-bar" bind:this={barEl}></div>
@@ -239,30 +240,48 @@
         left: 0;
         width: 100vw;
         height: 100vh;
-        background-color: var(--neutral-50, #f3f3f3); /* Stesso colore di background del counter */
         z-index: 9999999; /* Massima priorità */
         display: flex;
         align-items: center;
         justify-content: center;
         user-select: none;
+        background-color: transparent;
+        overflow: hidden; /* Nasconde il box-shadow enorme quando si espande */
+    }
+
+    .loader-curtain-hole {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 450px;
+        height: 48px;
+        border-radius: 24px;
+        background-color: transparent; /* Il foro è trasparente per far vedere il sito */
+        box-shadow: 0 0 0 9999px var(--neutral-50, #f3f3f3); /* Crea lo sfondo coprente intorno */
+        z-index: 1;
+        pointer-events: none;
+        will-change: width, height, border-radius;
     }
 
     .loader-content {
+        position: relative;
+        z-index: 2; /* Sopra la tenda coprente */
         display: flex;
         flex-direction: column;
         align-items: center;
         gap: var(--spacing-md, 16px);
         width: 90%;
         max-width: 450px;
+        pointer-events: none;
     }
-
 
     .loader-track {
         width: 100%;
         height: 48px;
         border: 6px solid var(--loader-color);
         border-radius: var(--radius-full, 9999px);
-        background-color: transparent;
+        background-color: transparent; /* Trasparente così si vede il sito sotto */
         padding: 4px;
         box-sizing: border-box;
         position: relative;
