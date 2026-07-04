@@ -53,7 +53,7 @@
                 trigger: villSection2,
                 scroller: window,
                 start: "top top",
-                end: "+=201%",
+                end: "+=301%",
                 scrub: 1,
                 pin: true,
                 pinSpacing: false,
@@ -76,7 +76,7 @@
                 trigger: villSection2,
                 scroller: window,
                 start: "top top",       // parte insieme alla prima
-                end: "+=180%",           // finisce all'80% della prima (81% di 101%)
+                end: "+=240%",           // finisce all'80% della prima (81% di 101%)
                 scrub: 1,
                 // NO pin — il pin lo gestisce già tl
             }

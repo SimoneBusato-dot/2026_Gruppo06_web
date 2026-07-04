@@ -45,7 +45,7 @@
                 trigger: villSection4,
                 scroller: window,
                 start: "top top",
-                end: "+=201%",
+                end: "+=301%",
                 scrub: 1,
                 pin: true,
                 pinSpacing: false,

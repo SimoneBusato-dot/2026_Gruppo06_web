@@ -97,7 +97,7 @@
         visibility: hidden;
         background-color: var(--neutral-50);
         overflow: hidden;
-        margin-block-start: 100dvh;
+        margin-block-start: 200dvh;
     }
 
     #svgContainer{

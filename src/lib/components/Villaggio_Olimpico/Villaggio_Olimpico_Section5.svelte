@@ -49,7 +49,7 @@
             trigger: villSection5,
             scroller: window,
             start: "top top",
-            end: "+=320%",
+            end: "+=480%",
             scrub: 1,
             onUpdate(self) {
     const progress = self.progress
@@ -87,7 +87,7 @@
             trigger: villSection5,
             scroller: window,
             start: "top top",
-            end: "+=401%",
+            end: "+=601%",
             scrub: 1,
             pin: true,
             pinSpacing: false,
@@ -158,7 +158,7 @@
         visibility: hidden;
         background-color: var(--neutral-50);
         overflow: hidden;
-        margin-block-start: 100dvh;
+        margin-block-start: 200dvh;
     }
 
    #curtain{

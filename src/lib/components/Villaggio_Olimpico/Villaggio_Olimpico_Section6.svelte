@@ -56,7 +56,7 @@
                 // if(self.progress>=0.1){gsap.set("#textContainer61", {opacity: 1, duration: 0.1, ease:"power2.out"});}
                 if(self.progress>=0.55){text62Enter.play(); upper2Enter.play()} else {text62Enter.reverse(); upper2Enter.reverse()}
                 // if(self.progress>=0.55){gsap.set("#textContainer62", {opacity: 1, duration: 0.1, ease:"power2.out"})}
-                if(self.progress>=0.7){text61Exit.play(); text62Exit.play(); upper1Exit.play(); upper2Exit.play()} else {text61Exit.reverse(); text62Exit.reverse(); upper1Exit.reverse(); upper2Exit.reverse()}
+                if(self.progress>=0.8){text61Exit.play(); text62Exit.play(); upper1Exit.play(); upper2Exit.play()} else {text61Exit.reverse(); text62Exit.reverse(); upper1Exit.reverse(); upper2Exit.reverse()}
             }
         }
     })
@@ -109,7 +109,7 @@
         visibility: hidden;
         background-color: var(--neutral-50);
         overflow: hidden;
-        margin-block-start: 300dvh;
+        margin-block-start: 500dvh;
     }
 
     #svgContainer6{
