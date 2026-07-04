@@ -167,11 +167,11 @@
         .to(barEl, { left: `${padding}px`, duration: 0.3, ease: 'power1.in' }, '<')
         
         // --- TRANSIZIONE DI MORPHING FINALE ---
-        // 1. Il rettangolo interno se ne va (loader-bar) e la percentuale sfuma
-        .to([barEl, '.loader-percentage'], {
+        // 1. Gli elementi grafici del loader spariscono istantaneamente
+        .to([barEl, '.loader-percentage', '.loader-track'], {
             opacity: 0,
-            duration: 0.25,
-            ease: 'power2.out'
+            duration: 0.05,
+            ease: 'none'
         })
         // 2. La maschera (il foro con box-shadow) si allarga a tutto schermo rivelando la pagina sotto
         .to('.loader-curtain-hole', {
@@ -180,13 +180,6 @@
             borderRadius: '1500px',
             duration: 1.15,
             ease: 'power3.inOut'
-        }, '<')
-        // 3. Il tracciato esterno si allarga leggermente e sfuma
-        .to('.loader-track', {
-            scale: 1.15,
-            opacity: 0,
-            duration: 0.6,
-            ease: 'power2.out'
         }, '<')
         // 4. Escono lo 0, lo scroll e i menu superiori della pagina sotto
         .to(navbar, {
