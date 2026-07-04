@@ -1148,6 +1148,7 @@ body.no-scroll-counter {
   justify-content: center;
   position: relative;
   z-index: 10;
+  perspective: 1000px;
 }
 
 /* Card container */
@@ -1156,6 +1157,7 @@ body.no-scroll-counter {
   width: 100%;
   max-width: 440px; /* Elegant size */
   margin: 0 auto;
+  transform-style: preserve-3d;
 }
 
 /* Shadow and front card alignment */
@@ -1186,7 +1188,7 @@ body.no-scroll-counter {
 
 .card-shadow-red {
   position: absolute;
-  left: 132px;
+  left: 12px;
   bottom: 209px;
   top: auto;
   width: 528px;
@@ -1198,7 +1200,7 @@ body.no-scroll-counter {
 
 .card-front-red {
   position: relative;
-  left: 170px;
+  left: 50px;
   bottom: 222px;
   top: auto;
   width: 440px;
@@ -1292,7 +1294,7 @@ body.no-scroll-counter {
 }
 
 .line-red-slide {
-  left: -350px;
+  left: -430px;
   bottom: 235px;
   top: auto;
   width: 500px;
@@ -1310,6 +1312,7 @@ body.no-scroll-counter {
   padding: 5vh 0 10vh 0; /* Spaziatura elegante prima del carosello */
   box-sizing: border-box;
   background-color: var(--neutral-50); /* Rende l'intero blocco finale bianco come le slide */
+  perspective: 1000px;
 }
 
 .fine-card-wrapper {
@@ -1324,6 +1327,8 @@ body.no-scroll-counter {
   justify-content: center;
   align-items: center;
   opacity: 1.00;
+  overflow: hidden;
+  transform-style: preserve-3d;
 }
 
 .fine-card-bg {
@@ -1406,7 +1411,7 @@ body.no-scroll-counter {
     width: 70vw;
   }
   .line-red-slide {
-    left: -10vw;
+    left: -20vw;
     width: 60vw;
   }
 

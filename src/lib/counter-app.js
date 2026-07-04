@@ -1285,6 +1285,15 @@ export function init() {
       cardIntensity = Math.min((currentProgress - fillPhaseStart1) / (totalPhase1Max - fillPhaseStart1), 1);
     }
 
+    let swayX = 0;
+    let swayY = 0;
+    if (cardIntensity > 0) {
+      const timeSec = performance.now() * 0.001;
+      const tSway = (timeSec / 2.5) * Math.PI * 2;
+      swayY = Math.sin(tSway) * 2.2 * cardIntensity;
+      swayX = -Math.sin(tSway * 0.5) * 1.5 * cardIntensity;
+    }
+
     const mouseActive = hasMoved && mouseInWindow && mouseX >= 0 && mouseY >= 0;
 
     if (mouseActive) {
@@ -1310,9 +1319,9 @@ export function init() {
         }
       } else if (cardIntensity > 0) {
         // --- 2. Card Phase: Standard Tilt & Glare ---
-        // Inclina la card verso il mouse (sollevamento in direzione del cursore)
-        targetTiltX = -normalizedY * maxTilt * cardIntensity;
-        targetTiltY = -normalizedX * maxTilt * cardIntensity;
+        // Inclina la card verso il mouse + idle sway additivo
+        targetTiltX = -normalizedY * maxTilt * cardIntensity + swayX;
+        targetTiltY = -normalizedX * maxTilt * cardIntensity + swayY;
         targetScale = 1;
 
         // Calculate glare reflection position
@@ -1339,9 +1348,9 @@ export function init() {
         }
       }
     } else {
-      // Inactive mouse
-      targetTiltX = 0;
-      targetTiltY = 0;
+      // Inactive mouse: apply dynamic idle sway when card is visible
+      targetTiltX = swayX;
+      targetTiltY = swayY;
       targetScale = 1;
       if (cardGlare) {
         cardGlare.style.opacity = 0;

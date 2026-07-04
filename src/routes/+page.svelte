@@ -11,6 +11,14 @@
 	let blueSplit;
 	let redSplit;
 	let videoObserver;
+	let moveCards;
+	let onMouseLeave;
+	let onMouseEnter;
+	let rafIdHome;
+	
+	let currentBlueX = 0, currentBlueY = 0;
+	let currentRedX = 0, currentRedY = 0;
+	let currentOrangeX = 0, currentOrangeY = 0;
 
 	gsap.registerPlugin(ScrollTrigger);
 
@@ -56,16 +64,16 @@
 			blueSplit = new SplitType(blueText, { types: "lines", tagName: "span" });
 			const blueLines = blueSplit.lines;
 			gsap.fromTo(blueLines,
-				{ x: 300, opacity: 0 },
+				{ x: 80, opacity: 0 },
 				{
 					x: 0,
 					opacity: 1,
-					stagger: 0.1,
-					duration: 0.6,
+					stagger: 0.08,
+					duration: 0.5,
 					ease: "power2.out",
 					scrollTrigger: {
 						trigger: "#text-blue-slide",
-						start: "top 85%",
+						start: "top 75%",
 						toggleActions: "play none none reverse"
 					}
 				}
@@ -73,15 +81,15 @@
 		}
 		if (blueCard) {
 			gsap.fromTo(blueCard,
-				{ x: -150, opacity: 0 },
+				{ x: -80, opacity: 0 },
 				{
 					x: 0,
 					opacity: 1,
-					duration: 0.8,
+					duration: 0.6,
 					ease: "power2.out",
 					scrollTrigger: {
-						trigger: ".slide-blue",
-						start: "top 80%",
+						trigger: "#text-blue-slide",
+						start: "top 75%",
 						toggleActions: "play none none reverse"
 					}
 				}
@@ -112,16 +120,16 @@
 			redSplit = new SplitType(redText, { types: "lines", tagName: "span" });
 			const redLines = redSplit.lines;
 			gsap.fromTo(redLines,
-				{ x: 300, opacity: 0 },
+				{ x: -80, opacity: 0 },
 				{
 					x: 0,
 					opacity: 1,
-					stagger: 0.1,
-					duration: 0.6,
+					stagger: 0.08,
+					duration: 0.5,
 					ease: "power2.out",
 					scrollTrigger: {
 						trigger: "#text-red-slide",
-						start: "top 85%",
+						start: "top 75%",
 						toggleActions: "play none none reverse"
 					}
 				}
@@ -129,15 +137,15 @@
 		}
 		if (redCard) {
 			gsap.fromTo(redCard,
-				{ x: 150, opacity: 0 },
+				{ x: 80, opacity: 0 },
 				{
 					x: 0,
 					opacity: 1,
-					duration: 0.8,
+					duration: 0.6,
 					ease: "power2.out",
 					scrollTrigger: {
-						trigger: ".slide-red",
-						start: "top 80%",
+						trigger: "#text-red-slide",
+						start: "top 75%",
 						toggleActions: "play none none reverse"
 					}
 				}
@@ -192,10 +200,129 @@
 		}, observerOptions);
 
 		videoElements.forEach(video => videoObserver.observe(video));
+
+		// Animazione fine card ("Tutti hanno interagito secondo trend prestabiliti")
+		const fineCardBg = document.querySelector('.fine-card-bg');
+		const fineCardText = document.querySelector('.fine-card-text');
+		if (fineCardBg && fineCardText) {
+			gsap.fromTo(fineCardBg,
+				{ y: "110%", opacity: 0 },
+				{
+					y: "0%",
+					opacity: 1,
+					duration: 1,
+					ease: "elastic.out(0.5, 0.4)",
+					scrollTrigger: {
+						trigger: ".trend-intro-section",
+						start: "top 85%",
+						toggleActions: "play none none reverse"
+					}
+				}
+			);
+			
+			gsap.fromTo(fineCardText,
+				{ yPercent: 200, xPercent: -50, opacity: 0 },
+				{
+					yPercent: -50,
+					xPercent: -50,
+					opacity: 1,
+					duration: 1,
+					ease: "elastic.out(0.5, 0.4)",
+					delay: 0.15,
+					scrollTrigger: {
+						trigger: ".trend-intro-section",
+						start: "top 85%",
+						toggleActions: "play none none reverse"
+					}
+				}
+			);
+		}
+
+		// --- MOUSEMOVE INTERACTION & AUTOMATIC IDLE SWAY FOR CARDS ---
+		const blueCardWrapper = document.querySelector('.slide-blue .video-card-wrapper');
+		const redCardWrapper = document.querySelector('.slide-red .video-card-wrapper');
+		const orangeCardWrapper = document.querySelector('.fine-card-wrapper');
+		
+		let mouseX = -1, mouseY = -1;
+		let mouseInWindow = false;
+		let hasMoved = false;
+
+		moveCards = (e) => {
+			mouseX = e.clientX;
+			mouseY = e.clientY;
+			mouseInWindow = true;
+			hasMoved = true;
+		};
+
+		onMouseLeave = () => { mouseInWindow = false; };
+		onMouseEnter = () => { mouseInWindow = true; };
+
+		window.addEventListener('mousemove', moveCards);
+		document.addEventListener('mouseleave', onMouseLeave);
+		document.addEventListener('mouseenter', onMouseEnter);
+
+		const tickHomeCards = () => {
+			const timeSec = performance.now() * 0.001;
+			const tSway = (timeSec / 2.5) * Math.PI * 2;
+			const swayY = Math.sin(tSway) * 2.2;
+			const swayX = -Math.sin(tSway * 0.5) * 1.5;
+
+			const mouseActive = hasMoved && mouseInWindow && mouseX >= 0 && mouseY >= 0;
+
+			let mouseTiltX = 0;
+			let mouseTiltY = 0;
+
+			if (mouseActive) {
+				const dx = mouseX - (window.innerWidth / 2);
+				const dy = mouseY - (window.innerHeight / 2);
+				const normalizedX = dx / (window.innerWidth / 2);
+				const normalizedY = dy / (window.innerHeight / 2);
+
+				mouseTiltX = -normalizedY * 3.5;
+				mouseTiltY = normalizedX * 4.5;
+			}
+
+			// Additive combination of mouse tilt and idle sway
+			const targetTiltX = mouseTiltX + swayX;
+			const targetTiltY = mouseTiltY + swayY;
+
+			// LERP interpolation for smooth movements
+			currentBlueX += (targetTiltX - currentBlueX) * 0.1;
+			currentBlueY += (targetTiltY - currentBlueY) * 0.1;
+
+			currentRedX += (targetTiltX - currentRedX) * 0.1;
+			currentRedY += (targetTiltY - currentRedY) * 0.1;
+
+			currentOrangeX += (targetTiltX - currentOrangeX) * 0.1;
+			currentOrangeY += (targetTiltY - currentOrangeY) * 0.1;
+
+			// Apply rotation
+			if (blueCardWrapper) {
+				blueCardWrapper.style.transform = `rotateX(${currentBlueX}deg) rotateY(${currentBlueY}deg)`;
+			}
+			if (redCardWrapper) {
+				redCardWrapper.style.transform = `rotateX(${currentRedX}deg) rotateY(${currentRedY}deg)`;
+			}
+			if (orangeCardWrapper) {
+				orangeCardWrapper.style.transform = `rotateX(${currentOrangeX}deg) rotateY(${currentOrangeY}deg)`;
+			}
+
+			rafIdHome = requestAnimationFrame(tickHomeCards);
+		};
+
+		rafIdHome = requestAnimationFrame(tickHomeCards);
 	});
 
 	onDestroy(() => {
 		cleanup();
+		if (typeof window !== 'undefined') {
+			if (moveCards) window.removeEventListener('mousemove', moveCards);
+			if (rafIdHome) cancelAnimationFrame(rafIdHome);
+		}
+		if (typeof document !== 'undefined') {
+			if (onMouseLeave) document.removeEventListener('mouseleave', onMouseLeave);
+			if (onMouseEnter) document.removeEventListener('mouseenter', onMouseEnter);
+		}
 		if (blueSplit) blueSplit.revert();
 		if (redSplit) redSplit.revert();
 		if (typeof window !== 'undefined' && window.gsap) {
