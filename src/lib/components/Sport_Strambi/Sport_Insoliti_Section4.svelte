@@ -34,6 +34,8 @@
                 end: "+=200%",
                 scrub: 1,
                 pin: true,
+                markers: true,
+                
                 pinSpacing: false,
                 onEnter: () => {gsap.set(section, { autoAlpha: 1 }); gsap.set(textLines, { opacity: 0, x: 300 })},
                 onLeave: () => gsap.set(section, { autoAlpha: 0 }),

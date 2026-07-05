@@ -67,7 +67,7 @@
                 trigger: hero,
                 scroller: window,
                 start: "top top",       
-                end: "+=200%",
+                end: "+=100%",
                 scrub: 1,
                 pin: true,  
                 refreshPriority: 1,
@@ -82,7 +82,8 @@
             xPercent: -150,
             yPercent: -50, // Aggiunto per centrare meglio il varco bianco
             rotate: -60,
-            ease: "power2.inOut"
+            ease: "power2.inOut",
+            duration :10
         });
 
 

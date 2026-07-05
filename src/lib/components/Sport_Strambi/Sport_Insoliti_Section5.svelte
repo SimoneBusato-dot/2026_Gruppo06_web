@@ -159,6 +159,7 @@
                     end: '+=300%',
                     scrub: 1,
                     pin: true,
+                    markers:true,
                     pinSpacing: false,
                     onEnter:     () => gsap.set(section, { autoAlpha: 1 }),
                     onLeave:     () => gsap.set(section, { autoAlpha: 0 }),

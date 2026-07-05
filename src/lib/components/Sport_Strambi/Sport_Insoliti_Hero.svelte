@@ -67,11 +67,12 @@
                 trigger: hero,
                 scroller: window,
                 start: "top top",       
-                end: "+=200%",
+                end: "+=100%",
                 scrub: 1,
                 pin: true,  
                 refreshPriority: 1,
                 pinSpacing: false,
+                markers:true,
                 onLeave: () => gsap.set(hero, { autoAlpha: 0 }),
                 onEnterBack: () => gsap.set(hero, { autoAlpha: 1 }),
             }
@@ -147,6 +148,7 @@
         position: relative;
         width: 100vw;
         height: 100vh;
+        
        
         /* Attiva la profondità 3D per tutto il contenitore */
         
