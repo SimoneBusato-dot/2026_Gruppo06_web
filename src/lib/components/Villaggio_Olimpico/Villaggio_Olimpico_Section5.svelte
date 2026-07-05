@@ -25,7 +25,7 @@
         };
     const length5 = line5.getTotalLength()
     gsap.set(line5, { strokeDasharray: length5, strokeDashoffset: length5, x: "60%" })
-    gsap.set(content5, { x: "100%" })
+    gsap.set(content5, { x: "150%" })
 
     const text5Elements = content5.querySelectorAll(".text5")
 
@@ -79,8 +79,17 @@
         }
     })
 
+    const tl3 = gsap.timeline({
+        scrollTrigger: {
+            trigger: villSection5,
+            scroller: window,
+            start: "top top",
+            end: "+=550%",
+            scrub: 1,
+        }})
+
     tl2.to(line5, { strokeDashoffset: -length5, x: "-60%", duration: 10, ease: "none" }, 0)
-    tl2.to(content5, { x: "-150%", duration: 9.5, ease: "power2.out" }, 0)
+    tl3.to(content5, { x: "-150%", duration: 9.5, ease: "power2.out" }, 0)
 
     const tl = gsap.timeline({
         scrollTrigger: {
