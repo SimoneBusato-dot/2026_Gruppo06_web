@@ -10,7 +10,7 @@
     /* ─── costanti ─── */
     const VARIANTS       = ['blue', 'purple', 'red', 'yellow'];
     const TOTAL          = VARIANTS.length;
-    const GAP            = 32;
+    let   GAP            = 32; // non più fissa: viene ricalcolata in base allo schermo in computeCardW()
     const EASE           = 0.07;
     const BEND           = 200;
     const MAX_ROT        = 28;
@@ -68,6 +68,9 @@
 
     let hasRestored = false; // guardia: NON è $state, serve solo come flag interno
 
+    /* larghezza corrente del clip-path, ricalcolata ad ogni resize */
+    let clipTargetWidth = 0;
+
     $effect(() => {
         const idx = activeIndex; // ⚠️ lettura SEMPRE eseguita → dipendenza sempre tracciata
         if (!hasRestored) return;
@@ -86,13 +89,39 @@
 
     function computeCardW() {
         const cw = containerEl?.offsetWidth ?? window.innerWidth;
-        CARD_W = Math.min(Math.max(320, cw * 0.287), 500);
+        /* card e gap scalano entrambi in proporzione alla larghezza dello schermo,
+           senza un tetto massimo: su schermi grandi le card diventano più grandi
+           E più distanti tra loro, su schermi piccoli più piccole e più vicine.
+           Il rapporto CARD_W/GAP resta simile su ogni dimensione, mentre il numero
+           di card "visibili" (3) è già garantito da VISIBLE_RANGE in positionCards,
+           che ragiona in step relativi e non in pixel assoluti. */
+        CARD_W = Math.max(260, cw * 0.28);
+        GAP    = Math.max(20, cw * 0.035);
         STEP   = CARD_W + GAP;
+    }
+
+    /* ricalcola la larghezza target del clip-path in base al container attuale */
+    function computeClipWidth() {
+        if (!svgClip) return;
+        clipTargetWidth = svgClip.getBoundingClientRect().width;
+        // se il clip è già "aperto" (oltre lo stato iniziale) aggiorna live la larghezza
+        if (ClipPath && Number(ClipPath.getAttribute('width')) > 0) {
+            gsap.set(ClipPath, { width: clipTargetWidth });
+        }
     }
 
     /* ─────────────────────────────────────────────────
        Posizionamento card (arco parabolico)
     ───────────────────────────────────────────────── */
+    /* quante "posizioni" (step) restano nitide ai lati della card attiva.
+       Con TOTAL=4 card: 1 step = card adiacente, 2 step = card opposta nel loop.
+       Impostato a 1.6 la card opposta (distanza 2) risulta sempre completamente
+       nascosta, mentre le due adiacenti (distanza 1) restano visibili: il numero
+       di card mostrate è quindi sempre 3, indipendentemente dalla larghezza dello
+       schermo, perché il calcolo è basato su "quante card di distanza" e non su
+       quanti pixel di distanza (che invece varierebbero da schermo a schermo). */
+    const VISIBLE_RANGE = 1.6;
+
     function positionCards() {
         const slides = getSlides();
         if (!slides.length) return;
@@ -107,20 +136,26 @@
             x += cx - CARD_W / 2;
 
             const cardCenter = x + CARD_W / 2;
-            const dist   = Math.abs(cardCenter - cx);
-            const maxOff = cx + CARD_W;
-            const depth  = Math.max(0, 1 - dist / maxOff);
-            const norm   = (cardCenter - cx) / cx;
+            const dist      = Math.abs(cardCenter - cx);
 
+            /* distanza espressa in "numero di card" invece che in pixel:
+               è un rapporto (dist / STEP), quindi resta identico su qualunque
+               risoluzione, a differenza del vecchio dist / (cx + CARD_W) che
+               cambiava in base alla larghezza reale del contenitore. */
+            const stepsAway = dist / STEP;
+            const depth     = Math.max(0, 1 - stepsAway / VISIBLE_RANGE);
+
+            const norm     = (cardCenter - cx) / cx; // usato solo per l'arco/rotazione visiva
             const yArc     = norm * norm * BEND;
             const rotRaw   = 2 * norm * BEND / cx * (180 / Math.PI) * 0.6;
             const rotation = Math.max(-MAX_ROT, Math.min(MAX_ROT, rotRaw));
 
             gsap.set(slide, {
                 x, y: yArc, rotation,
-                scale:   0.52 + depth * 0.48,
+                scale:   0.5 + depth * 0.5,
                 zIndex:  Math.round(depth * 100),
-                opacity: 0.30 + depth * 0.70,
+                // sotto una certa depth la card è la "quarta", va nascosta del tutto
+                opacity: depth < 0.05 ? 0 : 0.25 + depth * 0.75,
                 transformOrigin: '50% 100%',
             });
 
@@ -239,9 +274,8 @@
     ───────────────────────────────────────────────── */
     onMount(() => {
 
-        const box = svgClip.getBoundingClientRect();
-        const width = box.width;
         computeCardW();
+        computeClipWidth();
 
         const CENTER_OFFSET = Math.floor(TOTAL / 2);
         const initialIndex  = getSavedIndex() ?? 0;
@@ -251,9 +285,13 @@
         positionCards();
         hasRestored = true; // da qui in poi ok salvare
         rafId = requestAnimationFrame(tick);
-            
 
-        const onResize = () => { computeCardW(); positionCards(); };
+
+        const onResize = () => {
+            computeCardW();
+            computeClipWidth();
+            positionCards();
+        };
         window.addEventListener('resize', onResize);
         window.addEventListener('keydown', onKeyDown);
         window.addEventListener('pointermove', onWindowPointerMove);
@@ -289,7 +327,7 @@
         const subtitleEnter = gsap.fromTo(subtitleSplit.lines, {y: "100%"}, {y: "0%", duration: 0.6, ease:"power2.out", paused: true, delay: 1});
         const cardEnter = gsap.fromTo(trackEl, {y: "100%"}, {y: "0%", duration: 1, ease:"elastic.out(0.5,0.4)", paused: true, delay: 0.5});
 
-        const clipMove = gsap.fromTo(ClipPath, {width: 0 } , {width: width, duration: 1, ease: "power2.out", paused: true, delay: 0.3});
+        const clipMove = gsap.fromTo(ClipPath, {width: 0 } , {width: () => clipTargetWidth, duration: 1, ease: "power2.out", paused: true, delay: 0.3});
 
 
         const dots = Array.from(document.querySelectorAll('.dot'));
@@ -420,14 +458,18 @@
         background-color: var(--neutral-50);
     }
 
+    /* ── contenitori: 1512px resta il "design ideale" (max-width),
+       ma ora si adattano a qualunque risoluzione desktop ── */
     #text {
-        width: 1512px;
+        width: 100%;
+        max-width: 1512px;
         display: flex;
         flex-direction: column;
         align-items: center;
         text-align: center;
         padding-top: clamp(1.5rem, 3vh, 4rem);
         padding-bottom: 0.75rem;
+        padding-inline: clamp(1rem, 4vw, 3rem);
         gap: clamp(8px, 1.2vh, 20px);
         flex-shrink: 0;
         position: relative;
@@ -437,7 +479,7 @@
     #title {
         font-family: var(--font-family);
         text-transform: uppercase;
-        font-size: clamp(2.5rem, 6vw, 7.5rem);
+        font-size: clamp(2rem, 5.5vw, 7.5rem);
         font-weight: 800;
         margin: 0;
         color: var(--neutral-800);
@@ -445,10 +487,10 @@
 
     #description {
         font-family: var(--font-family-text);
-        font-size: clamp(0.95rem, 1.5vw, 2.1875rem);
+        font-size: clamp(0.9rem, 1.4vw, 2.1875rem);
         font-weight: 300;
         line-height: 110%;
-        max-width: clamp(320px, 55vw, 55.875rem);
+        max-width: clamp(280px, 55vw, 55.875rem);
         margin: 0;
     }
 
@@ -480,7 +522,8 @@
     #carousel-outer {
         flex: 1;
         min-height: 0;
-        width: 1512px;
+        width: 100%;
+        max-width: 1512px;
         position: relative;
         cursor: grab;
         touch-action: none;
@@ -500,7 +543,8 @@
         bottom: -90%;
         left: 50%;
         transform: translateX(-50%);
-        width: 1512px;
+        width: 100%;
+        max-width: 1512px;
         height: auto;
         pointer-events: none;
         z-index: 0;
@@ -510,8 +554,8 @@
 
     #clip {
         position: absolute;
-        width: 100vw;
-        height: 100vh;
+        width: 100%;
+        height: 100%;
         pointer-events: none;
     }
 
@@ -543,5 +587,22 @@
 
     .slide.is-active :global(a) {
         pointer-events: all;
+    }
+
+    /* ── laptop più piccoli (13"-14", 1280-1440px) ── */
+    @media (max-width: 1440px) {
+        #title { font-size: clamp(2rem, 5vw, 4.5rem); }
+        #description { font-size: clamp(0.9rem, 1.3vw, 1.25rem); }
+    }
+
+    /* ── desktop molto stretti / finestre ridotte ── */
+    @media (max-width: 1024px) {
+        #text { padding-top: 1rem; }
+        #title { font-size: clamp(1.75rem, 6vw, 3rem); }
+    }
+
+    /* ── monitor ultra-wide / 4K ── */
+    @media (min-width: 1920px) {
+        #text, #carousel-outer, #arc-bg { max-width: 1800px; }
     }
 </style>
