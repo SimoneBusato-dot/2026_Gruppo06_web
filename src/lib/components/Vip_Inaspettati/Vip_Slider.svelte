@@ -33,8 +33,8 @@
             initialSlide: 2,
             pagination: { el: ".swiper-pagination", clickable: true },
             cardsEffect: {
-                perSlideOffset: 33,
-                perSlideRotate: -2.5,
+                perSlideOffset: 28,
+                perSlideRotate: -1,
                 rotate: true,
                 slideShadows: false,
                 

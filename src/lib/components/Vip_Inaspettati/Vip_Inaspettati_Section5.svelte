@@ -12,12 +12,24 @@
     let snoopTitle;
     let transition;
 
+    let videoWrapper;
+    let cardBg1;
+    let cardBg2;
+    let textWrapper;
+
     onMount(() => {
         gsap.set(snoopSection, { autoAlpha: 0 });
 
+        // 1. Animazione del titolo      
         const titleChars = new SplitType(snoopTitle, { types: 'chars', tagName: 'span' }).chars;
-        gsap.set(titleChars, { opacity: 0, x: 120 });
+        gsap.set(titleChars, { y: 150, opacity: 0, rotateZ: 30 });  
 
+
+        // 2. Video + card-bg — stato iniziale nascosto
+        gsap.set(videoWrapper, { opacity: 0, y: 150, scale: 0.95 });
+        gsap.set(cardBg1, { opacity: 0, y: 150 });
+        gsap.set(cardBg2, { opacity: 0, y: 150 });
+        gsap.set(textWrapper, { opacity: 0, x: 60 });
 
 
         const tl = gsap.timeline({
@@ -34,18 +46,8 @@
                 onLeave: () => gsap.set(snoopSection, { autoAlpha: 0 }),
                 onEnterBack: () => gsap.set(snoopSection, { autoAlpha: 1 }),
                 onLeaveBack: () => gsap.set(snoopSection, { autoAlpha: 0 }),
-                
-            }
+            }   
         });
-
-        // 1. Animazione del titolo (Entrata)
-        tl.to(titleChars, {
-            opacity: 1,
-            x: 0,
-            rotate: 0,
-            ease: 'none',
-            duration: 0.8,
-        }, 0.20);
 
 
         // 2. Scroll Orizzontale
@@ -54,6 +56,14 @@
             ease: 'none', 
             duration: 1.5 
         });
+
+        // 1. Titolo — entra in parallelo allo scroll orizzontale (posizione 0 della timeline)
+        tl.to(titleChars, { y: 0, opacity: 1, rotateZ: 0, stagger: 0.03, ease: 'power1.out', duration: 0.3 }, 0.1);
+
+        tl.to(cardBg2, { opacity: 0.6, y: 20, duration: 0.3, ease: 'power1.out' }, 0.55);
+        tl.to(cardBg1, { opacity: 1, y: 80, duration: 0.3, ease: 'power1.out' }, 0.55);
+        tl.to(videoWrapper, { opacity: 1, y: 0, scale: 1, duration: 0.3, ease: 'power1.out' }, 0.5);
+        tl.to(textWrapper, { opacity: 1, x: 0, duration: 0.3, ease: 'power1.out' }, 0.7);
 
         // 3. Transizione finale
         gsap.set(transition, { scaleX: 0 }); 
@@ -81,14 +91,14 @@
         <section class="panel content-panel">
             
             <div class="v">
-                <div class="video-wrapper">
+                <div class="video-wrapper" bind:this={videoWrapper}>
                     <video src="/Vip_Inaspettati/Video_SezioneSnoop/Vip_IntroSnoop.mp4" autoplay muted loop></video>
-                    <div class="card-bg1"></div>
-                    <div class="card-bg2"></div>
+                    <div class="card-bg1" bind:this={cardBg1}></div>
+                    <div class="card-bg2" bind:this={cardBg2}></div>
                 </div>
             </div>
 
-            <div class="text-wrapper">
+            <div class="text-wrapper" bind:this={textWrapper}>
                 <p class="highlight-text">
                     La presenza di Snoop Dogg si è rivelata un vero e proprio catalizzatore di attenzione. 
                     Con il suo carisma trasversale, ha avvicinato chi solitamente ignora gli sport invernali.
@@ -148,6 +158,7 @@
         line-height: 76%;
         margin: 0;
         text-align: left;
+        transform: translateX(20vw);
     }
 
     :global(#snoopTitle .char) {
@@ -158,9 +169,9 @@
     /* PANNELLO 2: Contenuti */
     .content-panel {
         align-items: center;
-        justify-content: flex-start;
-        padding: 0 10vw 0 10vw; /* Allineamento ideale per distanziare dal titolo precedente */
-        gap: 20vw; /* Spazio arioso tra blocco visivo e blocco di testo */
+        justify-content: flex-end;
+        padding: 0 6vw 0 4vw; /* Allineamento ideale per distanziare dal titolo precedente */
+        gap: 15vw; /* Spazio arioso tra blocco visivo e blocco di testo */
     }
 
     .v {

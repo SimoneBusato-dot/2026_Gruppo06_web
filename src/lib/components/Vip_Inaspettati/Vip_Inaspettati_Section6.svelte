@@ -12,6 +12,8 @@
     let textLeft;
     let titleRight;
 
+    let transitionBox;
+
 
     onMount(() => {
         // --- Linee SVG ---
@@ -21,12 +23,15 @@
         const len2 = path2.getTotalLength();
         gsap.set(path2, { strokeDasharray: len2, strokeDashoffset: len2 });
 
-        const titleLines = new SplitType(titleRight, { types: 'lines', tagName: 'span' }).lines;
+        const titleLines = new SplitType(titleRight, { types: 'words', tagName: 'span' }).words;
         const textWords = new SplitType(textLeft, { types: 'words', tagName: 'span' }).words;
 
         // Impostiamo gli stati iniziali prima dello scroll
         gsap.set(textWords, { x: 100, opacity: 0 });
         gsap.set(titleLines, { x: 120, opacity: 0 });
+
+        gsap.set(transitionBox, { rotateZ: 90 });
+
 
 
         const tl = gsap.timeline({
@@ -43,12 +48,23 @@
                 onLeave: () => gsap.set(section, { autoAlpha: 0 }),
                 onEnterBack: () => gsap.set(section, { autoAlpha: 1 }),
                 onLeaveBack: () => gsap.set(section, { autoAlpha: 0 }),
+                onUpdate(self){
+                    if (self.progress >= 0.8) {
+                        const p = (self.progress - 0.8) / 0.2
+                        gsap.set(transitionBox, { rotateZ: 90 * (1 - p) })
+                    } else {
+                        gsap.set(transitionBox, { rotateZ: 90 })
+                    }
+                
+                    
+
+                }
             }
         });
 
         // 1. Le linee iniziano a disegnarsi subito
-        tl.to(path1, { strokeDashoffset: 0, ease: 'power2.out', duration: 0.5 }, 0);
-        tl.to(path2, { strokeDashoffset: 0, ease: 'none', duration: 0.6 }, 0.40);
+        tl.to(path1, { strokeDashoffset: 0, ease: 'power2.out', duration: 0.45 }, 0);
+        tl.to(path2, { strokeDashoffset: 0, ease: 'none', duration: 0.3 }, 0.35);
 
         // 2. Il primo testo entra fluidamente parola per parola e RESTA visibile
         tl.to(textWords, { 
@@ -57,16 +73,17 @@
             stagger: 0.03, 
             ease: 'power1.out', 
             duration: 0.20 
-        }, 0.3); 
+        }, 0.2); 
 
         // 3. Entrata del titolo sulla destra (senza nascondere il primo testo)
         tl.to(titleLines, { 
             x: 0, 
             opacity: 1, 
-            stagger: 0.08, 
-            ease: 'power2.out', 
+            stagger: 0.03, 
+            ease: 'power1.out', 
             duration: 0.20 
-        }, 0.5);
+        }, 0.35);
+
 
 
         return () => {
@@ -113,6 +130,10 @@
                 stroke-linecap="round"
             />
         </svg>
+    </div>
+
+    <div id="curtain">
+        <span id="uno" bind:this={transitionBox}></span>
     </div>
 
 </main>
@@ -210,6 +231,31 @@
     .highlight {
         color: var(--brand-vip-500);
         font-weight: 400;
+    }
+
+
+    /* Pannello diagonale che scende dall'alto e copre tutta la sezione */
+    #curtain{
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: 2;
+
+    }
+
+    #uno{
+        display: block;
+        width: 140%;      /* non serve 200% se il curtain è già 100vw */
+        height: 100%;      /* ognuno occupa metà altezza */
+        background-color: var(--brand-vip-500);
+        transform: translatex(-20%)
+    }
+
+    #uno{
+        transform-origin: bottom right;
     }
 
 

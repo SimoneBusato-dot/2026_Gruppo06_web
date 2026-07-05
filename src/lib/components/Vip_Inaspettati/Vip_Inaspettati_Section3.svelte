@@ -43,8 +43,15 @@
 
         
         // SplitType sezione 2
-        const s2P1Lines = new SplitType(s2P1, { types: "lines", tagName: "span" }).lines;
-        const s2P2Lines = new SplitType(s2P2, { types: "lines", tagName: "span" }).lines;
+        const s2P1Lines = new SplitType(s2P1, { types: "words", tagName: "span" }).words;
+        const s2P2Lines = new SplitType(s2P2, { types: "words", tagName: "span" }).words;
+
+
+        const text1s4 = new SplitType(textLeft, { types: 'lines', tagName: 'span' }).lines;
+        const text2s4 = new SplitType(titleMain, { types: 'lines', tagName: 'span' }).lines;
+        const text3s4 = new SplitType(textRight, { types: 'lines', tagName: 'span' }).lines;
+
+        
         
 
 // === TIMELINE UNICA (TUTTO SOTTO SCRUB) ===
@@ -71,8 +78,8 @@
         // Disegno linea s2
         tl.to(s2Path, { strokeDashoffset: 0, ease: "none", duration: 0.30 }, 0.03);
         // Comparsa testi s2 (Spostati qui dentro! Niente più onUpdate)
-        tl.fromTo(s2P1Lines, { x: 150, opacity: 0 }, { x: 0, opacity: 1, stagger: 0.05, duration: 0.08, ease: "power2.out" }, 0.04);
-        tl.fromTo(s2P2Lines, { x: 150, opacity: 0 }, { x: 0, opacity: 1, stagger: 0.05, duration: 0.08, ease: "power2.out" }, 0.15);
+        tl.fromTo(s2P1Lines, { x: 150, opacity: 0 }, { x: 0, opacity: 1, stagger: 0.03, duration: 0.08, ease: "power2.out" }, 0.04);
+        tl.fromTo(s2P2Lines, { x: 150, opacity: 0 }, { x: 0, opacity: 1, stagger: 0.03, duration: 0.08, ease: "power2.out" }, 0.15);
 
         // --- SCROLL ORIZZONTALE ---
         tl.fromTo(hScroll, { x: "0vw" }, { x: () => -(hScroll.scrollWidth - window.innerWidth), ease: "none", duration: 0.5 }, 0.3);
@@ -82,20 +89,20 @@
         tl.to(path, { strokeDashoffset: 0, ease: "none", duration: 0.37 }, 0.57);
         
         // TESTO 1: Entra a 0.68, esce a 0.75
-        tl.fromTo(textLeft, { x: 50, opacity: 0 }, { x: 0, opacity: 1, duration: 0.03, ease: "power2.out" }, 0.65)
-          .to(textLeft, { x: -50, opacity: 0, duration: 0.03, ease: "power2.in" }, 0.70);
+        tl.fromTo(text1s4, { x: 100, opacity: 0 }, { x: 0, opacity: 1, stagger: 0.015, duration: 0.025, ease: "power2.out" }, 0.65)
+          .to(text1s4, { x: -100, opacity: 0, stagger: 0.015, duration: 0.025, ease: "power2.in" }, 0.70);
 
         // TESTO 2: Entra a 0.75 (appena esce il primo), esce a 0.82
-        tl.fromTo(titleMain, { x: 50, opacity: 0 }, { x: 0, opacity: 1, duration: 0.03, ease: "power2.out" }, 0.78)
-          .to(titleMain, { x: -50, opacity: 0, duration: 0.03, ease: "power2.in" }, 0.83);
+        tl.fromTo(text2s4, { x: 100, opacity: 0 }, { x: 0, opacity: 1, stagger: 0.025, duration: 0.025, ease: "power2.out" }, 0.78)
+          .to(text2s4, { x: -100, opacity: 0, stagger: 0.025, duration: 0.025, ease: "power2.in" }, 0.83);
 
         // TESTO 3: Entra a 0.82 e resta visibile fino alla fine dello scroll
-        tl.fromTo(textRight, { x: 50, opacity: 0 }, { x: 0, opacity: 1, duration: 0.04, ease: "power2.out" }, 0.88)
-            .to(textRight, { x: -50, opacity: 0, duration: 0.03, ease: "power2.in" }, 0.93);
+        tl.fromTo(text3s4, { x: 100, opacity: 0 }, { x: 0, opacity: 1, stagger: 0.015, duration: 0.025, ease: "power2.out" }, 0.88)
+            .to(text3s4, { x: -100, opacity: 0, stagger: 0.015, duration: 0.025, ease: "power2.in" }, 0.93);
 
         // --- TRANSIZIONE FINALE (Anticipata a 0.88 per coincidere con la fine della linea) ---
-        tl.to(transitionEllipse, { attr: { rx: 3000, ry: 3000 }, ease: "power2.inOut", duration: 0.05 }, 0.95);
-        tl.to("#transitionOverlay", { autoAlpha: 0, duration: 0 }, 1.0);
+        tl.to(transitionEllipse, { attr: { rx: 3000, ry: 3000 }, ease: "power2.inOut", duration: 0.04 }, 0.96);
+        tl.to("#transitionOverlay", { autoAlpha: 0, duration: 0 }, 1);
 
 
         // === PARALLAX MOUSE OTTIMIZZATO ===
@@ -178,7 +185,7 @@
             </div>
             <p id="textDesc" bind:this={textRight}>
                 Il successo di questi personaggi nasce da un meccanismo semplice: <span class="highlight">chi guarda si riconosce.</span> <br>
-                Non ammira soltanto, partecipa.
+                Non ammira soltanto, partecipa.<br>
                 E in quella partecipazione si crea un legame che supera lo schermo.
             </p>
         </div>
@@ -319,7 +326,7 @@
     #lineContainer {
         position: absolute;
         top: 20%;
-        right: 0;
+        right: -5%;
         left: 0;
         width: 100%;
         height: 100%;

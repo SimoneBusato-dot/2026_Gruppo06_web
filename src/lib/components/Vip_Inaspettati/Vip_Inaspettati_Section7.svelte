@@ -2,6 +2,7 @@
     import { onMount } from 'svelte';
     import { gsap } from 'gsap';
     import { ScrollTrigger } from 'gsap/ScrollTrigger';
+    import SplitType from 'split-type';
 
     gsap.registerPlugin(ScrollTrigger);
 
@@ -13,63 +14,91 @@
 
     const rotations = [-2, 0.5, -1.5, 3, 0.5, -2, 0.5, -1.5, -2, 0.5, -1.5, 3]; // Rotazioni casuali per i video
 
+    let transitionBox;
+
 
     onMount(() => {
 
-        
+        const wrapperWidth = videoContainer.parentElement.offsetWidth; // Larghezza del contenitore della sezione
+
+        const titleTopWords = new SplitType(titleTop, { types: 'words', tagName: 'span' }).words;
+        const titleWords = titles.map(title => {
+            if (!title) return [];
+            return new SplitType(title, { types: 'words', tagName: 'span' }).words;
+        });
+
         // Impostiamo gli stati iniziali (nascosti) prima dello scroll
-        gsap.set(titleTop, { x: 30, opacity: 0 });
-        gsap.set(titles, { x: 40, opacity: 0 });
+        gsap.set(titleTopWords, { x: wrapperWidth, opacity: 0 });
+        titleWords.forEach(words => {
+            gsap.set(words, { x: wrapperWidth, opacity: 0 });
+        });
+
+        gsap.set(videoContainer, { x: wrapperWidth, opacity: 0 }); // Inizialmente posizioniamo il videoContainer fuori dalla vista a destra
+
+        gsap.set(transitionBox, { rotateZ: 90 });
 
 
-        // Timeline dedicata alla seconda sezione
         const tl = gsap.timeline({
             scrollTrigger: {
                 trigger: section,
-                start: 'top top',      // Si blocca quando la sezione tocca la cima dello schermo
-                end: '+=300%',         // Durata dello scroll (intensità del blocco)
-                scrub: 1,              // L'animazione segue la dita/rotella dello scroll
-                pin: true,             // Blocca la sezione sullo schermo
-                pinSpacing: false,     // Crea lo spazio necessario per le sezioni successive
-                markers: true,         // Cambia in true se vuoi vedere i marker di debug
+                start: 'top top',      
+                end: '+=300%',         
+                scrub: 1,              
+                pin: true,             
+                pinSpacing: false,     
+                markers: true,         
                 onEnter: () => {gsap.set(section, { autoAlpha: 1 })},
                 onLeave: () => gsap.set(section, { autoAlpha: 0 }),
                 onEnterBack: () => gsap.set(section, { autoAlpha: 1 }),
                 onLeaveBack: () => gsap.set(section, { autoAlpha: 0 }),
+                onUpdate(self){
+                    if (self.progress >= 0.9) {
+                        const p = (self.progress - 0.9) / 0.1
+                        gsap.set(transitionBox, { rotateZ: 90 * (1 - p) })
+                    } else {
+                        gsap.set(transitionBox, { rotateZ: 90 })
+                    }
+                
+                    
+
+                }
             }
         });
 
         // 1. Entrata del sotto-titolo e della griglia video
-        tl.to(titleTop, { x: 0, opacity: 1, duration: 0.6 })
+        tl.to(titleTopWords, { x: 0, opacity: 1, stagger: 0.05, duration: 1.5, ease: 'power2.out' }, 0);
+        tl.to(videoContainer, { x: 0, opacity: 1, ease: 'power2.out', duration: 1.5 }, 0);
 
-        // 2. Animazione a catena dei 4 titoli (Entra -> Resta -> Esce)
-        titles.forEach((title, index) => {
-            if (!title) return;
+        // Segniamo l'istante in cui inizia la catena di titoli
+        const titlesStart = tl.duration(); // = 1.5, fine dell'entrata
 
-            // Entrata del titolo corrente
-            tl.to(title, { x: 0, opacity: 1, duration: 0.6 });
+        // 2. Animazione a catena dei 4 titoli (invariata)
+        titleWords.forEach((words, index) => {
+            if (!words || words.length === 0) return;
 
-            // Se non è l'ultimo titolo, lo facciamo uscire prima di mostrare il prossimo
-            if (index < titles.length - 1) {
-                tl.to(title, { x: -200, opacity: 0, duration: 0.6 }, '+=0.6'); // il +=0.6 fa da "pausa" visiva
+            tl.to(words, { x: 0, opacity: 1, stagger: 0.03, duration: 0.6, ease: 'power2.out' });
+
+            if (index < titleWords.length - 1) {
+                tl.to(words, { x: -200, opacity: 0, stagger: 0.03, duration: 0.6, ease: 'power2.in' }, '+=0.6');
             } else {
-                // Sull'ultimo titolo diamo solo una leggera pausa temporale prima di chiudere
                 tl.to({}, { duration: 0.6 });
             }
         });
 
-        // 3. Effetto Slider Video (Spostamento orizzontale continuo durante la lettura dei titoli)
-        const wrapperWidth = videoContainer.parentElement.offsetWidth; // Larghezza del contenitore della sezione
-        const GridWidth = videoContainer.scrollWidth; // Larghezza totale della griglia
-        const distanceToScroll = GridWidth - wrapperWidth; // Distanza totale da scorrere
+        // Segniamo la fine della catena, per sapere quanto è durata
+        const titlesEnd = tl.duration();
+        const titlesDuration = titlesEnd - titlesStart;
+
+        // 3. Scroll video — ora in PARALLELO con la catena di titoli (stessa posizione di inizio, stessa durata)
+        const GridWidth = videoContainer.scrollWidth; 
+        const distanceToScroll = GridWidth - wrapperWidth;
 
         if (distanceToScroll > 0) {
-            tl.to(videoContainer, { x: -distanceToScroll, ease: 'none', duration: 4 }, 0); // Inizia subito con la timeline
+            tl.to(videoContainer, { x: -distanceToScroll, ease: 'none', duration: titlesDuration }, titlesStart);
         }
 
 
         return () => {
-            // Pulizia dei trigger associati a questo componente quando viene smontato
             ScrollTrigger.getAll().forEach(t => {
                 if (t.trigger === section) t.kill();
             });
@@ -77,7 +106,7 @@
     });
 </script>
 
-<section class="pink-section" bind:this={section}>
+<main class="pink-section" bind:this={section}>
     <div class="header-titles">
         <span class="sub-title" bind:this={titleTop}>
             L’engagement è decollato attorno a momenti iconici
@@ -103,17 +132,19 @@
                 {#each [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as n, i}
                     <div class="video-wrapper" style="transform: rotate({rotations[i]}deg);">
                         <video 
-                            src="/Vip_Inaspettati/Video_SezioneFinaleRosa/Vip_Snoop{n}.mp4" 
-                            muted 
-                            loop 
-                            playsinline
-                            autoplay
-                        ></video>
+                            src="/Vip_Inaspettati/Video_SezioneFinaleRosa/Vip_Snoop{n}.mp4" muted loop playsinline autoplay>
+                        </video>
                     </div>
                 {/each}
             </div>
         </div>
-</section>
+
+        <div id="curtain">
+            <span id="uno" bind:this={transitionBox}></span>
+        </div>
+
+</main>
+
 
 <style>
     .pink-section {
@@ -126,7 +157,6 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        padding: 2vw 6vw;
         box-sizing: border-box;
         visibility: hidden; /* Nascondi la sezione fino a quando non viene attivata dallo scroll */
         margin-block-start: 100vh;
@@ -135,7 +165,7 @@
     .header-titles {
         display: flex;
         flex-direction: column;
-        padding-top: 8vh;
+        padding: 6vw 6vw;
         gap: 1.5vh;
     }
 
@@ -174,6 +204,7 @@
         flex-grow: 1;
         display: flex;
         align-items: flex-end; /* Allinea i video in basso */
+        padding: 2vw 6vw;
     }
 
     .video-grid {
@@ -198,4 +229,36 @@
         display: block;
         border-radius: 20px; /* Segue il raggio del video-wrapper */
     }
+
+
+
+    /* Pannello diagonale che scende dall'alto e copre tutta la sezione */
+    #curtain{
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: 2;
+
+    }
+
+    #uno{
+        display: block;
+        width: 140%;      /* non serve 200% se il curtain è già 100vw */
+        height: 100%;      /* ognuno occupa metà altezza */
+        background-color: var(--neutral-50);
+        transform: translatex(-20%)
+    }
+
+    #uno{
+        transform-origin: bottom right;
+    }
+
+
+    :global(.title-animation .sub-title .word) {
+        display: inline-block;
+    }
+
 </style>
