@@ -226,6 +226,8 @@ export function init() {
     const startWidth = window.innerWidth;
     const startHeight = window.innerHeight;
 
+    const initialTextY = isMobile ? startHeight * 0.22 : startHeight * 0.38;
+
     let path, color, width, height, cardWidth, cardHeight;
     let textIndex, textOpacity, textTranslateY;
     let counterOpacity, cardTextOpacity, columnsOpacity;
@@ -257,9 +259,9 @@ export function init() {
         textOpacity = 0;
         textTranslateY = 0;
         numChars = 14;
-        fontSize = 19;
+        fontSize = isMobile ? 26 : 19;
         suffixText = "";
-        textY = startHeight * 0.38;
+        textY = initialTextY;
       } else if (progress < suspensionEnd1) {
         // Suspension Phase: Keep card fully brushed, full-size, static 22 MLD count
         path = startTrapezoid.path;
@@ -277,14 +279,14 @@ export function init() {
         textOpacity = 0;
         textTranslateY = 0;
         numChars = 14;
-        fontSize = 19;
+        fontSize = isMobile ? 26 : 19;
         suffixText = "";
-        textY = startHeight * 0.38;
+        textY = initialTextY;
       } else {
         // Transition Card 0 -> Card 1 - Stage 2 morphing
         const t = (progress - suspensionEnd1) / (totalPhase1Max - suspensionEnd1);
         const easedT = softEase(t);
-        textY = lerp(startHeight * 0.38, 0, easedT);
+        textY = lerp(initialTextY, 0, easedT);
         
         // Distort background container dynamically through Card 3 and Card 2 geometries
         if (easedT < 0.3333) {
@@ -343,8 +345,9 @@ export function init() {
         }
         
         // Font-size scaling: 19vw down to target (12.5vw desktop, 22vw mobile)
+        const startFontSize = isMobile ? 26 : 19;
         const targetFontSize = isMobile ? 22 : 12.5;
-        fontSize = lerp(19, targetFontSize, easedT);
+        fontSize = lerp(startFontSize, targetFontSize, easedT);
 
         // Suffix typing effect: types "MLD" letter-by-letter in the remaining 30% of transition
         if (easedT < 0.7) {
@@ -647,12 +650,20 @@ export function init() {
       displayBack.style.display = 'block';
       displayBack.style.opacity = state.counterOpacity;
       
-      const currentText = displayBackDigits.textContent;
-      let truncated = currentText;
-      if (currentText.length > state.numChars) {
-        truncated = currentText.substring(0, state.numChars);
+      const isMobile = window.innerWidth <= 900;
+      if (isMobile) {
+        const rawDigits = displayBackDigits.textContent.replace(/\./g, '');
+        const mobileNumChars = Math.round(lerp(2, 11, (state.numChars - 2) / 12));
+        let truncatedRaw = rawDigits.substring(0, mobileNumChars);
+        displayBackDigits.innerHTML = formatNumberMobileString(truncatedRaw);
+      } else {
+        const currentText = displayBackDigits.textContent;
+        let truncated = currentText;
+        if (currentText.length > state.numChars) {
+          truncated = currentText.substring(0, state.numChars);
+        }
+        displayBackDigits.textContent = truncated;
       }
-      displayBackDigits.textContent = truncated;
       displayBackSuffix.textContent = state.suffixText;
       
       displayBack.style.fontSize = `${state.fontSize}vw`;
@@ -804,6 +815,16 @@ export function init() {
   
   const formatNumber = (num) => {
     return new Intl.NumberFormat('it-IT').format(num);
+  };
+
+  const formatNumberMobileString = (str) => {
+    const groups = [];
+    let i = str.length;
+    while (i > 0) {
+      groups.unshift(str.slice(Math.max(0, i - 3), i));
+      i -= 3;
+    }
+    return groups.join('<br>');
   };
 
   // Prevent FOUT by fading in elements once fonts are fully loaded

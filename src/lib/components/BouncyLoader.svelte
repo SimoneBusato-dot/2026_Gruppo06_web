@@ -7,7 +7,7 @@
 
     let progress = $state(0);
     let activePhase = $state(0); // 0: Blue, 1: Pink, 2: Orange, 3: Red
-    let isVisible = $state(true);
+    let isVisible = $state(false);
     let isLoaded = $state(false);
 
     let barEl = $state(null);
@@ -23,6 +23,9 @@
 
 
     onMount(() => {
+        if (onComplete) onComplete();
+        return;
+
         // Cache DOM elements
         const navbar = document.querySelector('.navbar-header');
         const counterZero = document.getElementById('counter-display-back');

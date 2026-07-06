@@ -1438,6 +1438,17 @@ body.no-scroll-counter {
     font-size: 4.5vw;
     max-width: 90%;
   }
+
+  /* Mobile counter display vertical stacking styling */
+  .counter-display {
+    white-space: normal !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    line-height: 0.75 !important;
+  }
 }
 
 
