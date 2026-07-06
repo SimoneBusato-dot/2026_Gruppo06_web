@@ -514,7 +514,7 @@
 
                     // If we reached the end, redirect immediately
                     if (p >= 0.999) {
-                        goto('/?from=trend', { noScroll: true });
+                        goto('/Categorie');
                         return;
                     }
 

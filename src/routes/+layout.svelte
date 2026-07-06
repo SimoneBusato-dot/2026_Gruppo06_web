@@ -12,7 +12,12 @@
     let isTransitioningSvg = $state(false);
     let isAnimatingClass = $state(false);
 
+    // Tiene traccia della view transition "standard" attualmente in corso,
+    // per evitare sovrapposizioni che generano InvalidStateError
+    let currentViewTransition = null;
+
     onNavigate((navigation) => {
+    // ... resto invariato
         if (typeof document !== 'undefined') {
             const rxContainer = document.getElementById('reactions-container');
             if (rxContainer) {
@@ -33,6 +38,17 @@
             (navigation.from?.route.id === '/' && navigation.to?.route.id === '/Categorie') ||
             (navigation.from?.route.id === '/Categorie' && navigation.to?.route.id === '/');
 
+        // Se una view transition "standard" era rimasta appesa da una navigazione precedente,
+        // la saltiamo prima di iniziarne una nuova (SVG o standard che sia)
+        if (currentViewTransition) {
+            try {
+                currentViewTransition.skipTransition?.();
+            } catch (e) {
+                // ignorabile: la transizione potrebbe essere già conclusa
+            }
+            currentViewTransition = null;
+        }
+
         // GESTIONE CAMBIO PAGINA VERSO CATEGORIE (Usa l'animazione SVG)
         if (isCounterToCategorie) {
             isTransitioningSvg = true;
@@ -42,16 +58,20 @@
                 // L'animazione totale dura 1.4s (1400ms). Il picco massimo (schermo coperto) è al 50% (700ms).
                 setTimeout(async () => {
                     // Lo schermo è coperto dall'onda blu: ora cambiamo la pagina sotto!
-                    resolve(); 
-                    
-                    // Aspettiamo che la nuova pagina sia pronta, poi resettiamo gli stati a fine animazione
-                    await navigation.complete;
+                    resolve();
+
+                    try {
+                        // Aspettiamo che la nuova pagina sia pronta, poi resettiamo gli stati a fine animazione
+                        await navigation.complete;
+                    } catch (e) {
+                        // navigazione interrotta/sostituita: nessun problema, ignoriamo
+                    }
+
                     setTimeout(() => {
                         isTransitioningSvg = false;
                         isAnimatingClass = false;
                     }, 1500); // Il restante 50% del tempo per far uscire la linea
-                    
-                }, 1500); 
+                }, 1500);
             });
         }
 
@@ -61,8 +81,26 @@
         return new Promise((resolve) => {
             const transition = document.startViewTransition(async () => {
                 resolve();
-                await navigation.complete;
+                try {
+                    await navigation.complete;
+                } catch (e) {
+                    // navigazione interrotta: nessun problema, ignoriamo
+                }
             });
+
+            currentViewTransition = transition;
+
+            // Evita gli "Uncaught (in promise) InvalidStateError" quando la transizione
+            // viene interrotta/sovrascritta da una navigazione successiva
+            transition.ready.catch(() => {});
+            transition.updateCallbackDone.catch(() => {});
+            transition.finished
+                .catch(() => {})
+                .finally(() => {
+                    if (currentViewTransition === transition) {
+                        currentViewTransition = null;
+                    }
+                });
         });
     });
 
@@ -70,9 +108,9 @@
         const handleGlobalClick = (e) => {
             // Evita lo spawn se l'utente clicca su elementi interattivi come bottoni, link, ecc.
             if (
-                e.target.tagName === 'BUTTON' || 
-                e.target.tagName === 'A' || 
-                e.target.closest('button') || 
+                e.target.tagName === 'BUTTON' ||
+                e.target.tagName === 'A' ||
+                e.target.closest('button') ||
                 e.target.closest('a')
             ) {
                 return;
@@ -111,7 +149,7 @@
             <path
                 d="M13.4746 291.27C13.4746 291.27 100.646 -18.6724 255.617 16.8418C410.588 52.356 61.0296 431.197 233.017 546.326C431.659 679.299 444.494 21.0125 652.73 100.784C860.967 180.556 468.663 430.709 617.216 546.326C765.769 661.944 819.097 48.2722 988.501 120.156C1174.21 198.957 809.424 543.841 988.501 636.726C1189.37 740.915 1301.67 149.213 1301.67 149.213"
                 stroke="var(--brand-vip-500)"
-                stroke-width="24" 
+                stroke-width="24"
                 stroke-linecap="round"
                 stroke-linejoin="round"
             />
@@ -176,17 +214,14 @@
 @keyframes stacked-slide-in {
     0% {
         scale: 1;
-        transform: translateY(0);
-        border-radius: 0;
+        border-radius: 20px;
     }
     50% {
         scale: 0.85;
-        transform: translateY(0);
         border-radius: 20px;
     }
     100% {
         scale: 1;
-        transform: translateY(0);
         border-radius: 0;
     }
 }
@@ -194,15 +229,15 @@
 :root::view-transition-old(root),
 :root::view-transition-new(root) {
     mix-blend-mode: normal;
-    animation: none; 
-    opacity: 1; 
+    animation: none;
+    opacity: 1;
 }
 
 :root::view-transition-old(root) {
     animation: 1.7s stacked-slide-out forwards 0.3s;
     transform-origin: center center;
     animation-timing-function: cubic-bezier(0.83, 0, 0.17, 1);
-    z-index: 2; 
+    z-index: 2;
     overflow: hidden;
     isolation: isolate;
     transition: all 0.1s ease;
@@ -256,19 +291,16 @@
     0% {
         stroke-dashoffset: 5500;
         stroke-width: 24;
-        
     }
     /* Al 50% lo schermo è completamente coperto di colore blu */
     50% {
         stroke-dashoffset: 0;
-        stroke-width: 900; 
-        
+        stroke-width: 900;
     }
     /* Dal 50% in poi la linea si svuota e svela la nuova pagina */
     100% {
         stroke-dashoffset: -5500;
         stroke-width: 24;
-        
     }
 }
 </style>
