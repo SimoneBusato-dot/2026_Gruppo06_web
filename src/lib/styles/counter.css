@@ -555,7 +555,7 @@ body.no-scroll-counter {
   background: rgba(21, 21, 21, 0.82);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1.2px solid rgba(255, 255, 255, 0.15);
+  
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   padding: 6px 18px;
   border-radius: 9999px;
@@ -707,7 +707,7 @@ body.no-scroll-counter {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  gap: 0.5vw; /* Spacing between cards */
+  gap: 2vw; /* Spacing between cards */
   width: auto;
   will-change: transform;
 }
@@ -769,7 +769,7 @@ body.no-scroll-counter {
   align-items: center;
   border-radius: 50%;
   background: rgba(83, 62, 220, 0.9); /* Brand violet with opacity */
-  border: 1.5px solid rgba(255, 255, 255, 0.6);
+  
   color: #ffffff;
   font-family: var(--font-family-text), sans-serif;
   font-weight: 400;
@@ -782,9 +782,7 @@ body.no-scroll-counter {
 
 /* Hover style for badge */
 .carousel-card-item:hover .card-number {
-  background: rgba(83, 62, 220, 1);
-  border-color: rgba(255, 255, 255, 1);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  background: var(--brand-sport-insoliti-500);
 }
 
 @media (max-width: 900px) {
@@ -879,7 +877,7 @@ body.no-scroll-counter {
   background: rgba(255, 255, 255, 0.78);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+
   border-radius: 16px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
   z-index: 10000;
@@ -903,7 +901,7 @@ body.no-scroll-counter {
   justify-content: space-between;
   align-items: center;
   background: rgba(83, 62, 220, 0.08);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  
   cursor: pointer;
   user-select: none;
 }
@@ -967,7 +965,7 @@ body.no-scroll-counter {
 .inspector-field input[type="text"] {
   width: 100%;
   padding: 6px 10px;
-  border: 1px solid rgba(0, 0, 0, 0.15);
+ 
   border-radius: 6px;
   background: #fff;
   font-size: 13px;
@@ -1000,7 +998,7 @@ body.no-scroll-counter {
   text-transform: uppercase;
   color: #888;
   letter-spacing: 0.1em;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+
   padding-bottom: 4px;
   margin-top: 8px;
   text-align: left;
@@ -1038,7 +1036,7 @@ body.no-scroll-counter {
   border-radius: 50%;
   background: var(--brand-sport-insoliti-500);
   cursor: pointer;
-  border: 2px solid #fff;
+  
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
@@ -1048,7 +1046,7 @@ body.no-scroll-counter {
   font-family: monospace;
   font-size: 11px;
   padding: 8px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  
   border-radius: 6px;
   background: rgba(0, 0, 0, 0.03);
   color: #333;
@@ -1281,7 +1279,6 @@ body.no-scroll-counter {
   position: absolute;
   pointer-events: none;
   z-index: 1;
-  opacity: 0.85;
 }
 
 .line-blue-slide {
@@ -1290,7 +1287,6 @@ body.no-scroll-counter {
   top: auto;
   width: 700px;
   max-width: 700px;
-  opacity: 0.85;
 }
 
 .line-red-slide {
@@ -1299,7 +1295,6 @@ body.no-scroll-counter {
   top: auto;
   width: 500px;
   max-width: 500px;
-  opacity: 0.85;
 }
 
 /* Trend Selection Section */

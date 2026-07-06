@@ -427,7 +427,7 @@
 				<div class="final-cards-container">
 					<div class="final-cards-track">
 						{#each Array(30) as _, i}
-							<div class="carousel-card-item">
+							<div class="carousel-card-item" style="transform: rotate({(Math.random() - 0.5) * 8}deg);">
 								<video
 									src="/assets/carousel_videos/video_{i + 1}.mp4"
 									poster="/assets/carousel_videos/poster_{i + 1}.jpg"
@@ -476,7 +476,7 @@
 		<!-- Slide 1: Blue -->
 		<div class="video-slide slide-blue">
 			<svg class="slide-wavy-line line-blue-slide" viewBox="0 0 965 624" fill="none" xmlns="http://www.w3.org/2000/svg">
-				<path d="M33.3964 12.7461C33.3964 12.7461 -14.1036 94.7461 123.896 175.746C261.896 256.746 760.397 221.746 736.397 400.246C712.397 578.746 796.897 604.246 963.397 596.246" stroke="#533EDC" stroke-width="51" stroke-linecap="round" stroke-linejoin="round"/>
+				<path d="M33.3964 12.7461C33.3964 12.7461 -14.1036 94.7461 123.896 175.746C261.896 256.746 760.397 221.746 736.397 400.246C712.397 578.746 796.897 604.246 963.397 596.246" stroke="#533DDC" stroke-width="51" stroke-linecap="round" stroke-linejoin="round"/>
 			</svg>
 			
 			<div class="slide-content-left">

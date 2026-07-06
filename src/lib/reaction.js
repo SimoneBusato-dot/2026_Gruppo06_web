@@ -1,11 +1,8 @@
-const colors = {
-  heart: '#ff2d55', // Instagram vibrant red
-  like: '#1877f2'   // Facebook vibrant blue
-};
+const colors = ['#dc3dcc', '#533ddc', '#dc3e41', '#dc963e'];
 
 // Helper to compile self-contained SVG with flat colors for each reaction
 export function getReactionSVG(type) {
-  const color = colors[type];
+  const color = colors[Math.floor(Math.random() * colors.length)];
   
   if (type === 'heart') {
     return `
