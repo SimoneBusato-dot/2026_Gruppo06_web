@@ -13,7 +13,7 @@
     // Modifica questi valori per cambiare i punti di calamita (snapping) e i
     // range di scroll libero in questa sezione.
     // =========================================================================
-    const totalD = 24.0; // Durata temporale logica della timeline GSAP
+    const totalD = 23.6; // Durata temporale logica della timeline GSAP
     const SECTION_SNAP_CONFIG = {
         // Punti di Snap per i Testi Iniziali (Slide 1)
         slide1Text1: 1.4 / totalD,   // Snap al primo testo ("Non c'è creator...")
@@ -34,22 +34,22 @@
         pastaOlimpicaSnap: 10.5 / totalD,  // Snap con PASTA OLIMPICA completamente a schermo e animata (Hold)
         swiperDeckSnap: 12.5 / totalD,     // Snap al carosello di card (Hold statico per consentire interazione)
         chartPeak1Snap: 15.3 / totalD,     // Snap al picco 1 del grafico con testo completato
-        chartPeak2Snap: 16.2 / totalD,     // Snap al picco 2 del grafico con testo completato
-        quoteSnap: 19.4 / totalD,          // Snap alla citazione (linea finita in alto a destra, prima dei commenti)
+        chartPeak2Snap: 16.1 / totalD,     // Snap al picco 2 del grafico con testo completato
+        quoteSnap: 19.0 / totalD,          // Snap alla citazione (linea finita in alto a destra, prima dei commenti)
 
         // Altre transizioni di sezione
         deckTransition: 11.0 / totalD,     // Inizio transizione Swiper deck
         chartTransition: 14.6 / totalD,    // Inizio transizione grafico D3
-        quoteTransition: 17.4 / totalD,    // Inizio transizione citazione grande
-        commentsTransition: 19.9 / totalD, // Inizio transizione commenti
-        redirectTransition: 21.9 / totalD, // Inizio contatore di caricamento finale
+        quoteTransition: 17.0 / totalD,    // Inizio transizione citazione grande
+        commentsTransition: 19.5 / totalD, // Inizio transizione commenti
+        redirectTransition: 21.5 / totalD, // Inizio contatore di caricamento finale
 
         // Range di Scroll Libero (senza calamita)
         freeScroll: {
             gallery: { start: 4.5 / totalD, end: 6.0 / totalD },
             swiper: { start: 12.0 / totalD, end: 13.5 / totalD },
-            chart: { start: 14.7 / totalD, end: 17.2 / totalD },
-            comments: { start: 19.9 / totalD, end: 21.9 / totalD }
+            chart: { start: 14.7 / totalD, end: 16.4 / totalD },
+            comments: { start: 19.5 / totalD, end: 21.5 / totalD }
         }
     };
 
@@ -135,7 +135,6 @@
     let redirectLine;
     let redirectPath;
     let redirectTextElement;
-    let progressCircle;
 
     // Swiper zafferano colors
     const colors = [
@@ -263,7 +262,6 @@
         gsap.set(quotePath, { strokeDasharray: lenQuote, strokeDashoffset: lenQuote });
         gsap.set(commentsPath, { strokeDasharray: lenComments, strokeDashoffset: lenComments, x: 0 });
         gsap.set(redirectPath, { strokeDasharray: lenRedirect, strokeDashoffset: lenRedirect });
-        gsap.set(progressCircle, { strokeDasharray: 188.5, strokeDashoffset: 188.5 });
 
         // Initialize states
         gsap.set([introText1, introText2, introText3], { opacity: 1, y: 0 });
@@ -277,7 +275,6 @@
         gsap.set(commentsLine, { yPercent: 0, opacity: 0, x: 0 });
         gsap.set(commentsVideoScroll, { x: "180%" });
         gsap.set(redirectContainer, { xPercent: 0 });
-        gsap.set('.circular-progress-container', { opacity: 0, scale: 0.8 });
         gsap.set('.gallery-col', { y: 0 });
         gsap.set([interText1, interText2, interText3], { opacity: 1, y: 0 });
 
@@ -419,13 +416,6 @@
                 pinSpacing: true,
                 snap: {
                     snapTo: (value) => {
-                        // Snapping logic for redirect lock
-                        const lockStart = 23.3 / totalD;
-                        const commentsEnd = 21.9 / totalD;
-                        if (value > commentsEnd && value < 0.999) {
-                            return lockStart; // Snap to start of redirect slide (before loading begins)
-                        }
-
                         const points = [
                             0,
                             SECTION_SNAP_CONFIG.slide1Text1,
@@ -439,8 +429,6 @@
                             SECTION_SNAP_CONFIG.slide3Text3,
                             SECTION_SNAP_CONFIG.pastaOlimpicaSnap,
                             SECTION_SNAP_CONFIG.swiperDeckSnap,
-                            SECTION_SNAP_CONFIG.chartPeak1Snap,
-                            SECTION_SNAP_CONFIG.chartPeak2Snap,
                             SECTION_SNAP_CONFIG.quoteSnap,
                             SECTION_SNAP_CONFIG.commentsTransition,
                             SECTION_SNAP_CONFIG.redirectTransition,
@@ -493,12 +481,11 @@
                 onLeaveBack: () => gsap.set(section, { autoAlpha: 0 }),
                 onUpdate: (self) => {
                     const p = self.progress;
-                    const totalD = 24.0;
-                    const startP = 23.3 / totalD;
+                    const totalD = 23.6;
 
                     // Dynamically disable snapping in the comments range to preserve browser momentum
-                    const commentsStart = 19.8 / totalD;
-                    const commentsEnd = 22.0 / totalD;
+                    const commentsStart = 19.4 / totalD;
+                    const commentsEnd = 21.6 / totalD;
                     if (p >= commentsStart && p <= commentsEnd) {
                         if (self.vars.snap) {
                             if (!self.originalSnapConfig) {
@@ -509,25 +496,6 @@
                     } else {
                         if (!self.vars.snap && self.originalSnapConfig) {
                             self.vars.snap = self.originalSnapConfig;
-                        }
-                    }
-
-                    // If we reached the end, redirect immediately
-                    if (p >= 0.999) {
-                        goto('/Categorie');
-                        return;
-                    }
-
-                    if (p >= startP) {
-                        // User is scrolling to fill the progress circle
-                        const f = Math.max(0, Math.min(1, (p - startP) / (1 - startP)));
-                        const offset = 188.5 * (1 - f);
-                        if (progressCircle) {
-                            progressCircle.style.strokeDashoffset = offset;
-                        }
-                    } else {
-                        if (progressCircle) {
-                            progressCircle.style.strokeDashoffset = 188.5;
                         }
                     }
                 }
@@ -642,40 +610,39 @@
           .fromTo(chartText2Lines, { opacity: 0, x: 300 }, { opacity: 1, x: 0, stagger: 0.05, duration: 0.4, ease: "power2.out" }, 15.7)
           // Parallax continued scroll slightly
           .to('#svgChartContainer', { x: "-35vw", ease: "none", duration: 0.4 }, 15.6)
-          // Hold Peak 2 visible (Hold snap)
-          .to({}, { duration: 1.1 }, 16.1)
+          // Hold Peak 2 visible (Hold snap) - 0.3s duration to allow text entrance to fully finish before zoom starts
+          .to({}, { duration: 0.3 }, 16.1)
 
-          // Phase 9D: Zoom Circle Transition to Slide 7 (0.2 duration - extremely quick!)
-          .to(chartText2Lines, { opacity: 0, x: -200, stagger: 0.05, duration: 0.3, ease: "power2.in" }, 17.2)
-          .to([chartFirstCircle, '.chart-area', '.chart-main-line'], { opacity: 0, duration: 0.1 }, 17.2)
-          .to(cinematicCard, { backgroundColor: "#ffffff", duration: 0.2, ease: "power2.inOut" }, 17.2)
-          .to(chartLastCircle, { scale: 350, fill: "#ffffff", duration: 0.2, ease: "power2.in" }, 17.2)
-          .set(chartContainer, { opacity: 0 }, 17.4)
+          // Phase 9D: Zoom Circle Transition to Slide 7 (0.6 duration - slower and normal scroll distance)
+          .to(chartText2Lines, { opacity: 0, x: -200, stagger: 0.05, duration: 0.5, ease: "power2.in" }, 16.4)
+          .to([chartFirstCircle, '.chart-area', '.chart-main-line'], { opacity: 0, duration: 0.2 }, 16.4)
+          .to(cinematicCard, { backgroundColor: "#ffffff", duration: 0.5, ease: "power2.inOut" }, 16.4)
+          .to(chartLastCircle, { scale: 350, fill: "#ffffff", duration: 0.6, ease: "power2.in" }, 16.4)
+          .set(chartContainer, { opacity: 0 }, 17.0)
 
           // 10. PHASE 10: Transition to Slide 7 (Quote section) with opacity cross-fade (no sliding)
-          .to(chartContainer, { opacity: 0, duration: 1.0, ease: "power2.inOut" }, 17.4)
-          .to(cinematicCard, { opacity: 0, duration: 1.0, ease: "power2.inOut" }, 17.4)
-          .to(quoteContainer, { opacity: 1, duration: 1.0, ease: "power2.inOut" }, 17.4)
-          .to(quotePath, { strokeDashoffset: 0, duration: 1.0, ease: "none" }, 17.9)
-          .fromTo(quoteTextLines, { opacity: 0, x: 300 }, { opacity: 1, x: 0, stagger: 0.05, ease: "power2.out", duration: 0.6 }, 17.9)
+          .to(chartContainer, { opacity: 0, duration: 1.0, ease: "power2.inOut" }, 17.0)
+          .to(cinematicCard, { opacity: 0, duration: 1.0, ease: "power2.inOut" }, 17.0)
+          .to(quoteContainer, { opacity: 1, duration: 1.0, ease: "power2.inOut" }, 17.0)
+          .to(quotePath, { strokeDashoffset: 0, duration: 1.0, ease: "none" }, 17.5)
+          .fromTo(quoteTextLines, { opacity: 0, x: 300 }, { opacity: 1, x: 0, stagger: 0.05, ease: "power2.out", duration: 0.6 }, 17.5)
           // Hold Quote page visible (line exited top right, text fully read) (Hold snap)
-          .to({}, { duration: 1.0 }, 18.9)
+          .to({}, { duration: 1.0 }, 18.5)
 
           // 11. PHASE 11: Transition to Slide 8 (Comments section) with quote retraction and comments line bottom entrance
-          .to(quoteTextLines, { opacity: 0, x: -200, stagger: 0.05, ease: "power2.in", duration: 0.4 }, 19.9)
-          .to(quotePath, { strokeDashoffset: -lenQuote, duration: 1.0, ease: "power2.inOut" }, 19.9)
-          .to(commentsLine, { opacity: 1, duration: 1.0, ease: "power2.inOut" }, 19.9)
-          .to(commentsLine, { x: "-60vw", ease: "none", duration: 2.0 }, 19.9)
-          .to(commentsVideoScroll, { x: "-200%", ease: "none", duration: 2.0 }, 19.9)
-          .to(commentsPath, { strokeDashoffset: 0, ease: "none", duration: 2.0 }, 19.9)
+          .to(quoteTextLines, { opacity: 0, x: -200, stagger: 0.05, ease: "power2.in", duration: 0.4 }, 19.5)
+          .to(quotePath, { strokeDashoffset: -lenQuote, duration: 1.0, ease: "power2.inOut" }, 19.5)
+          .to(commentsLine, { opacity: 1, duration: 1.0, ease: "power2.inOut" }, 19.5)
+          .to(commentsLine, { x: "-60vw", ease: "none", duration: 2.0 }, 19.5)
+          .to(commentsVideoScroll, { x: "-200%", ease: "none", duration: 2.0 }, 19.5)
+          .to(commentsPath, { strokeDashoffset: 0, ease: "none", duration: 2.0 }, 19.5)
 
           // 12. PHASE 12: Transition to Slide 9 (Redirect section)
-          .to(redirectPath, { strokeDashoffset: 0, ease: "none", duration: 1.0 }, 21.9)
-          .to(commentsPath, { strokeDashoffset: -lenComments - 500, ease: "power2.inOut", duration: 0.8 }, 21.5)
-          .set(commentsLine, { opacity: 0 }, 22.3)
-          .to(redirectTextWords, { opacity: 1, y: 0, stagger: 0.08, duration: 0.8, ease: "power2.out" }, 22.4)
-          .fromTo('.circular-progress-container', { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1.0, duration: 0.8, ease: "power2.out" }, 22.4)
-          .to({}, { duration: 24.0 - 23.0 }, 23.0);
+          .to(redirectPath, { strokeDashoffset: 0, ease: "none", duration: 1.0 }, 21.5)
+          .to(commentsPath, { strokeDashoffset: -lenComments - 500, ease: "power2.inOut", duration: 0.8 }, 21.1)
+          .set(commentsLine, { opacity: 0 }, 21.9)
+          .to(redirectTextWords, { opacity: 1, y: 0, stagger: 0.08, duration: 0.8, ease: "power2.out" }, 22.0)
+          .to({}, { duration: 23.6 - 22.6 }, 22.6);
 
         const preventDefaultScroll = (e) => {
             if (isSwipingSwiper) {
@@ -981,8 +948,8 @@
             </div>
         </div>
         <div id="commentsSvgContainer" bind:this={commentsLine}>
-            <svg width="200%" height="100%" viewBox="0 0 2374 219" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path bind:this={commentsPath} d="M25.1792 395.969C46.2211 264.612 269.241 39.0184 401.679 26.4684C549.667 12.4449 663.179 154.468 758.679 229.969C935.179 369.506 809.673 322.658 974.179 254.469C1104.49 200.455 1153.99 150.045 1284.68 96.9687C1489.35 13.847 1657.03 392.953 1857.18 299.469C1949.36 256.416 1967.82 159.328 2077.18 140.969C2145.68 129.469 2200.82 151.427 2239.68 224.469C2278.87 298.144 2324.47 370.376 2348.68 450.238" stroke="var(--brand-cibo-500)" stroke-width="51" stroke-linejoin="round" stroke-linecap="round"/>
+            <svg width="200%" height="100%" viewBox="0 0 2280 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path bind:this={commentsPath} d="M 0 150 C 95 30, 190 30, 285 150 C 380 270, 475 270, 570 150 C 665 30, 760 30, 855 150 C 950 270, 1045 270, 1140 150 C 1235 30, 1330 30, 1425 150 C 1520 270, 1615 270, 1710 150 C 1805 30, 1900 30, 1995 150 C 2090 270, 2185 270, 2280 150" stroke="var(--brand-cibo-500)" stroke-width="51" stroke-linejoin="round" stroke-linecap="round"/>
             </svg>
         </div>
     </div>
@@ -1001,17 +968,6 @@
             <p id="redirectParagraph" bind:this={redirectTextElement}>
                 Continua a scrollare per tornare alle card
             </p>
-        </div>
-
-        <div class="circular-progress-container">
-            <svg class="progress-ring" width="80" height="80">
-                <circle class="progress-ring__background" stroke="rgba(0,0,0,0.1)" stroke-width="6" fill="transparent" r="30" cx="40" cy="40" />
-                <circle class="progress-ring__circle" bind:this={progressCircle} stroke="var(--brand-cibo-500)" stroke-width="6" fill="transparent" r="30" cx="40" cy="40" />
-            </svg>
-            <svg class="arrow-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="var(--brand-cibo-500)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <polyline points="19 12 12 19 5 12"></polyline>
-            </svg>
         </div>
     </div>
 </main>
@@ -1497,11 +1453,14 @@
         top: 12vh;
         width: 28vw;
         font-size: 26px;
-        color: var(--neutral-50) !important;
+        color: #ffffff !important;
         font-weight: 400;
         font-family: var(--font-family-text);
         line-height: 140%;
         text-align: left;
+    }
+    .chart-paragraph p, .chart-paragraph span {
+        color: #ffffff !important;
     }
 
     #chartText1 {
@@ -1672,7 +1631,7 @@
 
     #commentsSvgContainer {
         position: absolute;
-        bottom: -30%;
+        top: -45%;
         left: 0;
         width: 100%;
         height: 100%;
@@ -1709,46 +1668,5 @@
         font-size: 1.625rem;
         color: var(--neutral-900);
         font-family: var(--font-family-text);
-    }
-
-    .circular-progress-container {
-        position: absolute;
-        bottom: 15%;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 80px;
-        height: 80px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0;
-        z-index: 10;
-    }
-
-    .progress-ring {
-        transform: rotate(-90deg);
-        transform-origin: center;
-    }
-
-    .progress-ring__circle {
-        transition: stroke-dashoffset 0.05s linear;
-    }
-
-    .arrow-icon {
-        position: absolute;
-        animation: bounce-cibo 2s infinite;
-        pointer-events: none;
-    }
-
-    @keyframes bounce-cibo {
-        0%, 20%, 50%, 80%, 100% {
-            transform: translateY(0);
-        }
-        40% {
-            transform: translateY(6px);
-        }
-        60% {
-            transform: translateY(3px);
-        }
     }
 </style>
