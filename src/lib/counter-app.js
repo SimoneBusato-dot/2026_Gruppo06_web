@@ -1285,6 +1285,7 @@ export function init() {
       cardIntensity = Math.min((currentProgress - fillPhaseStart1) / (totalPhase1Max - fillPhaseStart1), 1);
     }
 
+    // Calculate dynamic idle sway (breathing effect)
     let swayX = 0;
     let swayY = 0;
     if (cardIntensity > 0) {
