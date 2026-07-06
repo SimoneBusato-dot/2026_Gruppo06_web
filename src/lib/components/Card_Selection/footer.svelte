@@ -1,54 +1,59 @@
 <script>
     import { onMount } from "svelte";
-        import gsap from "gsap";
-        import { ScrollTrigger } from "gsap/ScrollTrigger";
-        import SplitText from 'gsap/SplitText';
+    import gsap from "gsap";
+    import { ScrollTrigger } from "gsap/ScrollTrigger";
+    import SplitText from 'gsap/SplitText';
 
-        gsap.registerPlugin(ScrollTrigger, SplitText);
-        let footer;
-        let footerContent;
-        let footerTitle;
+    gsap.registerPlugin(ScrollTrigger, SplitText);
+    
+    /** @type {HTMLElement} */
+    let footer;
+    /** @type {HTMLElement} */
+    let footerContent;
+    /** @type {HTMLElement} */
+    let footerTitle;
+    
+    onMount(() => {
+        let cat = Array.from(footer.querySelectorAll('.categ'));
+        const splitFooter = new SplitText(footerTitle, { type: "words", mask: "words" });
+        const footerTitleEnter = gsap.fromTo(splitFooter.words, { y: "120%"}, { y: "0%", duration: 0.6, stagger:0.1, ease:"elastic.out(0.5,0.4)", paused: true, delay: 0.5});
+        const categEnter = gsap.fromTo(cat, {y: "100%"}, {y: "0%", duration: 1, stagger: 0.1, ease:"elastic.out(0.5,0.4)", paused: true, delay: 1});
+        const footerEnter = gsap.fromTo(footerContent, {height: "0"}, {height: "40dvh", duration: 1, ease:"power2.out", paused: true , delay: 0.3});
         
-        onMount(()=>{
-            let cat = Array.from(footer.querySelectorAll('.categ'));
-            const splitFooter = new SplitText(footerTitle, { type: "words", mask: "words" });
-            const footerTitleEnter = gsap.fromTo(splitFooter.words, { y: "120%"}, { y: "0%", duration: 0.6, stagger:0.1, ease:"elastic.out(0.5,0.4)", paused: true, delay: 0.5});
-            const categEnter = gsap.fromTo(cat, {y: "100%"}, {y: "0%", duration: 1, stagger: 0.1, ease:"elastic.out(0.5,0.4)", paused: true, delay: 1});
-            const footerEnter = gsap.fromTo(footerContent, {height: "0"}, {height: "40dvh", duration: 1, ease:"power2.out", paused: true , delay: 0.3});
-            let tl = gsap.timeline({
-                scrollTrigger: {
-                    trigger: footer,
-                    onEnter() {footerEnter.play(); categEnter.play(); footerTitleEnter.play();},
-                    onLeave() {footerEnter.reverse(); categEnter.reverse(); footerTitleEnter.reverse();},
-                    onEnterBack() {footerEnter.play(); categEnter.play(); footerTitleEnter.play();},
-                    onLeaveBack() {footerEnter.reverse(); categEnter.reverse(); footerTitleEnter.reverse();}
-                }
-            })
-        })
+        gsap.timeline({
+            scrollTrigger: {
+                trigger: footer,
+                onEnter() { footerEnter.play(); categEnter.play(); footerTitleEnter.play(); },
+                onLeave() { footerEnter.reverse(); categEnter.reverse(); footerTitleEnter.reverse(); },
+                onEnterBack() { footerEnter.play(); categEnter.play(); footerTitleEnter.play(); },
+                onLeaveBack() { footerEnter.reverse(); categEnter.reverse(); footerTitleEnter.reverse(); }
+            }
+        });
+    });
 </script>
 
 <footer id="footer" bind:this={footer}>
     <div id="footerContent" bind:this={footerContent}>
-    <div id="footerTitle">
-        <h1 id="fT" bind:this={footerTitle}>LE PIU VISTE DELLA STORIA</h1>
-    </div>
-    <div id="smallCategories">
-        <div class="categ">
-            <p class="catText">Sport insoliti</p>
+        <div id="footerTitle">
+            <h1 id="fT" bind:this={footerTitle}>LE PIU VISTE DELLA STORIA</h1>
         </div>
-        <div class="categ">
-            <p class="catText">VIP inaspettati</p>
+        <div id="smallCategories">
+            <a href="/Sport_Insoliti" class="categ">
+                <p class="catText">Sport insoliti</p>
+            </a>
+            <a href="/Vip_Inaspettati" class="categ">
+                <p class="catText">VIP inaspettati</p>
+            </a>
+            <a href="/Villaggio_Olimpico" class="categ">
+                <p class="catText">Villaggio olimpico</p>
+            </a>
+            <a href="/Cucina_Italiana" class="categ">
+                <p class="catText">Cucina italiana</p>
+            </a>
         </div>
-        <div class="categ">
-            <p class="catText">Villaggio olimpico</p>
+        <div id="designedBy">
+            <p>Designed by: Luca Assinnato, Simone Busato, Nicola Castriotta, Edoardo Cicerone, Filippo Esposito, Mattia Lampugnani</p>
         </div>
-        <div class="categ">
-            <p class="catText">Cucina italiana</p>
-        </div>
-    </div>
-    <div id="designedBy">
-        <p>Designed by: Luca Assinnato, Simone Busato, Nicola Castriotta, Edoardo Cicerone, Filippo Esposito, Mattia Lampugnani</p>
-    </div>
     </div>
 </footer>
 
@@ -92,9 +97,20 @@
         align-items: center;
         gap: 2rem;
         overflow: hidden;
-        
     }
 
+    .categ {
+        border-radius: 1rem;
+        text-decoration: none;
+        cursor: pointer;
+        display: inline-block;
+        transition: transform 0.2s ease, filter 0.2s ease;
+    }
+
+    .categ:hover {
+        transform: scale(1.05);
+        filter: brightness(1.15);
+    }
     
     .catText {
         font-size: 1.625rem;
@@ -102,9 +118,7 @@
         font-weight: 300;
         color: var(--neutral-50);
         padding: 0.5rem 1rem;
-    }
-    .categ {
-        border-radius: 1rem;
+        margin: 0;
     }
 
     .categ:first-child {
