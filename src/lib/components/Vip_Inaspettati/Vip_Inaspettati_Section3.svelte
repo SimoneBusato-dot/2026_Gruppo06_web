@@ -29,6 +29,7 @@
     
 
     onMount(() => {
+
         gsap.set([section, s2Section, "#section3Panel"], { autoAlpha: 1 });
 
         
@@ -115,6 +116,14 @@
                 duration: 1.2,
                 rotateY: xPercent * 5,
                 rotateX: -yPercent * 3,
+                ease: "power2.out",
+                overwrite: "auto",
+            });
+
+            gsap.to(sliderElement, {
+                duration: 1.2,
+                rotateY: xPercent * 15,
+                rotateX: -yPercent * 7,
                 ease: "power2.out",
                 overwrite: "auto",
             });

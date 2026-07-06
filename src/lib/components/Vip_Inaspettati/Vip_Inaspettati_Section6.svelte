@@ -11,6 +11,8 @@
     let path2;
     let textLeft;
     let titleRight;
+    let lineTopEl;
+    let lineBottomEl;
 
     let transitionBox;
 
@@ -84,9 +86,24 @@
             duration: 0.20 
         }, 0.35);
 
+        // animazione mouse
+        const moveElements = (e) => {
+            const xPercent = (e.clientX / window.innerWidth - 0.5) * 2;
+            const yPercent = (e.clientY / window.innerHeight - 0.5) * 2;
 
+            gsap.to([lineTopEl, lineBottomEl], {
+                duration: 1.2,
+                rotateY: xPercent * 15,
+                rotateX: -yPercent * 10,
+                ease: "power2.out",
+                overwrite: "auto",
+            });
+        };
+
+        window.addEventListener("mousemove", moveElements);
 
         return () => {
+            window.removeEventListener("mousemove", moveElements);
             ScrollTrigger.getAll().forEach(t => t.kill());
         };
     });
@@ -107,7 +124,7 @@
     </div>
 
     <!-- Linea SVG in alto -->
-    <div id="lineTop">
+    <div id="lineTop" bind:this={lineTopEl}>
         <svg width=100% height=100% viewBox="0 0 2023 705" perspectiveAspectRatio="xMidYMid meet" fill="none" xmlns="http://www.w3.org/2000/svg">ù
             <path 
                 bind:this={path1}
@@ -120,7 +137,7 @@
     </div>
 
     <!-- Linea SVG in basso -->
-    <div id="lineBottom">
+    <div id="lineBottom" bind:this={lineBottomEl}>
         <svg width="100%" height="100%" viewBox="0 0 2023 705" preserveAspectRatio="xMidYMid meet" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
                 bind:this={path2}
@@ -256,6 +273,10 @@
 
     #uno{
         transform-origin: bottom right;
+    }
+
+    #lineTop, #lineBottom {
+        transform-style: preserve-3d;
     }
 
 

@@ -108,65 +108,65 @@
             <div id="videoContainer" bind:this={videoScroll}>
                 <div class="v" >
                     <div class="video-wrapper">
-                        <video src="/Sport_Insoliti/Video_Commenti/Curling_Commenti1.mp4" autoplay muted loop></video>
+                        <video src="/Vip_Inaspettati/Video_CommentiVip/Vip_Commento1.mp4" autoplay muted loop></video>
                         <div class="card-bg"></div>
                     </div>
                     <div class="comments">
-                        <Comments variant="purple" user="ciaozio">Lo sport più ridicolo del mondo...🤔</Comments>
+                        <Comments variant="purple" user="blorbo.boy">Snoop is the reason to watch the Olympics 😂😂😂</Comments>
                     </div>
                 </div>
                 <div class="v">
                     <div class="video-wrapper">
-                        <video src="/Sport_Insoliti/Video_Commenti/Curling_Commenti2.mp4" autoplay muted loop></video>
+                        <video src="/Vip_Inaspettati/Video_CommentiVip/Vip_Commento2.mp4" autoplay muted loop></video>
                         <div class="card-bg"></div>
                     </div>
                     <div class="comments">
-                        <Comments variant="purple">sbaglio o tutti ci siamo appassionati al curling?</Comments>
+                        <Comments variant="purple" user="npc.afk_">The king of side quests</Comments>
                     </div>
                 </div>
                 <div class="v">
                     <div class="video-wrapper">
-                        <video src="/Sport_Insoliti/Video_Commenti/Curling_Commenti3.mp4" autoplay muted loop></video>
+                        <video src="/Vip_Inaspettati/Video_CommentiVip/Vip_Commento3.mp4" autoplay muted loop></video>
                         <div class="card-bg"></div>
                     </div>
                     <div class="comments">
-                        <Comments variant="purple">amo il curling</Comments>
+                        <Comments variant="purple" user="rachet66">Lo sa che quella bianca in terra si chiama pista ??</Comments>
                     </div>
                 </div>
                 <div class="v">
                     <div class="video-wrapper">
-                        <video src="/Sport_Insoliti/Video_Commenti/Curling_Commenti4.mp4" autoplay muted loop></video>
+                        <video src="/Vip_Inaspettati/Video_CommentiVip/Vip_Commento4.mp4" autoplay muted loop></video>
                         <div class="card-bg"></div>
                     </div>
                     <div class="comments">
-                        <Comments variant="purple">CHE SPORT SIGNORI</Comments>
+                        <Comments variant="purple" user="user748133">Olympic crush</Comments>
                     </div>
                 </div>
                 <div class="v">
                     <div class="video-wrapper">
-                        <video src="/Sport_Insoliti/Video_Commenti/Curling_Commenti5.mp4" autoplay muted loop></video>
+                        <video src="/Vip_Inaspettati/Video_CommentiVip/Vip_Commento5.mp4" autoplay muted loop></video>
                         <div class="card-bg"></div>
                     </div>
                     <div class="comments">
-                        <Comments variant="purple">Si lascia il calcio per il curling</Comments>
+                        <Comments variant="purple" user="marlene00">He’s sooooo in to heimself.</Comments>
                     </div>
                 </div>
                 <div class="v">
                     <div class="video-wrapper">
-                        <video src="/Sport_Insoliti/Video_Commenti/Curling_Commenti6.mp4" autoplay muted loop></video>
+                        <video src="/Vip_Inaspettati/Video_CommentiVip/Vip_Commento6.mp4" autoplay muted loop></video>
                         <div class="card-bg"></div>
                     </div>
                     <div class="comments">
-                        <Comments variant="purple">Fanculo il calcio ora si vede solo il curling</Comments>
+                        <Comments variant="purple" user="dog.jpeg">why is the winter Olympics just baddies and baddies </Comments>
                     </div>
                 </div>
                 <div class="v">
                     <div class="video-wrapper">
-                        <video src="/Sport_Insoliti/Video_Commenti/Curling_Commenti7.mp4" autoplay muted loop></video>
+                        <video src="/Vip_Inaspettati/Video_CommentiVip/Vip_Commento7.mp4" autoplay muted loop></video>
                         <div class="card-bg"></div>
                     </div>
                     <div class="comments">
-                        <Comments variant="purple">Posso farlo anche io!!</Comments>
+                        <Comments variant="purple" user="blueeyy_">wait i’m soo lost is he in the Olympics?</Comments>
                     </div>
                 </div>
             </div>
@@ -174,7 +174,7 @@
     </div>
 
      <div id="svgContainer7" bind:this={line7}>
-        <svg width="100%" height="100%" viewBox="0 0 2374 219" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="200%" height="100%" viewBox="0 0 2374 219" fill="none" xmlns="http://www.w3.org/2000/svg">
              <path bind:this={path7} d="M25.1792 395.969C46.2211 264.612 269.241 39.0184 401.679 26.4684C549.667 12.4449 663.179 154.468 758.679 229.969C935.179 369.506 809.673 322.658 974.179 254.469C1104.49 200.455 1153.99 150.045 1284.68 96.9687C1489.35 13.847 1657.03 392.953 1857.18 299.469C1949.36 256.416 1967.82 159.328 2077.18 140.969C2145.68 129.469 2200.82 151.427 2239.68 224.469C2278.87 298.144 2324.47 370.376 2348.68 450.238" stroke="#dc3dcc" stroke-width="51" stroke-linejoin="round" stroke-linecap="round"/>
         </svg>
     </div>
@@ -198,11 +198,12 @@
 
 #svgContainer7 {
     position: absolute;
-    bottom: -40%;
-    left: 0;
+    top: -40%;
+    left: -5%;
     width: 100%;
     height: 100%;
     z-index: -1;
+    transform: scaleY(-1);
 
 }
 
@@ -217,6 +218,7 @@
     justify-content: center;
     gap: 15rem;
     height: 100%;
+    transform: translateY(15%);
 }
 
 .v {

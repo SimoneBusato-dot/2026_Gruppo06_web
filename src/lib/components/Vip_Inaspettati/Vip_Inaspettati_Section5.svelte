@@ -29,7 +29,9 @@
         gsap.set(videoWrapper, { opacity: 0, y: 150, scale: 0.95 });
         gsap.set(cardBg1, { opacity: 0, y: 150 });
         gsap.set(cardBg2, { opacity: 0, y: 150 });
-        gsap.set(textWrapper, { opacity: 0, x: 60 });
+
+        const textWrapperWords = new SplitType(textWrapper, { types: 'words', tagName: 'span' }).words;
+        gsap.set(textWrapperWords, { opacity: 0, x: 60 });
 
 
         const tl = gsap.timeline({
@@ -63,7 +65,7 @@
         tl.to(cardBg2, { opacity: 0.6, y: 20, duration: 0.3, ease: 'power1.out' }, 0.55);
         tl.to(cardBg1, { opacity: 1, y: 80, duration: 0.3, ease: 'power1.out' }, 0.55);
         tl.to(videoWrapper, { opacity: 1, y: 0, scale: 1, duration: 0.3, ease: 'power1.out' }, 0.5);
-        tl.to(textWrapper, { opacity: 1, x: 0, duration: 0.3, ease: 'power1.out' }, 0.7);
+        tl.to(textWrapperWords, { opacity: 1, x: 0, stagger: 0.03, duration: 0.2, ease: 'power1.out' }, 0.7);
 
         // 3. Transizione finale
         gsap.set(transition, { scaleX: 0 }); 
@@ -73,7 +75,24 @@
             duration: 0.8 
         });
 
+
+        const moveElements = (e) => {
+            const xPercent = (e.clientX / window.innerWidth - 0.5) * 2;
+            const yPercent = (e.clientY / window.innerHeight - 0.5) * 2;
+
+            gsap.to([videoWrapper], {
+                duration: 1.2,
+                rotateY: xPercent * 5,
+                rotateX: -yPercent * 3,
+                ease: "power2.out",
+                overwrite: "auto",
+            });
+        };
+
+        window.addEventListener("mousemove", moveElements);
+
         return () => {
+            window.removeEventListener("mousemove", moveElements);
             ScrollTrigger.getAll().forEach(t => t.kill());
         };
     });

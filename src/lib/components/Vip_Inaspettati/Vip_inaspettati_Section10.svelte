@@ -7,16 +7,13 @@
 
     gsap.registerPlugin(ScrollTrigger);
     let section8;
-    let line8, path8, text8;
-
+    let line8, path8;
     onMount(() => {
 
         const length = path8.getTotalLength();
         gsap.set(path8, { strokeDasharray: length, strokeDashoffset: length });
 
-        let text8SplitType = new SplitType(text8, { types: 'words', tagName: 'span' });
-        let text8Words = text8SplitType.words;
-        const text8Animation = gsap.fromTo(text8Words, { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 1, ease: "power2.out", stagger: 0.1, paused: true });
+        
         
         const tl = gsap.timeline({
             scrollTrigger: {
@@ -29,12 +26,9 @@
                 pinSpacing: true,
                 markers: true,
                 onEnter: () => gsap.set(section8, { autoAlpha: 1 }),
-                onLeave: () =>  {goto('/?from=trend', { noScroll: true }); console.log('onLeave triggered');},
+                onLeave: () =>  {goto('/Categorie'); console.log('onLeave triggered');},
                 onEnterBack: () => gsap.set(section8, { autoAlpha: 1 }),
                 onLeaveBack: () => gsap.set(section8, { autoAlpha: 0 }),
-                onUpdate: (self) => {
-                    if (self.progress >= 0.2) { text8Animation.play(); } else { text8Animation.reverse(); }
-                },
                 
 
 
@@ -53,11 +47,6 @@
         </svg>
     </div>
 
-    <div id="text8">
-        <p id="paragraph8" bind:this={text8}>
-            Continua a scrollare per tornare alle card
-        </p>
-    </div>
 </main>
 
 <style>
@@ -88,11 +77,4 @@
         stroke: round;
     }
 
-    #text8 {
-        position: relative;
-        z-index: 1;
-        font-size: 1.625rem;
-        color: var(--neutral-900);
-        font-family: var(--font-family-text);
-    }
 </style>

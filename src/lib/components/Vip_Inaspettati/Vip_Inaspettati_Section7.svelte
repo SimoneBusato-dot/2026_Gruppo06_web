@@ -98,7 +98,26 @@
         }
 
 
+        // animazione mouse
+        const moveElements = (e) => {
+            console.log("moveElements fired", videoContainer, titles);
+            const xPercent = (e.clientX / window.innerWidth - 0.5) * 2;
+            const yPercent = (e.clientY / window.innerHeight - 0.5) * 2;
+
+            gsap.to([videoContainer], {
+                duration: 1.2,
+                rotateY: xPercent * 15,
+                rotateX: -yPercent * 10,
+                ease: "power2.out",
+                overwrite: "auto",
+            });
+        };
+
+        window.addEventListener("mousemove", moveElements);
+
+
         return () => {
+            window.removeEventListener("mousemove", moveElements);
             ScrollTrigger.getAll().forEach(t => {
                 if (t.trigger === section) t.kill();
             });
@@ -109,7 +128,7 @@
 <main class="pink-section" bind:this={section}>
     <div class="header-titles">
         <span class="sub-title" bind:this={titleTop}>
-            L’engagement è decollato attorno a momenti iconici
+            L’engagement è decollato attorno a momenti iconici come ... 
         </span>
         <div class="main-title-container">
             <h3 class="title-animation" bind:this={titles[0]}>
