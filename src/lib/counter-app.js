@@ -289,7 +289,7 @@ export function init(options = {}) {
 
   const cards = [
     {
-      title: "VISUALIZ-\nZAZIONI",
+      title: "VISUALIZZAZIONI",
       number: "22",
       suffix: "MLD",
       description: "<span style=\"color: rgb(83, 62, 220)\">Quasi tre volte l'intera popolazione mondiale.</span> Un flusso ininterrotto di sguardi incollati ai video di queste Olimpiadi Invernali.",
@@ -307,7 +307,7 @@ export function init(options = {}) {
       path: parsePath("M0.0335474 33.4578C-0.820912 14.7085 14.5698 -0.747219 33.3225 0.0282694L500.709 19.3563C517.469 20.0493 530.849 33.5665 531.371 50.3324L539.964 326.123C540.508 343.582 526.95 358.252 509.502 359.083L47.9735 381.061C30.2949 381.903 15.2903 368.234 14.4845 350.554L0.0335474 33.4578Z")
     },
     {
-      title: "POST\nPUBBLICATI",
+      title: "POST PUBBLICATI",
       number: "27",
       suffix: "MLN",
       description: "<span style=\"color: rgb(220, 149, 62)\">La voglia di esserci</span> ha inondato i social, tra racconti in prima persona e un'infinita produzione di meme.",

@@ -320,9 +320,10 @@ body.no-scroll-counter {
 
 /* 12-column Grid Placement */
 .column-left {
-  grid-column: 2 / 4;
+  grid-column: 1 / 4;
   text-align: left;
-  max-width: 320px;
+  padding-left: 2vw;
+  max-width: 420px;
   justify-self: start;
 }
 
@@ -336,6 +337,7 @@ body.no-scroll-counter {
 .column-right {
   grid-column: 10 / 13;
   text-align: left;
+  padding-right: 1vw;
   max-width: 370px; /* Ridotto a circa 2.5 colonne di larghezza */
   justify-self: end;
 }
@@ -343,7 +345,7 @@ body.no-scroll-counter {
 .section-title {
   font-family: var(--font-family), sans-serif;
   font-weight: 900;
-  font-size: clamp(2rem, 5vw, 6.3rem); /* Allineato alle altre sezioni come Villaggio Olimpico */
+  font-size: clamp(2rem, 3.8vw, 4.8rem); /* Allineato alle altre sezioni come Villaggio Olimpico */
   letter-spacing: 0.02em;
   line-height: 1; /* Allineato alle altre sezioni */
   color: var(--neutral-900);
@@ -352,7 +354,7 @@ body.no-scroll-counter {
   margin: 0;
   /* Transition handled frame-by-frame by JS LERP for maximum smoothness */
   will-change: opacity, transform;
-  white-space: pre-wrap;
+  white-space: nowrap;
 }
 
 .description-text {
