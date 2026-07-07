@@ -587,6 +587,8 @@ body.no-scroll-counter {
     order: 2 !important;
     width: 100% !important;
     margin-bottom: 0.2vh !important;
+    align-items: flex-start !important;
+    padding-left: 0 !important;
   }
   
   .column-right {
@@ -1858,6 +1860,28 @@ body.no-scroll-counter {
   body.active-slide-7 .trend-intro-section {
     opacity: 1 !important;
     transform: translateY(0) !important;
+  }
+}
+
+@media (min-width: 1440px) {
+  /* Ancoraggio elementi di sinistra (Blue Card & Red Line) */
+  .line-red-slide {
+    left: calc(-430px - (100vw - 1440px) / 2);
+  }
+  .card-front-blue, 
+  .card-shadow-blue {
+    left: calc(-296px - (100vw - 1440px) / 2);
+  }
+
+  /* Ancoraggio elementi di destra (Blue Line & Red Card) */
+  .line-blue-slide {
+    left: calc(723px + (100vw - 1440px) / 2);
+  }
+  .card-front-red {
+    left: calc(50px + (100vw - 1440px) / 2);
+  }
+  .card-shadow-red {
+    left: calc(12px + (100vw - 1440px) / 2);
   }
 }
 

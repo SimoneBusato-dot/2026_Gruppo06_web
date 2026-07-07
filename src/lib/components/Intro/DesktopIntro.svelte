@@ -108,7 +108,7 @@
 					trigger: ".slide-blue",
 					start: "top 95%",
 					end: "top 15%",
-					scrub: 0.1
+					scrub: 1.2
 				}
 			});
 		}
@@ -173,7 +173,7 @@
 					trigger: ".slide-red",
 					start: "top 95%",
 					end: "top 15%",
-					scrub: 0.1
+					scrub: 1.2
 				}
 			});
 		}

@@ -8,7 +8,7 @@ import SplitType from 'split-type';
 // =========================================================================
 export const COUNTER_SNAP_CONFIG = {
   // Soglia di scroll per far scattare lo snap (in pixel)
-  threshold: 35,
+  threshold: 100,
   
   // Posizioni di snap (percentuale di scroll totale della pagina)
   step0_end: 0.325,  // Fine scorrimento iniziale contatore (corrisponde a fillPhaseStart1)
@@ -85,6 +85,7 @@ export function init(options = {}) {
   }
 
   function goToNextSlideMobile() {
+    if (isAutoscrolling || isTransitioningBackMobile) return;
     if (activeStep >= 7) {
       if (goto) {
         goto('/Categorie');
@@ -106,6 +107,7 @@ export function init(options = {}) {
   }
 
   function goToPrevSlideMobile() {
+    if (isAutoscrolling || isTransitioningBackMobile) return;
     if (activeStep <= 1) {
       activeStep = 0;
       updateBodySlideClass(0);
@@ -148,7 +150,7 @@ export function init(options = {}) {
   const handleTouchStart = (e) => {
     const isMobile = window.innerWidth <= 900;
     if (!isMobile) return;
-    if (activeStep === 0) return;
+    if (activeStep === 0 || isAutoscrolling || isTransitioningBackMobile) return;
     startY = e.touches[0].clientY;
     isSwiping = true;
   };
@@ -166,7 +168,7 @@ export function init(options = {}) {
   const handleTouchEnd = (e) => {
     const isMobile = window.innerWidth <= 900;
     if (!isMobile) return;
-    if (activeStep === 0 || !isSwiping) return;
+    if (activeStep === 0 || !isSwiping || isAutoscrolling || isTransitioningBackMobile) return;
     
     if (activeStep === 4 && !isStep4EntranceComplete) {
       isSwiping = false;
@@ -186,9 +188,36 @@ export function init(options = {}) {
     }
   };
 
+  let isWheelCooldown = false;
+  const handleWheelMobile = (e) => {
+    const isMobile = window.innerWidth <= 900;
+    if (!isMobile) return;
+    if (activeStep === 0) return;
+    
+    if (e.cancelable) {
+      e.preventDefault();
+    }
+    
+    if (isAutoscrolling || isTransitioningBackMobile || isWheelCooldown) return;
+    
+    if (Math.abs(e.deltaY) > 10) {
+      isWheelCooldown = true;
+      setTimeout(() => {
+        isWheelCooldown = false;
+      }, 800);
+      
+      if (e.deltaY > 0) {
+        goToNextSlideMobile();
+      } else {
+        goToPrevSlideMobile();
+      }
+    }
+  };
+
   window.addEventListener('touchstart', handleTouchStart, { passive: true });
   window.addEventListener('touchmove', handleTouchMove, { passive: false });
   window.addEventListener('touchend', handleTouchEnd, { passive: true });
+  window.addEventListener('wheel', handleWheelMobile, { passive: false });
   
   let backToCards = false;
   if (typeof window !== 'undefined') {
@@ -222,6 +251,7 @@ export function init(options = {}) {
   const morphPath = document.getElementById('morph-path');
   const finalCardsContainer = document.querySelector('.final-cards-container');
   const finalScreen = document.getElementById('final-screen');
+  const scrollableSection = document.getElementById('scrollable-content-section');
   
   // Decorative lines initialization
   const primaLinea = document.getElementById('prima-linea');
@@ -868,7 +898,7 @@ export function init(options = {}) {
           displayBack.style.setProperty('opacity', finalOpacity, 'important');
         }
       } else {
-        displayBack.style.display = 'block';
+        displayBack.style.display = 'inline-flex';
         displayBack.style.opacity = state.counterOpacity;
       }
       
@@ -997,7 +1027,7 @@ export function init(options = {}) {
             track.style.transform = '';
           } else {
             const presentationScrollHeight = presentationMultiplier * window.innerHeight;
-            const scrollPosition = window.scrollY;
+            const scrollPosition = currentScrollYSmooth;
             const carouselStart = 0.91 * presentationScrollHeight;
             const carouselSpan = 4.0 * window.innerHeight;
             
@@ -1106,6 +1136,8 @@ export function init(options = {}) {
   let currentProgress = 0;
   let currentProgressTop = 0;
   let currentProgressBottom = 0;
+  let targetScrollYSmooth = typeof window !== 'undefined' ? window.scrollY : 0;
+  let currentScrollYSmooth = typeof window !== 'undefined' ? window.scrollY : 0;
   let isAnimating = false;
 
   // Variables for autonomous final transition and post-transition slide-up
@@ -1129,7 +1161,7 @@ export function init(options = {}) {
   let isAutoscrolling = false;
   let autoscrollStartTime = null;
   let autoscrollStartScrollY = 0;
-  const autoscrollDuration = 1800; // Rallentato a 1800ms per una transizione molto più fluida ed elegante
+  const autoscrollDuration = 1100; // Rallentato a 1100ms per una transizione molto più fluida ed elegante
 
 
   // activeStep is initialized to 0 because we force scroll to top on page load.
@@ -1147,15 +1179,30 @@ export function init(options = {}) {
   };
   
   function lockScroll() {
-    document.documentElement.style.overflow = 'hidden';
-    document.body.style.overflow = 'hidden';
+    const isMobile = window.innerWidth <= 900;
+    if (isMobile) {
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+    } else {
+      window.addEventListener('wheel', preventDefaultScroll, { passive: false });
+      window.addEventListener('touchmove', preventDefaultScroll, { passive: false });
+      window.addEventListener('keydown', preventDefaultScroll, { passive: false });
+    }
   }
 
   function unlockScroll() {
     const isMobile = window.innerWidth <= 900;
-    if (isMobile && activeStep >= 1) return;
-    document.documentElement.style.overflow = '';
-    document.body.style.overflow = '';
+    if (isMobile) {
+      if (activeStep >= 1) return;
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+    } else {
+      window.removeEventListener('wheel', preventDefaultScroll);
+      window.removeEventListener('touchmove', preventDefaultScroll);
+      window.removeEventListener('keydown', preventDefaultScroll);
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+    }
   }
 
   function triggerAutoscrollTo(targetPercent) {
@@ -1218,7 +1265,7 @@ export function init(options = {}) {
           cooldownActive = false;
           unlockScroll();
           lastScrollY = window.scrollY;
-        }, 100);
+        }, 400);
       }
     }
   }
@@ -1226,7 +1273,7 @@ export function init(options = {}) {
   function drawFrame() {
     const frameStart = performance.now();
     const presentationScrollHeight = presentationMultiplier * window.innerHeight;
-    const scrollPosition = window.scrollY;
+    const scrollPosition = isMobile ? window.scrollY : currentScrollYSmooth;
     
     // Slide up all fixed viewport elements if scrolling down to the white text section
     let exitOffset = 0;
@@ -1275,6 +1322,12 @@ export function init(options = {}) {
         reactionsContainer.style.transition = '';
         reactionsContainer.style.transform = '';
       }
+    }
+
+    if (scrollableSection && !isMobile) {
+      const scrollYDiff = window.scrollY - currentScrollYSmooth;
+      scrollableSection.style.transition = 'none';
+      scrollableSection.style.transform = `translate3d(0, ${scrollYDiff}px, 0)`;
     }
     
     // Smoothly fade out and slide down the scroll indicator
@@ -1340,6 +1393,14 @@ export function init(options = {}) {
     currentProgressTop += diffTop * (lerpRate * 0.85);
     currentProgressBottom += diffBottom * (lerpRate * 0.65);
 
+    // Smoothly lerp targetScrollYSmooth
+    const diffScrollY = targetScrollYSmooth - currentScrollYSmooth;
+    if (isAutoscrolling) {
+      currentScrollYSmooth = targetScrollYSmooth;
+    } else {
+      currentScrollYSmooth += diffScrollY * 0.15;
+    }
+
     // Increment time-based auto-scroll timer if Step 4 is active, otherwise reset it
     if (activeStep === 4) {
       autoScrollTime += deltaTime;
@@ -1395,6 +1456,7 @@ export function init(options = {}) {
                       Math.abs(targetProgress - currentProgressBottom) < 0.00005 &&
                       (!isAutonomousActive || autonomousFillProgress === 1) &&
                       Math.abs(currentSlideProgress - targetSlide) < 0.00005 &&
+                      Math.abs(targetScrollYSmooth - currentScrollYSmooth) < 0.5 &&
                       !isStep4Active;
                       
     if (isSettled) {
@@ -1435,6 +1497,8 @@ export function init(options = {}) {
 
     const scrollContainer = isMobile ? document.getElementById('intro') : null;
     const scrollPosition = scrollContainer ? scrollContainer.scrollTop : window.scrollY;
+    
+    targetScrollYSmooth = scrollPosition;
     
     const presentationScrollHeight = isMobile ? (4 * window.innerHeight) : (presentationMultiplier * window.innerHeight);
     const tempTargetProgress = presentationScrollHeight > 0 ? Math.min(Math.max(scrollPosition / presentationScrollHeight, 0), 1) : 0;
