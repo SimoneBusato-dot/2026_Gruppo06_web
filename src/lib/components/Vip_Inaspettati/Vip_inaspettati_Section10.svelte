@@ -24,7 +24,7 @@
                 scrub: 1,
                 pin: true,
                 pinSpacing: true,
-                markers: true,
+                markers: false,
                 onEnter: () => gsap.set(section8, { autoAlpha: 1 }),
                 onLeave: () =>  {window.scrollTo(0, 0);
                         goto('/Categorie');},

@@ -43,7 +43,7 @@
                 scrub: 1,
                 pin: true,
                 pinSpacing: false, 
-                markers: true, // Toglili quando hai finito il debug
+                markers: false, // Toglili quando hai finito il debug
                 onEnter: () => gsap.set(snoopSection, { autoAlpha: 1 }),
                 onLeave: () => gsap.set(snoopSection, { autoAlpha: 0 }),
                 onEnterBack: () => gsap.set(snoopSection, { autoAlpha: 1 }),

@@ -67,7 +67,7 @@
                 scrub: 1,
                 pin: true,
                 pinSpacing: false,
-                markers: true,
+                markers: false,
                 onEnter: () => {gsap.set(hScroll, { autoAlpha: 1 })},
                 onLeave: () => gsap.set(hScroll, { autoAlpha: 0 }),
                 onEnterBack: () => gsap.set(hScroll, { autoAlpha: 1 }),

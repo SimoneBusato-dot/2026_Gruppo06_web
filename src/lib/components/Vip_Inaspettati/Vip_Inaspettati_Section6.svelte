@@ -45,7 +45,7 @@
                 scrub: 1,
                 pin: true,
                 pinSpacing: false,
-                markers: true,
+                markers: false,
                 onEnter: () => gsap.set(section, { autoAlpha: 1 }),
                 onLeave: () => gsap.set(section, { autoAlpha: 0 }),
                 onEnterBack: () => gsap.set(section, { autoAlpha: 1 }),
