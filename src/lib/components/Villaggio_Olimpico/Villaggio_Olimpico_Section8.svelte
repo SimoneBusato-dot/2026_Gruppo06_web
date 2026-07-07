@@ -7,7 +7,8 @@
 
     gsap.registerPlugin(ScrollTrigger);
     let section8;
-    let line8, path8
+    let line8;
+    let path8;
 
     onMount(() => {
 
@@ -30,9 +31,6 @@
                 onLeave: () =>  {goto('/Categorie'); console.log('onLeave triggered');},
                 onEnterBack: () => gsap.set(section8, { autoAlpha: 1 }),
                 onLeaveBack: () => gsap.set(section8, { autoAlpha: 0 }),
-                onUpdate: (self) => {
-                    
-                },
                 
 
 
@@ -64,8 +62,7 @@
         visibility: hidden;
         background-color: var(--neutral-50);
         overflow: hidden;
-        margin-block-start: 200dvh;
-        margin-block-end: 0.1dvh;
+        margin: 0;
     }
 
     #svgContainer8 {

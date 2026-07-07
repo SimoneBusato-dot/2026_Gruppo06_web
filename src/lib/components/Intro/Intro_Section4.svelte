@@ -281,7 +281,7 @@
 			<div class="slide-content-left">
 				<div class="video-card-wrapper">
 					<img class="card-shadow-blue" src="/assets/svg_video/1_ombra.svg" alt="" />
-					<img class="card-front-blue" src="/assets/svg_video/1_sopra.svg" alt="Video Olimpico" />
+					<video class="card-front-blue" src="/assets/svg_video/1_sopravideo.mp4" autoplay muted loop playsinline />
 				</div>
 			</div>
 

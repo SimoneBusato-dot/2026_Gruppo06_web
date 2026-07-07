@@ -70,11 +70,12 @@
 <style>
     .swiper {
         /* scala con il viewport: su MBP14 1512px → 26.4vw ≈ 400px */
-        width: clamp(175px, 47vw, 320px);
+        width: clamp(301px, 47vw, 320px);
         /* rapporto 400:711 = 0.5626 → height = width / 0.5626 */
-        height: clamp(142px, 47vw, 569px);
+        height: clamp(536px, 47vw, 569px);
         padding-bottom: clamp(3.5rem, 3vh, 5rem); /* spazio per la pagination */
         box-sizing: content-box;
+        touch-action: pan-y;
     }
 
     .swiper-slide {
@@ -82,8 +83,7 @@
         border-radius: 10px;
         overflow: hidden;;
         flex-shrink: 0;  
-        
-        
+        touch-action: none;
     }
 
     .overlay {

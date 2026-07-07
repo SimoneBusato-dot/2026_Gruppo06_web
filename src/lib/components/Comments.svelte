@@ -106,4 +106,12 @@
     .comm-purple #background-icon{
         fill: var(--brand-vip-300);
     }
+
+
+    @media(max-width: 450px){
+        #textContainer{
+            font-size: 1rem;
+            width: 9.3125rem;
+        }
+    }
 </style>
