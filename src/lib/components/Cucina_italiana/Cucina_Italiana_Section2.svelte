@@ -1237,7 +1237,7 @@
         line-height: 145%;
     }
 
-    :global(#pastaTitle .char) {
+    #fusedContainer :global(#pastaTitle .char) {
         display: inline-block;
         transform-origin: center bottom;
         will-change: transform, opacity;
@@ -1395,14 +1395,14 @@
         z-index: 15;
     }
 
-    :global(.swiper-pagination-bullet) {
+    #swiperDeckContainer :global(.swiper-pagination-bullet) {
         pointer-events: auto !important;
         transition: all 0.3s ease;
         background: var(--brand-cibo-500) !important;
         opacity: 0.4 !important;
     }
 
-    :global(.swiper-pagination-bullet-active) {
+    #swiperDeckContainer :global(.swiper-pagination-bullet-active) {
         background: var(--brand-cibo-500) !important;
         opacity: 1 !important;
         width: 24px !important;
