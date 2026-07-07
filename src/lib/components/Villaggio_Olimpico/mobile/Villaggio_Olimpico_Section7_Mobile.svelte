@@ -28,7 +28,7 @@
                 scrub: 1,
                 pin: true,
                 pinSpacing: false,
-                markers: true,
+                markers: false,
                 onEnter: () => {
                     gsap.set(videoScroll, { y: "400%" });
                     gsap.set(section, { autoAlpha: 1 });

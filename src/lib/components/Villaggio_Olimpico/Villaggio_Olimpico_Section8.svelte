@@ -26,7 +26,7 @@
                 scrub: 1,
                 pin: true,
                 pinSpacing: true,
-                markers: true,
+                markers: false,
                 onEnter: () => gsap.set(section8, { autoAlpha: 1 }),
                 onLeave: () =>  {goto('/Categorie'); console.log('onLeave triggered');},
                 onEnterBack: () => gsap.set(section8, { autoAlpha: 1 }),

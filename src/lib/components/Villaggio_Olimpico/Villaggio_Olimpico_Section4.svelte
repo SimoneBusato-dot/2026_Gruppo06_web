@@ -49,7 +49,7 @@
                 scrub: 1,
                 pin: true,
                 pinSpacing: false,
-                markers:true,
+                markers:false,
                 onEnter: () => {gsap.set(villSection4, { autoAlpha: 1 }); gsap.set([...lines41, ...words42, ...title4Chars], {x: "30%", opacity: 0})},
                 onLeave: () => gsap.set(villSection4, { autoAlpha: 0 }),
                 onEnterBack: () => gsap.set(villSection4, { autoAlpha: 1 }),

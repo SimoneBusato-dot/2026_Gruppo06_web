@@ -72,7 +72,7 @@
                 pin: true,  
                 refreshPriority: 1,
                 pinSpacing: false,
-                markers: true,
+                markers: false,
                 onLeave: () => gsap.set(hero, { autoAlpha: 0 }),
                 onEnterBack: () => gsap.set(hero, { autoAlpha: 1 }),
             }
