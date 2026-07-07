@@ -102,8 +102,8 @@
 
     .swiper-pagination { position: absolute; bottom: 0; }
 
-    :global(.swiper-pagination-bullet) { transition: all 0.3s ease; }
-    :global(.swiper-pagination-bullet-active) {
+    .swiper :global(.swiper-pagination-bullet) { transition: all 0.3s ease; }
+    .swiper :global(.swiper-pagination-bullet-active) {
         background: var(--brand-vip-200);
         width: 16px;
         border-radius: 4px;

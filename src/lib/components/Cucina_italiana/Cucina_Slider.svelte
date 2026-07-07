@@ -139,11 +139,13 @@
   position: absolute;
     bottom: -10%;
 }
-:global(.swiper-pagination-bullet){
+
+.swiper :global(.swiper-pagination-bullet){
     transition: all 0.3s ease;
 }
 
-:global(.swiper-pagination-bullet-active) {
+
+.swiper :global(.swiper-pagination-bullet-active) {
     background-color: var(--brand-cibo-500);
     width: 16px;
     border-radius: 4px;

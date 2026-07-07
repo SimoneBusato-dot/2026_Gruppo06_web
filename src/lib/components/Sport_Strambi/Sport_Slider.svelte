@@ -86,8 +86,8 @@
 
     .swiper-pagination { position: absolute; bottom: 0; }
 
-    :global(.swiper-pagination-bullet) { transition: all 0.3s ease; }
-    :global(.swiper-pagination-bullet-active) {
+   .swiper :global(.swiper-pagination-bullet) { transition: all 0.3s ease; }
+   .swiper :global(.swiper-pagination-bullet-active) {
         background-color: var(--brand-sport-insoliti-500);
         width: 16px;
         border-radius: 4px;
