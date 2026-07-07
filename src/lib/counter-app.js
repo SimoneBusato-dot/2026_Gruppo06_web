@@ -167,7 +167,7 @@ export function init() {
       path: parsePath("M83.4264 31.2829C87.2475 17.6812 99.5363 8.19496 113.662 7.94264L558.038 0.00519967C575.234 -0.301956 589.597 13.0383 590.559 30.2101L608.13 343.844C609.175 362.495 594.089 378.072 575.414 377.625L31.2516 364.587C10.3741 364.087 -4.43754 344.047 1.21056 323.942L83.4264 31.2829Z")
     },
     {
-      title: "INTERAZIONI",
+      title: "INTER-\nAZIONI",
       number: "1.0",
       suffix: "MLD",
       description: "<span style=\"color: rgb(220, 62, 65)\">Un'ondata di commenti, condivisioni e reazioni.</span> Il pubblico ha partecipato attivamente a ogni singolo istante dei Giochi.",
@@ -226,7 +226,7 @@ export function init() {
     const startWidth = window.innerWidth;
     const startHeight = window.innerHeight;
 
-    const initialTextY = isMobile ? 0 : startHeight * 0.38;
+    const initialTextY = isMobile ? startHeight * 0.22 : startHeight * 0.38;
 
     let path, color, width, height, cardWidth, cardHeight;
     let textIndex, textOpacity, textTranslateY;
@@ -346,7 +346,7 @@ export function init() {
         
         // Font-size scaling: 19vw down to target (12.5vw desktop, 22vw mobile)
         const startFontSize = isMobile ? 26 : 19;
-        const targetFontSize = isMobile ? 26 : 12.5;
+        const targetFontSize = isMobile ? 22 : 12.5;
         fontSize = lerp(startFontSize, targetFontSize, easedT);
 
         // Suffix typing effect: types "MLD" letter-by-letter in the remaining 30% of transition
@@ -367,7 +367,7 @@ export function init() {
       columnsOpacity = 1;
       finalScreenOpacity = 0;
       numChars = 2;
-      fontSize = isMobile ? 26 : 12.5;
+      fontSize = isMobile ? 22 : 12.5;
       
       if (progress2 <= 0.36) {
         // Transition 1 -> 2 (Card 1 to Card 2, mapped completely between scroll progress 0.50 and 0.68)
@@ -472,14 +472,6 @@ export function init() {
       suffixText = cards[textIndex].suffix;
     }
 
-    if (isMobile) {
-      path = backgroundCard.path;
-      width = backgroundCard.viewBox[0];
-      height = backgroundCard.viewBox[1];
-      cardWidth = startWidth * 1.1;
-      cardHeight = startHeight * 1.1;
-    }
-
     return {
       progress,
       path, color, width, height, cardWidth, cardHeight,
@@ -574,12 +566,7 @@ export function init() {
         }
 
         const cardData = cards[state.textIndex];
-        const isMobile = window.innerWidth <= 900;
-        if (isMobile) {
-          cardTitle.innerHTML = cardData.title.replace(/-\n/g, '').replace(/\n/g, ' ');
-        } else {
-          cardTitle.innerHTML = cardData.title.replace(/\n/g, '<br>');
-        }
+        cardTitle.innerHTML = cardData.title.replace(/\n/g, '<br>');
         cardDescription.innerHTML = cardData.description;
         lastTextIndex = state.textIndex;
 
@@ -596,19 +583,6 @@ export function init() {
           { x: 50, opacity: 0 },
           { x: 0, opacity: 1, stagger: 0.08, duration: 0.45, ease: "power2.out", overwrite: "auto" }
         );
-
-        if (isMobile && state.textIndex > 0) {
-          const activeReelItem = reelItems[state.textIndex];
-          if (activeReelItem) {
-            const wrapper = activeReelItem.querySelector('.number-wrapper');
-            if (wrapper) {
-              gsap.fromTo(wrapper,
-                { x: -50, opacity: 0 },
-                { x: 0, opacity: 1, duration: 0.45, ease: "power2.out", overwrite: "auto" }
-              );
-            }
-          }
-        }
       }
       
       const transformStr = `translate3d(0, ${state.textTranslateY}px, 0)`;
@@ -627,8 +601,8 @@ export function init() {
     // Manage numbers reel translation and item opacities/colors
     if (numbersReel) {
       const isMobile = window.innerWidth <= 900;
-      const reelItemHeightVw = isMobile ? 50.1 : 12;
-      const translation = isMobile ? (state.textIndex * reelItemHeightVw) : (state.activeIndex * reelItemHeightVw);
+      const reelItemHeightVw = isMobile ? 21.2 : 12;
+      const translation = state.activeIndex * reelItemHeightVw;
       
       numbersReel.style.transform = `translate3d(0, -${translation}vw, 0)`;
       numbersReel.style.opacity = state.columnsOpacity;
@@ -639,13 +613,7 @@ export function init() {
         const style = getReelItemStyle(d);
         
         let itemOpacity = style.opacity;
-        if (isMobile) {
-          if (state.textIndex === 0) {
-            itemOpacity = 0; // Hide active reel item while rolling counter is visible
-          } else {
-            itemOpacity = (index === state.textIndex) ? (state.columnsOpacity * state.textOpacity) : 0;
-          }
-        } else if (state.counterOpacity > 0) {
+        if (state.counterOpacity > 0) {
           if (index === 0) {
             itemOpacity = 0; // Hide active reel item while rolling counter is visible
           } else {
@@ -669,29 +637,20 @@ export function init() {
           const scaleVal = 1 - 0.08 * Math.abs(d);   // leggero rimpicciolimento man mano che si allontanano dal centro
           const spacingOffset = d * 50;              // px extra di distanza verticale tra le righe (regola per più/meno spazio)
 
-          if (!isMobile) {
-            wrapper.style.transform =
-              `perspective(600px) translateY(${spacingOffset}px) rotateX(${rotateAngle}deg) scale(${scaleVal})`;
-          }
+          wrapper.style.transform =
+            `perspective(600px) translateY(${spacingOffset}px) rotateX(${rotateAngle}deg) scale(${scaleVal})`;
           wrapper.style.transformOrigin = 'center center';
           wrapper.style.backfaceVisibility = 'hidden';
         }
       });
     }
 
-    const isMobile = window.innerWidth <= 900;
-    if (state.counterOpacity > 0 || (isMobile && state.textIndex === 0)) {
+    // Manage counter display text truncation and font-size
+    if (state.counterOpacity > 0) {
       displayBack.style.display = 'block';
-      if (isMobile) {
-        if (state.counterOpacity > 0.01 && state.columnsOpacity < 0.99) {
-          displayBack.style.opacity = state.counterOpacity;
-        } else {
-          displayBack.style.opacity = (state.textIndex === 0) ? (state.columnsOpacity * state.textOpacity) : 0;
-        }
-      } else {
-        displayBack.style.opacity = state.counterOpacity;
-      }
+      displayBack.style.opacity = state.counterOpacity;
       
+      const isMobile = window.innerWidth <= 900;
       if (isMobile) {
         const rawDigits = displayBackDigits.textContent.replace(/\./g, '');
         const mobileNumChars = Math.round(lerp(2, 11, (state.numChars - 2) / 12));
@@ -707,7 +666,7 @@ export function init() {
       }
       displayBackSuffix.textContent = state.suffixText;
       
-      displayBack.style.fontSize = isMobile ? `${state.fontSize * 2}vw` : `${state.fontSize}vw`;
+      displayBack.style.fontSize = `${state.fontSize}vw`;
       
       if (state.progress < fillPhaseStart1) {
         displayBack.style.color = 'var(--brand-vip-300)';
@@ -1174,11 +1133,8 @@ export function init() {
   }
 
   function updateTargetProgress() {
-    const isMobile = window.innerWidth <= 900;
-    const scrollContainer = isMobile ? document.getElementById('intro') : null;
-    const scrollPosition = scrollContainer ? scrollContainer.scrollTop : window.scrollY;
-    
-    const presentationScrollHeight = isMobile ? (4 * window.innerHeight) : (presentationMultiplier * window.innerHeight);
+    const presentationScrollHeight = presentationMultiplier * window.innerHeight;
+    const scrollPosition = window.scrollY;
     const tempTargetProgress = presentationScrollHeight > 0 ? Math.min(Math.max(scrollPosition / presentationScrollHeight, 0), 1) : 0;
     
     targetProgress = tempTargetProgress;
@@ -1191,11 +1147,10 @@ export function init() {
   }
 
   window.addEventListener('scroll', () => {
-    const isMobile = window.innerWidth <= 900;
     const scrollPosition = window.scrollY;
     const deltaY = Math.abs(scrollPosition - lastScrollY);
 
-    if (deltaY > 0 && !isMobile) {
+    if (deltaY > 0) {
       // Reduced intensity: base of 0.0022 spawns 1 reaction every ~450px scrolled from the start.
       // EasedProgress scales it up to 0.006 (1 reaction every ~166px scrolled at 22 Billion).
       const easedProgress = bezierEase(currentProgress);
@@ -1209,7 +1164,7 @@ export function init() {
       reactionAccumulator -= reactionsToSpawn;
 
       if (reactionsToSpawn > 0) {
-        const estimatedNumberWidth = window.innerWidth * 0.22;
+        const estimatedNumberWidth = window.innerWidth <= 900 ? (window.innerWidth * 0.45) : (window.innerWidth * 0.22);
         createReaction(estimatedNumberWidth);
       }
     }
@@ -1266,19 +1221,6 @@ export function init() {
     lastScrollY = scrollPosition;
     updateTargetProgress();
   }, { passive: true });
-
-  const introEl = document.getElementById('intro');
-  if (introEl) {
-    const handleIntroScroll = () => {
-      const isMobile = window.innerWidth <= 900;
-      if (isMobile) {
-        lastScrollY = introEl.scrollTop;
-        updateTargetProgress();
-      }
-    };
-    activeListeners.push({ target: introEl, type: 'scroll', listener: handleIntroScroll, options: { passive: true } });
-    introEl.addEventListener('scroll', handleIntroScroll, { passive: true });
-  }
 
   // Handle window resizing (e.g. rotating device)
   window.addEventListener('resize', () => {
