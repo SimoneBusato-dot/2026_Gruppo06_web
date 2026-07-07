@@ -210,8 +210,8 @@
     .hamburger-btn {
         pointer-events: auto;
         position: absolute;
-        top: 12px; /* Centered in the 52px capsule height relative to space below */
-        right: 21px; /* Centered in the 68px capsule width */
+        top: 15px; /* Centered in the 52px capsule height relative to space below */
+        right: 33px; /* Centered in the 68px capsule width, adjusted for skew */
         width: 26px;
         height: 16px;
         background: none;
