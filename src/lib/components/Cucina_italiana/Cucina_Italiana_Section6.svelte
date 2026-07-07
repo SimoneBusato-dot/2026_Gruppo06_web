@@ -61,7 +61,7 @@
     </div>
 
     <div id="text">
-        <p bind:this={text} id="paragraph">Vederli godersi questi piatti con la nostra stessa voglia ha fatto <span class="highlight">crollare l'immagine</span> dell'atleta distante, freddo e rigoroso.</p>
+        <p bind:this={text} id="paragraph">Vederli godersi questi piatti con la nostra stessa voglia ha fatto <span class="highlight">crollare l'immagine</span> ìdell'atleta distante, freddo e rigoroso.</p>
     </div>
 </main>
 

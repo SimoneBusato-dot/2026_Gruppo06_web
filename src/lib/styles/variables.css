@@ -165,7 +165,7 @@
 /* ==================== GLOBAL TYPOGRAPHY UNIFICATION ==================== */
 /* Unify the kerning (crenatura / letter-spacing) globally for Dharma and Gelica fonts */
 
-/* .section-title,
+.section-title,
 .title-animation,
 .gusto-dharma,
 .final-title,
@@ -188,7 +188,7 @@ h6,
 [style*="var(--font-family)"],
 [style*="dharma-gothic-e"] {
   letter-spacing: var(--letter-spacing-dharma) !important;
-} */
+}
 
 .description-text,
 .slide-subtitle,
@@ -200,5 +200,6 @@ p,
 [style*="var(--font-family-text)"],
 [style*="gelica"] {
   letter-spacing: var(--letter-spacing-gelica) !important;
+  text-wrap: balance !important;
 }
 

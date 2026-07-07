@@ -103,7 +103,7 @@
     <div id="content">
         <div id="text2">
             <p bind:this={p1}>I feed su Milano Cortina si sono riempiti di discipline invernali insolite.</p>
-            <p bind:this={p2}>Tra le discese folli dello <mark class="highlight">skeleton</mark> o il mix sci-carabina del <mark class="highlight">biathlon</mark>, le persone hanno scoperto una passione improvvisa per gli sport più <mark id="Upper">PECULIARI E STRAMBI</mark></p>
+            <p bind:this={p2}>Tra le discese folli dello <mark class="highlight">skeleton</mark> o il mix sci-carabina del <mark class="highlight">biathlon,</mark> le persone hanno scoperto una passione improvvisa per gli sport più <mark id="Upper">PECULIARI E STRAMBI</mark></p>
         </div>
         <SportSlider bind:el={sliderElement} />
     </div>
