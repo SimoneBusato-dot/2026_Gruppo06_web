@@ -35,7 +35,7 @@
                 end: "+=100%",
                 scrub: 1,
                 pin: true,
-                markers:true,
+              
                 pinSpacing: false,
                 onEnter: () => {gsap.set(section, { autoAlpha: 1 }); gsap.set([...textLines6, ...UpperWords], {opacity: 0, x: 300} )},
                 onLeave: () => gsap.set(section, { autoAlpha: 0 }),
@@ -99,6 +99,12 @@
         /* vw/vh invece di px fissi — scala con il viewport */
         width: 24vw;
         height: 61vh;
+    }
+
+    #path path{
+        position: absolute;
+        top: -10%;
+        left: -15%;
     }
 
     #path2 {

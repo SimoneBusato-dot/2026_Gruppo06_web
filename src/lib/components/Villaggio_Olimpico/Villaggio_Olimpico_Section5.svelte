@@ -100,7 +100,7 @@
             scrub: 1,
             pin: true,
             pinSpacing: false,
-            markers:true,
+            markers:false,
             onEnter: () => gsap.set(villSection5, { autoAlpha: 1 }),
             onLeave: () => gsap.set(villSection5, { autoAlpha: 0 }),
             onEnterBack: () => gsap.set(villSection5, { autoAlpha: 1 }),

@@ -93,7 +93,6 @@
             scrub: 1,
             pin: true,
             pinSpacing: false,
-            markers:true,
             onEnter: () => gsap.set(villSection5, { autoAlpha: 1 }),
             onLeave: () => gsap.set(villSection5, { autoAlpha: 0 }),
             onEnterBack: () => gsap.set(villSection5, { autoAlpha: 1 }),
@@ -160,9 +159,9 @@
         visibility: hidden;
         background-color: var(--neutral-50);
         overflow: hidden;
-        overflow-y: scroll;
+        /* overflow-y: scroll;
         scroll-snap-type: y mandatory;
-        -webkit-overflow-scrolling: touch;
+        -webkit-overflow-scrolling: touch; */
     }
 
    #curtain{
@@ -170,7 +169,7 @@
         display: flex;
         flex-direction: row;
         width: 100%;
-        height: 100%;
+        height: 200%;
         overflow: hidden;
         z-index: -2;
 

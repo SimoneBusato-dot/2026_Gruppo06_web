@@ -28,7 +28,7 @@
                 scrub: 1,
                 pin: true,
                 pinSpacing: false,
-                markers: false,
+    
                 onEnter: () => {
                     gsap.set(videoScroll, { y: "400%" });
                     gsap.set(section, { autoAlpha: 1 });
@@ -146,9 +146,9 @@
     margin-block-start: 100dvh ;
     background-color: var(--neutral-50);
     position: relative;
-    overflow-y: scroll;
+    /* overflow-y: scroll;
     scroll-snap-type: y mandatory;
-     -webkit-overflow-scrolling: touch;
+     -webkit-overflow-scrolling: touch; */
 }
 
 #perspective, #Content {

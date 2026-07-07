@@ -259,3 +259,11 @@
     <VillaggioOlimpicoSection7 />
     <VillaggioOlimpicoSection8 />
 {/if}
+
+<style>
+    @media(max-width:450px){
+        :global(body){
+            cursor: none;
+        }
+    }
+</style>

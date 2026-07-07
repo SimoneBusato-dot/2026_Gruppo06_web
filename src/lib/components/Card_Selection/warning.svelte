@@ -299,6 +299,7 @@
         color: var(--brand-villaggio-500);
         width: 55.875rem;
         font-size: 1.625rem;
+        font-family: var(--font-family-text);
     }
 
     #warningProgress{
@@ -316,5 +317,25 @@
         position: absolute;
         top: 0;
         transition: fill 0.2s ease;
+    }
+
+    @media(max-width:450px){
+        #warningTriangle{
+            width: 17.60213rem;
+            height: 14.8125rem;
+        }
+
+        #EM{
+            font-size: 11.125rem;
+             top: 20%;
+        }
+        
+         #warningText{
+            width: 22.0625rem;
+            font-size: 1.25rem;
+        
+    }
+
+
     }
 </style>

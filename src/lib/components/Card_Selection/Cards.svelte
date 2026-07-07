@@ -177,4 +177,11 @@ import { hasNavigatedCategory } from '$lib/store/categoryNav.js';
     .card-red    { background-color: var(--brand-villaggio-500); }
     .card-purple { background-color: var(--brand-vip-500); }
     .card-yellow { background-color: var(--brand-cibo-500); }
+
+    @media(max-width: 450px){
+        a{
+            cursor: none;
+        }
+
+    }
 </style>

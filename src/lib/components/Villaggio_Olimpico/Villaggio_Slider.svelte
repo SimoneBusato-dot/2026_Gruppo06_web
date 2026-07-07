@@ -109,4 +109,10 @@
         border-radius: 4px;
     }
 
+
+@media(max-width:450px){
+    .swiper{
+        cursor: none;
+    }
+}
 </style>

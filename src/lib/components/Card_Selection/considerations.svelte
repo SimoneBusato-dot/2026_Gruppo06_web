@@ -217,4 +217,79 @@
         line-height: 80%;
         color: var(--brand-villaggio-500);
     }
+
+
+    @media(max-width: 450px){
+        #textContainer1 {
+        width: 22.125rem;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        font-size: 1.25rem;
+        text-align: left;
+        margin-left: 5%;
+        font-family:var(--font-family-text)
+        
+    }
+
+    #Upper {
+        font-weight: 900;
+        font-size: 4.6875rem;
+        margin-bottom: 1rem;
+        font-family:var(--font-family);
+        text-transform: uppercase;
+        line-height: 80%;
+        color: var(--brand-sport-insoliti-500);
+    }
+
+    #paragraph{
+        width: 18.1875rem;
+        text-align: right;
+        align-self: flex-end;
+    }
+
+    #svgContainer1{
+        scale: 2;
+        bottom: -8%;
+    }
+
+    #textContainer2 {
+        width: 22.125rem;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        font-size: 1.25rem;
+        text-align: left;
+        margin-left: 5%;
+        font-family:var(--font-family-text)
+        
+    }
+
+
+     #Upper2{
+        font-weight: 900;
+        font-size: 4.6875rem;
+        margin-bottom: 1rem;
+        font-family:var(--font-family);
+        text-transform: uppercase;
+        line-height: 80%;
+        color: var(--brand-villaggio-500);
+    }
+
+    #paragraph2{
+        width: 18.1875rem;
+        text-align: right;
+        align-self: flex-end;
+    }
+
+    #svgContainer2{
+        scale: 0.7;
+        bottom: -50%;
+         left: -60%;
+    }
+    }
 </style>

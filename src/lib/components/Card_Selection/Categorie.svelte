@@ -51,6 +51,9 @@
     let CARD_W = 434;
     let STEP   = CARD_W + GAP;
 
+    /* ─── breakpoint mobile (deve coincidere con il media query CSS) ─── */
+    const MOBILE_BREAKPOINT = 450;
+
     /* ─── drag ─── */
     let isPointerDown   = false;
     let dragStartX      = 0;
@@ -89,15 +92,29 @@
 
     function computeCardW() {
         const cw = containerEl?.offsetWidth ?? window.innerWidth;
-        /* card e gap scalano entrambi in proporzione alla larghezza dello schermo,
-           senza un tetto massimo: su schermi grandi le card diventano più grandi
-           E più distanti tra loro, su schermi piccoli più piccole e più vicine.
-           Il rapporto CARD_W/GAP resta simile su ogni dimensione, mentre il numero
-           di card "visibili" (3) è già garantito da VISIBLE_RANGE in positionCards,
-           che ragiona in step relativi e non in pixel assoluti. */
-        CARD_W = Math.max(260, cw * 0.28);
-        GAP    = Math.max(20, cw * 0.035);
-        STEP   = CARD_W + GAP;
+
+        // FIX: il floor fisso di 260px andava bene su desktop ma su mobile
+        // (container ≤ 450px) era più della metà del contenitore, rompendo
+        // le proporzioni. Ora il floor dipende dalla larghezza dello schermo.
+        const isMobile = cw <= MOBILE_BREAKPOINT;
+
+        if (isMobile) {
+            /* su mobile vogliamo una card centrale "piena" ma con un piccolo
+               margine ai lati per intravedere le adiacenti */
+            CARD_W = Math.max(140, cw * 0.55);
+            GAP    = Math.max(12, cw * 0.05);
+        } else {
+            /* card e gap scalano entrambi in proporzione alla larghezza dello schermo,
+               senza un tetto massimo: su schermi grandi le card diventano più grandi
+               E più distanti tra loro, su schermi piccoli più piccole e più vicine.
+               Il rapporto CARD_W/GAP resta simile su ogni dimensione, mentre il numero
+               di card "visibili" (3) è già garantito da VISIBLE_RANGE in positionCards,
+               che ragiona in step relativi e non in pixel assoluti. */
+            CARD_W = Math.max(260, cw * 0.28);
+            GAP    = Math.max(20, cw * 0.035);
+        }
+
+        STEP = CARD_W + GAP;
     }
 
     /* ricalcola la larghezza target del clip-path in base al container attuale */
@@ -325,7 +342,7 @@
 
         const titleEnter = gsap.fromTo(titleSplit.words, {y: "100%"}, {y: "0%", stagger: 0.1, duration: 0.6, ease:"elastic.out(0.5,0.4)", paused: true, delay: 0.5});
         const subtitleEnter = gsap.fromTo(subtitleSplit.lines, {y: "100%"}, {y: "0%", duration: 0.6, ease:"power2.out", paused: true, delay: 1});
-        const cardEnter = gsap.fromTo(trackEl, {y: "100%"}, {y: "0%", duration: 1, ease:"elastic.out(0.5,0.4)", paused: true, delay: 0.5});
+        const cardEnter = gsap.fromTo(trackEl, {y: "150%"}, {y: "0%", duration: 1, ease:"elastic.out(0.5,0.4)", paused: true, delay: 0.5});
 
         const clipMove = gsap.fromTo(ClipPath, {width: 0 } , {width: () => clipTargetWidth, duration: 1, ease: "power2.out", paused: true, delay: 0.3});
 
@@ -605,4 +622,83 @@
     @media (min-width: 1920px) {
         #text, #carousel-outer, #arc-bg { max-width: 1800px; }
     }
+
+    @media(max-width: 450px){
+
+        /* FIX: position: relative aggiunto — mancava, e #carousel-outer
+           essendo "position: absolute" si posizionava rispetto al viewport
+           invece che rispetto a questa sezione. */
+        #Selezione-Categorie {
+            position: relative;
+            width: 100vw;
+            max-width: 450px;
+            height: 100vh;
+            max-height: 874px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--neutral-50);
+        }
+
+
+        #text {
+            width: 100%;
+            max-width: 450px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: clamp(8px, 1.2vh, 20px);
+            flex-shrink: 0;
+            position: relative;
+            z-index: 10;
+            height: fit-content;
+            margin-bottom: auto;
+            margin-top: 3rem;
+        }
+
+        #title {
+            font-family: var(--font-family);
+            text-transform: uppercase;
+            font-size: 4.25rem;
+            font-style: normal;
+            font-weight: 900;
+            /* FIX: line-height era 1.9375rem (troppo basso rispetto ai 4.25rem
+               di font-size) e tagliava le lettere con ascendenti/discendenti,
+               specialmente dentro le mask create da SplitText. Ora è un valore
+               unitless proporzionale al font-size. */
+            line-height: 0.9;
+            text-transform: uppercase;
+            color: var(--neutral-800);
+        }
+
+        #carousel-outer {
+            height: 500px;
+            width: 100%;
+            max-width: 450px;
+            cursor: grab;
+            touch-action: none;
+            user-select: none;
+            overflow: visible;
+            position: absolute;
+            left: -10%;
+        }
+
+
+        #carousel-outer {
+        cursor: none;
+    }
+
+    #carousel-outer:active { cursor: none}
+
+
+    }
+
+    .slide {
+        cursor: none;
+    }
+
+
 </style>

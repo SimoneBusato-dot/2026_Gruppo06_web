@@ -57,7 +57,6 @@
                 scrub: 1,
                 pin: true,
                 pinSpacing: false,
-                markers:false,
                 onEnter: () => {gsap.set(villSection2Mobile, { autoAlpha: 1 }); gsap.set([...villText2Lines], {x: "100%", opacity: 0})},
                 onLeave: () => gsap.set(villSection2Mobile, { autoAlpha: 0 }),
                 onEnterBack: () => gsap.set(villSection2Mobile, { autoAlpha: 1 }),

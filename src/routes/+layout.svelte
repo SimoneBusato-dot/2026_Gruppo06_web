@@ -315,4 +315,11 @@
         stroke-width: 24;
     }
 }
+
+
+@media(max-width: 450px){
+    :root{
+        cursor: none;
+    }
+}
 </style>

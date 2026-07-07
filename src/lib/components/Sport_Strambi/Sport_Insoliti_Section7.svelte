@@ -73,7 +73,7 @@
                 scrub: 1,
                 pin: true,
                 pinSpacing: false,
-                markers: false,
+               
                 onEnter: () => {
                     gsap.set(videoScroll, { x: "100vw" });
                     gsap.set(section, { autoAlpha: 1 });
