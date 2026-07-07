@@ -691,7 +691,7 @@
             </div>
             <div class="intro-text-block text-3" bind:this={introText3}>
                 <p class="p2-sub">Ogni pasto l'ha trasformato in un</p>
-                <h1 class="p2-dharma">TREND DA <br> MILIONI DI <br> LIKE</h1>
+                <h1 class="p2-dharma">TREND DA <br> MILIONI <br>DI LIKE</h1>
             </div>
         </div>
     </div>
