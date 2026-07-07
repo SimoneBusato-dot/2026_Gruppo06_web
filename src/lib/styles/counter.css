@@ -157,10 +157,12 @@
   --radius-md: var(--radius-m);
   --radius-lg: var(--radius-l);
   --radius-circle: var(--radius-full);
+}.mobile-only {
+  display: none !important;
 }
-
-
-
+.desktop-only {
+  display: inline !important;
+}
 
 * {
   box-sizing: border-box;
@@ -922,7 +924,7 @@ body.no-scroll-counter {
 
 @media (max-width: 900px) {
   .final-title {
-    font-size: 22vw !important;
+    font-size: 33vw !important;
     line-height: 0.85 !important;
     top: 50% !important;
     left: 50% !important;
@@ -1029,6 +1031,23 @@ body.no-scroll-counter {
 
   .carousel-card-item.active-front {
     z-index: 20 !important;
+  }
+
+  .final-screen.active .line-mask:nth-child(1) .line-content {
+    transition-delay: 0.3s !important;
+  }
+  .final-screen.active .line-mask:nth-child(2) .line-content {
+    transition-delay: 0.45s !important;
+  }
+  .final-screen.active .line-mask:nth-child(3) .line-content {
+    transition-delay: 0.6s !important;
+  }
+  .final-screen.active .line-mask:nth-child(4) .line-content {
+    transition-delay: 0.75s !important;
+  }
+
+  #prima-linea {
+    display: none !important;
   }
 }
 
@@ -1592,31 +1611,106 @@ body.no-scroll-counter {
     padding: 6vh 0;
     min-height: auto;
   }
+  .desktop-only {
+    display: none !important;
+  }
+  .mobile-only {
+    display: inline !important;
+  }
+
+  .slide-blue .slide-content-right {
+    order: 1 !important; /* Text on top */
+  }
+  .slide-blue .slide-content-left {
+    order: 2 !important; /* Video at bottom */
+  }
+
+  .slide-red .slide-content-left {
+    order: 1 !important; /* Text on top */
+  }
+  .slide-red .slide-content-right {
+    order: 2 !important; /* Video at bottom */
+  }
+
   .slide-content-left, .slide-content-right {
-    width: 100%;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
+
+  .scrollable-content-section .slide-subtitle {
+    color: #333333 !important;
+    font-size: 1.15rem !important;
+    font-weight: 500 !important;
+    line-height: 1.55 !important;
+    text-align: left !important;
+    padding: 0 8vw !important;
+    margin: 0 !important;
+  }
+
+  .blue-text-highlight {
+    color: #533edc !important;
+    font-weight: 700 !important;
+  }
+
+  .red-text-highlight {
+    color: #dc3e41 !important;
+    font-weight: 700 !important;
+  }
+
   .video-card-wrapper {
-    max-width: 320px;
+    position: relative !important;
+    width: 60vw !important;
+    max-width: 250px !important;
+    aspect-ratio: 9/16 !important;
+    margin: 4vh auto 0 auto !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
   }
-  .slide-text-container {
-    text-align: center;
-    max-width: none;
+
+  .card-shadow-blue, .card-shadow-red {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 1 !important;
+    transform: rotate(-6deg) translate3d(-12px, 0, 0) !important;
   }
-  .slide-subtitle {
-    font-size: 1.625rem;
-    margin-bottom: 1.2rem;
+
+  .card-front-blue, .card-front-red {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    z-index: 2 !important;
+    border-radius: 12px !important;
+    transform: rotate(3deg) translate3d(6px, 0, 0) !important;
   }
-  .slide-title {
-    font-size: 2.8rem;
-    letter-spacing: -0.05rem;
-  }
+
   .line-blue-slide {
-    right: -10vw;
-    width: 70vw;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    z-index: 0 !important;
   }
+
   .line-red-slide {
-    left: -20vw;
-    width: 60vw;
+    position: absolute !important;
+    top: 40% !important;
+    left: 0 !important;
+    width: 35vw !important;
+    max-width: 120px !important;
+    height: auto !important;
+    z-index: 0 !important;
+    transform: translateY(-50%) !important;
   }
 
   /* Trend Selection Section Mobile */

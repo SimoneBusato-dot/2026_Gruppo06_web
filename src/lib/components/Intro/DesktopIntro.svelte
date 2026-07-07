@@ -443,8 +443,6 @@
 				</div>
 			</div>
 
-			<!-- Glare effect overlay -->
-			<div class="card-glare"></div>
 		</div>
 	</div>
 

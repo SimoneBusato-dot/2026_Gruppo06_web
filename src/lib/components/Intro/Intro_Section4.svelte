@@ -267,8 +267,6 @@
 					</div>
 				</div>
 			</div>
-
-			<div class="card-glare"></div>
 		</div>
 	</div>
 
@@ -307,8 +305,8 @@
 			<div class="slide-content-right">
 				<div class="slide-text-container" id="text-blue-slide">
 					<p class="slide-subtitle">
-						<span class="highlight-blue">Un'Olimpiade iper-condivisa,</span> in cui il racconto social si è rivelato estremamente
-						<span class="slide-title blue-text">DECENTRALIZZATO<br>DALLO SPORT</span>
+						<span class="desktop-only"><span class="highlight-blue">Un'Olimpiade iper-condivisa,</span> in cui il racconto social si è rivelato estremamente <span class="slide-title blue-text">DECENTRALIZZATO<br>DALLO SPORT</span></span>
+						<span class="mobile-only">Le olimpiadi invernali sono state molto condivise sui social, e ne è rilevato è un evento estremamente <span class="blue-text-highlight">decentralizzato dallo sport.</span></span>
 					</p>
 				</div>
 			</div>
@@ -321,8 +319,8 @@
 			<div class="slide-content-left">
 				<div class="slide-text-container" id="text-red-slide">
 					<p class="slide-subtitle">
-						<span class="highlight-red">Persino chi non segue</span> queste discipline si è sentito chiamato in causa a
-						<span class="slide-title red-text">RECENSIRE<br>QUESTO EVENTO</span>
+						<span class="desktop-only"><span class="highlight-red">Persino chi non segue</span> queste discipline si è sentito chiamato in causa a <span class="slide-title red-text">RECENSIRE<br>QUESTO EVENTO</span></span>
+						<span class="mobile-only">Anche gli utenti che non c'entrano nulla si sono sentiti chiamati in causa a <span class="red-text-highlight">"recensire"</span> questa olimpiade.</span>
 					</p>
 				</div>
 			</div>
