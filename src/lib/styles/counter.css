@@ -401,7 +401,7 @@ body.no-scroll-counter {
 
 @media (max-width: 900px) {
   :root {
-    --reel-item-height: 21.2vw;
+    --reel-item-height: 50.1vw;
   }
 }
 
@@ -502,36 +502,158 @@ body.no-scroll-counter {
 
 /* Mobile responsive styles */
 @media (max-width: 900px) {
+  #intro {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    overflow-y: scroll !important;
+    scroll-snap-type: y mandatory !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .snap-section {
+    width: 100% !important;
+    scroll-snap-align: start !important;
+    scroll-snap-stop: always !important;
+    pointer-events: none !important;
+    flex-shrink: 0 !important;
+  }
+
+  .snap-section:nth-child(1) {
+    height: 200vh !important;
+    height: 200dvh !important;
+  }
+  .snap-section:nth-child(2) {
+    height: 72vh !important;
+    height: 72dvh !important;
+  }
+  .snap-section:nth-child(3) {
+    height: 64vh !important;
+    height: 64dvh !important;
+  }
+  .snap-section:nth-child(4) {
+    height: 64vh !important;
+    height: 64dvh !important;
+  }
+  .snap-section:nth-child(5) {
+    height: 100vh !important;
+    height: 100dvh !important;
+  }
+
   .main-layout-container {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto;
-    gap: 3vh;
-    padding: 4vh 6vw;
-    align-content: center;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    gap: 3vh !important;
+    padding: 0 8vw !important;
+    box-sizing: border-box !important;
+    z-index: 2 !important;
+    pointer-events: none !important;
+  }
+
+  .main-layout-container * {
+    pointer-events: auto !important;
   }
   
-  .column-left, .column-center, .column-right {
-    grid-column: 1 / -1;
-    text-align: center;
+  .column-center {
+    order: 1 !important;
+    position: relative !important;
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    height: 56vh !important;
+    min-height: 56vh !important;
   }
   
+  .column-left {
+    order: 2 !important;
+    width: 100% !important;
+  }
+  
+  .column-right {
+    order: 3 !important;
+    width: 100% !important;
+    max-width: 90% !important;
+  }
+
+  .morph-card {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    z-index: -1 !important;
+  }
+  
+  #counter-display-back {
+    position: absolute !important;
+    top: 48% !important;
+    left: 50% !important;
+    transform: translate3d(-50%, -50%, 40px) !important;
+    width: 100% !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+  }
+
+  .card-text-mask {
+    position: absolute !important;
+    top: 48% !important;
+    left: 50% !important;
+    transform: translate3d(-50%, -50%, 30px) !important;
+    width: 100% !important;
+    height: var(--reel-item-height) !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+  }
+
+  .numbers-reel {
+    align-items: center !important;
+    width: 100% !important;
+  }
+  
+  .number-wrapper {
+    justify-content: center !important;
+  }
+
   .section-title {
-    font-size: 13vw;
-    line-height: 0.85;
+    font-size: 10vw !important;
+    line-height: 1.1 !important;
+    margin: 0 !important;
+    text-align: left !important;
+    white-space: nowrap !important;
   }
   
   .description-text {
-    font-size: 1.3rem;
-    line-height: 1.45;
+    font-size: 4.8vw !important;
+    line-height: 1.5 !important;
+    text-align: left !important;
+    margin: 0 !important;
   }
   
   .number-digits {
-    font-size: 22vw;
+    font-size: 52vw !important;
+    line-height: 0.8 !important;
   }
   
   .number-suffix {
-    font-size: 6vw;
-    margin-top: 1.5vw;
+    font-size: 14vw !important;
+    margin-top: 3.5vw !important;
+    line-height: 0.8 !important;
   }
 }
 
@@ -1438,11 +1560,19 @@ body.no-scroll-counter {
   .counter-display {
     white-space: normal !important;
     display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
+    flex-direction: row !important;
+    align-items: flex-start !important;
     justify-content: center !important;
     text-align: center !important;
-    line-height: 0.75 !important;
+  }
+
+  /* Rendi tutti i testi bianchi su mobile */
+  .description-text span,
+  .description-text,
+  .section-title,
+  .number-digits,
+  .number-suffix {
+    color: #ffffff !important;
   }
 }
 
