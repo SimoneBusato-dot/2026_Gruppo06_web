@@ -78,6 +78,7 @@ export function init() {
   const displayBack = document.getElementById('counter-display-back');
   const displayBackDigits = displayBack.querySelector('.digits-span');
   const displayBackSuffix = displayBack.querySelector('.suffix-span');
+  let cachedColumnCenterY = null;
   const layerBase = document.querySelector('.layer-base');
   
   const layoutContainer = document.querySelector('.main-layout-container');
@@ -167,7 +168,7 @@ export function init() {
       path: parsePath("M83.4264 31.2829C87.2475 17.6812 99.5363 8.19496 113.662 7.94264L558.038 0.00519967C575.234 -0.301956 589.597 13.0383 590.559 30.2101L608.13 343.844C609.175 362.495 594.089 378.072 575.414 377.625L31.2516 364.587C10.3741 364.087 -4.43754 344.047 1.21056 323.942L83.4264 31.2829Z")
     },
     {
-      title: "INTER-\nAZIONI",
+      title: "INTERAZIONI",
       number: "1.0",
       suffix: "MLD",
       description: "<span style=\"color: rgb(220, 62, 65)\">Un'ondata di commenti, condivisioni e reazioni.</span> Il pubblico ha partecipato attivamente a ogni singolo istante dei Giochi.",
@@ -226,7 +227,7 @@ export function init() {
     const startWidth = window.innerWidth;
     const startHeight = window.innerHeight;
 
-    const initialTextY = isMobile ? startHeight * 0.22 : startHeight * 0.38;
+    const initialTextY = isMobile ? 0 : startHeight * 0.38;
 
     let path, color, width, height, cardWidth, cardHeight;
     let textIndex, textOpacity, textTranslateY;
@@ -346,7 +347,7 @@ export function init() {
         
         // Font-size scaling: 19vw down to target (12.5vw desktop, 22vw mobile)
         const startFontSize = isMobile ? 26 : 19;
-        const targetFontSize = isMobile ? 22 : 12.5;
+        const targetFontSize = isMobile ? 26 : 12.5;
         fontSize = lerp(startFontSize, targetFontSize, easedT);
 
         // Suffix typing effect: types "MLD" letter-by-letter in the remaining 30% of transition
@@ -367,7 +368,7 @@ export function init() {
       columnsOpacity = 1;
       finalScreenOpacity = 0;
       numChars = 2;
-      fontSize = isMobile ? 22 : 12.5;
+      fontSize = isMobile ? 26 : 12.5;
       
       if (progress2 <= 0.36) {
         // Transition 1 -> 2 (Card 1 to Card 2, mapped completely between scroll progress 0.50 and 0.68)
@@ -472,6 +473,14 @@ export function init() {
       suffixText = cards[textIndex].suffix;
     }
 
+    if (isMobile) {
+      path = backgroundCard.path;
+      width = backgroundCard.viewBox[0];
+      height = backgroundCard.viewBox[1];
+      cardWidth = startWidth * 1.1;
+      cardHeight = startHeight * 1.1;
+    }
+
     return {
       progress,
       path, color, width, height, cardWidth, cardHeight,
@@ -566,7 +575,12 @@ export function init() {
         }
 
         const cardData = cards[state.textIndex];
-        cardTitle.innerHTML = cardData.title.replace(/\n/g, '<br>');
+        const isMobile = window.innerWidth <= 900;
+        if (isMobile) {
+          cardTitle.innerHTML = cardData.title.replace(/-\n/g, '').replace(/\n/g, ' ');
+        } else {
+          cardTitle.innerHTML = cardData.title.replace(/\n/g, '<br>');
+        }
         cardDescription.innerHTML = cardData.description;
         lastTextIndex = state.textIndex;
 
@@ -583,6 +597,19 @@ export function init() {
           { x: 50, opacity: 0 },
           { x: 0, opacity: 1, stagger: 0.08, duration: 0.45, ease: "power2.out", overwrite: "auto" }
         );
+
+        if (isMobile && state.textIndex > 0) {
+          const activeReelItem = reelItems[state.textIndex];
+          if (activeReelItem) {
+            const wrapper = activeReelItem.querySelector('.number-wrapper');
+            if (wrapper) {
+              gsap.fromTo(wrapper,
+                { x: -50, opacity: 0 },
+                { x: 0, opacity: 1, duration: 0.45, ease: "power2.out", overwrite: "auto" }
+              );
+            }
+          }
+        }
       }
       
       const transformStr = `translate3d(0, ${state.textTranslateY}px, 0)`;
@@ -601,8 +628,8 @@ export function init() {
     // Manage numbers reel translation and item opacities/colors
     if (numbersReel) {
       const isMobile = window.innerWidth <= 900;
-      const reelItemHeightVw = isMobile ? 21.2 : 12;
-      const translation = state.activeIndex * reelItemHeightVw;
+      const reelItemHeightVw = isMobile ? 50.1 : 12;
+      const translation = isMobile ? (state.textIndex * reelItemHeightVw) : (state.activeIndex * reelItemHeightVw);
       
       numbersReel.style.transform = `translate3d(0, -${translation}vw, 0)`;
       numbersReel.style.opacity = state.columnsOpacity;
@@ -613,7 +640,13 @@ export function init() {
         const style = getReelItemStyle(d);
         
         let itemOpacity = style.opacity;
-        if (state.counterOpacity > 0) {
+        if (isMobile) {
+          if (state.textIndex === 0) {
+            itemOpacity = 0; // Hide active reel item while rolling counter is visible
+          } else {
+            itemOpacity = (index === state.textIndex) ? (state.columnsOpacity * state.textOpacity) : 0;
+          }
+        } else if (state.counterOpacity > 0) {
           if (index === 0) {
             itemOpacity = 0; // Hide active reel item while rolling counter is visible
           } else {
@@ -637,20 +670,69 @@ export function init() {
           const scaleVal = 1 - 0.08 * Math.abs(d);   // leggero rimpicciolimento man mano che si allontanano dal centro
           const spacingOffset = d * 50;              // px extra di distanza verticale tra le righe (regola per più/meno spazio)
 
-          wrapper.style.transform =
-            `perspective(600px) translateY(${spacingOffset}px) rotateX(${rotateAngle}deg) scale(${scaleVal})`;
+          if (!isMobile) {
+            wrapper.style.transform =
+              `perspective(600px) translateY(${spacingOffset}px) rotateX(${rotateAngle}deg) scale(${scaleVal})`;
+          }
           wrapper.style.transformOrigin = 'center center';
           wrapper.style.backfaceVisibility = 'hidden';
         }
       });
     }
 
-    // Manage counter display text truncation and font-size
-    if (state.counterOpacity > 0) {
-      displayBack.style.display = 'block';
-      displayBack.style.opacity = state.counterOpacity;
+    const isMobile = window.innerWidth <= 900;
+
+    // Mobile layout: calculate t, left, top, transform and apply to both elements every frame
+    if (isMobile) {
+      if (cachedColumnCenterY === null) {
+        const columnCenter = document.querySelector('.column-center');
+        if (columnCenter) {
+          const rect = columnCenter.getBoundingClientRect();
+          cachedColumnCenterY = rect.top + rect.height / 2;
+        }
+      }
+
+      const targetTop = cachedColumnCenterY || (window.innerHeight * 0.5);
+
+      let t = 0;
+      if (state.progress > suspensionEnd1 && state.progress < totalPhase1Max) {
+        t = (state.progress - suspensionEnd1) / (totalPhase1Max - suspensionEnd1);
+      } else if (state.progress >= totalPhase1Max) {
+        t = 1;
+      }
+
+      const currentLeft = lerp(50, 8, t);
+      const currentTranslateX = lerp(-50, 0, t);
+      const currentTop = lerp(window.innerHeight * 0.5, targetTop, t);
+
+      displayBack.style.setProperty('left', `${currentLeft}vw`, 'important');
+      displayBack.style.setProperty('top', `${currentTop}px`, 'important');
+      displayBack.style.setProperty('transform', `translate3d(${currentTranslateX}%, -50%, 40px)`, 'important');
+      displayBack.style.setProperty('justify-content', (t > 0.8) ? 'flex-start' : 'center', 'important');
+
+      const cardTextMask = document.querySelector('.card-text-mask');
+      if (cardTextMask) {
+        cardTextMask.style.setProperty('left', `${currentLeft}vw`, 'important');
+        cardTextMask.style.setProperty('top', `${currentTop}px`, 'important');
+        cardTextMask.style.setProperty('transform', `translate3d(${currentTranslateX}%, -50%, 30px)`, 'important');
+        cardTextMask.style.setProperty('justify-content', (t > 0.8) ? 'flex-start' : 'center', 'important');
+      }
+    }
+
+    if (state.counterOpacity > 0 || (isMobile && state.textIndex === 0)) {
+      if (isMobile) {
+        displayBack.style.setProperty('display', 'flex', 'important');
+        if (state.counterOpacity > 0.01 && state.columnsOpacity < 0.99) {
+          displayBack.style.setProperty('opacity', state.counterOpacity, 'important');
+        } else {
+          const finalOpacity = (state.textIndex === 0) ? (state.columnsOpacity * state.textOpacity) : 0;
+          displayBack.style.setProperty('opacity', finalOpacity, 'important');
+        }
+      } else {
+        displayBack.style.display = 'block';
+        displayBack.style.opacity = state.counterOpacity;
+      }
       
-      const isMobile = window.innerWidth <= 900;
       if (isMobile) {
         const rawDigits = displayBackDigits.textContent.replace(/\./g, '');
         const mobileNumChars = Math.round(lerp(2, 11, (state.numChars - 2) / 12));
@@ -666,7 +748,7 @@ export function init() {
       }
       displayBackSuffix.textContent = state.suffixText;
       
-      displayBack.style.fontSize = `${state.fontSize}vw`;
+      displayBack.style.fontSize = isMobile ? `${state.fontSize * 2}vw` : `${state.fontSize}vw`;
       
       if (state.progress < fillPhaseStart1) {
         displayBack.style.color = 'var(--brand-vip-300)';
@@ -680,19 +762,26 @@ export function init() {
         displayBack.style.color = '#ffffff';
       }
       
-      // Animate slide-up of the counter text (positioned relative to center with textY)
-      const slideY = (1 - state.counterOpacity) * 50;
-      const finalY = state.textY - slideY;
-      displayBack.style.transform = `translate3d(-50%, calc(-50% + ${finalY}px), 0)`;
-      
-      // Also update the position of the reel container
-      const cardTextMask = document.querySelector('.card-text-mask');
-      if (cardTextMask) {
-        cardTextMask.style.transform = `translate3d(-50%, calc(-50% + ${state.textY}px), 30px)`;
+      if (!isMobile) {
+        // Animate slide-up of the counter text (positioned relative to center with textY)
+        const slideY = (1 - state.counterOpacity) * 50;
+        const finalY = state.textY - slideY;
+        displayBack.style.transform = `translate3d(-50%, calc(-50% + ${finalY}px), 0)`;
+        
+        // Also update the position of the reel container
+        const cardTextMask = document.querySelector('.card-text-mask');
+        if (cardTextMask) {
+          cardTextMask.style.transform = `translate3d(-50%, calc(-50% + ${state.textY}px), 30px)`;
+        }
       }
     } else {
-      displayBack.style.display = 'none';
-      displayBack.style.opacity = 0;
+      if (isMobile) {
+        displayBack.style.setProperty('display', 'none', 'important');
+        displayBack.style.setProperty('opacity', '0', 'important');
+      } else {
+        displayBack.style.display = 'none';
+        displayBack.style.opacity = 0;
+      }
     }
 
     // Manage left/right columns opacity
@@ -920,11 +1009,22 @@ export function init() {
   }
 
   function triggerAutoscrollTo(targetPercent) {
+    const isMobile = window.innerWidth <= 900;
+    const scrollContainer = isMobile ? document.getElementById('intro') : null;
+    
     isAutoscrolling = true;
     autoscrollTargetProgress = targetPercent;
     autoscrollStartTime = null;
-    autoscrollStartScrollY = window.scrollY;
-    lockScroll();
+    autoscrollStartScrollY = scrollContainer ? scrollContainer.scrollTop : window.scrollY;
+    
+    if (isMobile && scrollContainer) {
+      // Disable native snap and lock overflow to prevent touch fights
+      scrollContainer.style.setProperty('scroll-snap-type', 'none', 'important');
+      scrollContainer.style.setProperty('overflow-y', 'hidden', 'important');
+    } else {
+      lockScroll();
+    }
+    
     requestAnimationFrame(performAutoscroll);
   }
 
@@ -933,29 +1033,43 @@ export function init() {
     if (!autoscrollStartTime) autoscrollStartTime = timestamp;
     
     const elapsed = timestamp - autoscrollStartTime;
-    const t = Math.min(elapsed / autoscrollDuration, 1);
+    const isMobile = window.innerWidth <= 900;
+    const duration = isMobile ? 800 : autoscrollDuration;
+    const t = Math.min(elapsed / duration, 1);
     
-    // Quartic ease-in-out curve for balanced, smooth deceleration (Idea C)
+    // Quartic ease-in-out curve
     const easeT = t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2;
     
-    const presentationScrollHeight = presentationMultiplier * window.innerHeight;
+    const scrollContainer = isMobile ? document.getElementById('intro') : null;
+    const presentationScrollHeight = isMobile ? (4 * window.innerHeight) : (presentationMultiplier * window.innerHeight);
     const scrollEnd = presentationScrollHeight * autoscrollTargetProgress;
     
-    const currentScrollY = lerp(autoscrollStartScrollY, scrollEnd, easeT);
-    window.scrollTo(0, currentScrollY);
+    const currentScroll = lerp(autoscrollStartScrollY, scrollEnd, easeT);
+    
+    if (isMobile && scrollContainer) {
+      scrollContainer.scrollTop = currentScroll;
+    } else {
+      window.scrollTo(0, currentScroll);
+    }
     
     if (t < 1) {
       requestAnimationFrame(performAutoscroll);
     } else {
       isAutoscrolling = false;
-      lastScrollY = window.scrollY;
       
-      cooldownActive = true;
-      setTimeout(() => {
-        cooldownActive = false;
-        unlockScroll();
+      if (isMobile && scrollContainer) {
+        scrollContainer.style.setProperty('scroll-snap-type', 'y mandatory', 'important');
+        scrollContainer.style.setProperty('overflow-y', 'scroll', 'important');
+        lastScrollY = scrollContainer.scrollTop;
+      } else {
         lastScrollY = window.scrollY;
-      }, 100); // Ridotto a 100ms per sbloccare quasi istantaneamente dopo lo snap
+        cooldownActive = true;
+        setTimeout(() => {
+          cooldownActive = false;
+          unlockScroll();
+          lastScrollY = window.scrollY;
+        }, 100);
+      }
     }
   }
 
@@ -1133,8 +1247,11 @@ export function init() {
   }
 
   function updateTargetProgress() {
-    const presentationScrollHeight = presentationMultiplier * window.innerHeight;
-    const scrollPosition = window.scrollY;
+    const isMobile = window.innerWidth <= 900;
+    const scrollContainer = isMobile ? document.getElementById('intro') : null;
+    const scrollPosition = scrollContainer ? scrollContainer.scrollTop : window.scrollY;
+    
+    const presentationScrollHeight = isMobile ? (4 * window.innerHeight) : (presentationMultiplier * window.innerHeight);
     const tempTargetProgress = presentationScrollHeight > 0 ? Math.min(Math.max(scrollPosition / presentationScrollHeight, 0), 1) : 0;
     
     targetProgress = tempTargetProgress;
@@ -1147,10 +1264,11 @@ export function init() {
   }
 
   window.addEventListener('scroll', () => {
+    const isMobile = window.innerWidth <= 900;
     const scrollPosition = window.scrollY;
     const deltaY = Math.abs(scrollPosition - lastScrollY);
 
-    if (deltaY > 0) {
+    if (deltaY > 0 && !isMobile) {
       // Reduced intensity: base of 0.0022 spawns 1 reaction every ~450px scrolled from the start.
       // EasedProgress scales it up to 0.006 (1 reaction every ~166px scrolled at 22 Billion).
       const easedProgress = bezierEase(currentProgress);
@@ -1164,7 +1282,7 @@ export function init() {
       reactionAccumulator -= reactionsToSpawn;
 
       if (reactionsToSpawn > 0) {
-        const estimatedNumberWidth = window.innerWidth <= 900 ? (window.innerWidth * 0.45) : (window.innerWidth * 0.22);
+        const estimatedNumberWidth = window.innerWidth * 0.22;
         createReaction(estimatedNumberWidth);
       }
     }
@@ -1222,8 +1340,69 @@ export function init() {
     updateTargetProgress();
   }, { passive: true });
 
+  const introEl = document.getElementById('intro');
+  if (introEl) {
+    const handleIntroScroll = () => {
+      const isMobile = window.innerWidth <= 900;
+      if (isMobile) {
+        const scrollTop = introEl.scrollTop;
+        lastScrollY = scrollTop;
+        updateTargetProgress();
+
+        if (!isAutoscrolling && !cooldownActive) {
+          const scrollHeight = 4 * window.innerHeight;
+          const y0_susp = 0.35 * scrollHeight; // fine sospensione
+          const y1 = COUNTER_SNAP_CONFIG.step1 * scrollHeight;
+          const y2 = COUNTER_SNAP_CONFIG.step2 * scrollHeight;
+          const y3 = COUNTER_SNAP_CONFIG.step3 * scrollHeight;
+          
+          const threshold = COUNTER_SNAP_CONFIG.threshold;
+
+          if (activeStep === 0) {
+            if (scrollTop > y0_susp) {
+              activeStep = 1;
+              triggerAutoscrollTo(COUNTER_SNAP_CONFIG.step1);
+            }
+          } else if (activeStep === 1) {
+            if (scrollTop > y1 + threshold) {
+              activeStep = 2;
+              triggerAutoscrollTo(COUNTER_SNAP_CONFIG.step2);
+            } else if (scrollTop < y1 - threshold) {
+              activeStep = 0;
+              triggerAutoscrollTo(COUNTER_SNAP_CONFIG.step0_end - 0.02);
+            }
+          } else if (activeStep === 2) {
+            if (scrollTop > y2 + threshold) {
+              activeStep = 3;
+              triggerAutoscrollTo(COUNTER_SNAP_CONFIG.step3);
+            } else if (scrollTop < y2 - threshold) {
+              activeStep = 1;
+              triggerAutoscrollTo(COUNTER_SNAP_CONFIG.step1);
+            }
+          } else if (activeStep === 3) {
+            if (scrollTop > y3 + threshold) {
+              activeStep = 4;
+              triggerAutoscrollTo(COUNTER_SNAP_CONFIG.step4);
+            } else if (scrollTop < y3 - threshold) {
+              activeStep = 2;
+              triggerAutoscrollTo(COUNTER_SNAP_CONFIG.step2);
+            }
+          } else if (activeStep === 4) {
+            if (scrollTop < y3 - threshold) {
+              activeStep = 3;
+              triggerAutoscrollTo(COUNTER_SNAP_CONFIG.step3);
+            }
+          }
+        }
+      }
+    };
+    activeListeners.push({ target: introEl, type: 'scroll', listener: handleIntroScroll, options: { passive: true } });
+    introEl.addEventListener('scroll', handleIntroScroll, { passive: true });
+  }
+
   // Handle window resizing (e.g. rotating device)
   window.addEventListener('resize', () => {
+    cachedColumnCenterY = null;
     const presentationScrollHeight = presentationMultiplier * window.innerHeight;
     if (presentationScrollHeight > 0) {
       let targetP = 0;
