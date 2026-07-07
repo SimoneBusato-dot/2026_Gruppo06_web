@@ -533,4 +533,11 @@
 	
 	
 </div>
+
+	<!-- Mobile Snap Spacers -->
+	<div class="snap-section"></div>
+	<div class="snap-section"></div>
+	<div class="snap-section"></div>
+	<div class="snap-section"></div>
+	<div class="snap-section"></div>
 </main>

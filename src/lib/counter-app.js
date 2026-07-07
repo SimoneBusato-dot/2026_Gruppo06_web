@@ -78,6 +78,7 @@ export function init() {
   const displayBack = document.getElementById('counter-display-back');
   const displayBackDigits = displayBack.querySelector('.digits-span');
   const displayBackSuffix = displayBack.querySelector('.suffix-span');
+  let cachedColumnCenterY = null;
   const layerBase = document.querySelector('.layer-base');
   
   const layoutContainer = document.querySelector('.main-layout-container');
@@ -680,15 +681,55 @@ export function init() {
     }
 
     const isMobile = window.innerWidth <= 900;
+
+    // Mobile layout: calculate t, left, top, transform and apply to both elements every frame
+    if (isMobile) {
+      if (cachedColumnCenterY === null) {
+        const columnCenter = document.querySelector('.column-center');
+        if (columnCenter) {
+          const rect = columnCenter.getBoundingClientRect();
+          cachedColumnCenterY = rect.top + rect.height / 2;
+        }
+      }
+
+      const targetTop = cachedColumnCenterY || (window.innerHeight * 0.5);
+
+      let t = 0;
+      if (state.progress > suspensionEnd1 && state.progress < totalPhase1Max) {
+        t = (state.progress - suspensionEnd1) / (totalPhase1Max - suspensionEnd1);
+      } else if (state.progress >= totalPhase1Max) {
+        t = 1;
+      }
+
+      const currentLeft = lerp(50, 8, t);
+      const currentTranslateX = lerp(-50, 0, t);
+      const currentTop = lerp(window.innerHeight * 0.5, targetTop, t);
+
+      displayBack.style.setProperty('left', `${currentLeft}vw`, 'important');
+      displayBack.style.setProperty('top', `${currentTop}px`, 'important');
+      displayBack.style.setProperty('transform', `translate3d(${currentTranslateX}%, -50%, 40px)`, 'important');
+      displayBack.style.setProperty('justify-content', (t > 0.8) ? 'flex-start' : 'center', 'important');
+
+      const cardTextMask = document.querySelector('.card-text-mask');
+      if (cardTextMask) {
+        cardTextMask.style.setProperty('left', `${currentLeft}vw`, 'important');
+        cardTextMask.style.setProperty('top', `${currentTop}px`, 'important');
+        cardTextMask.style.setProperty('transform', `translate3d(${currentTranslateX}%, -50%, 30px)`, 'important');
+        cardTextMask.style.setProperty('justify-content', (t > 0.8) ? 'flex-start' : 'center', 'important');
+      }
+    }
+
     if (state.counterOpacity > 0 || (isMobile && state.textIndex === 0)) {
-      displayBack.style.display = 'block';
       if (isMobile) {
+        displayBack.style.setProperty('display', 'flex', 'important');
         if (state.counterOpacity > 0.01 && state.columnsOpacity < 0.99) {
-          displayBack.style.opacity = state.counterOpacity;
+          displayBack.style.setProperty('opacity', state.counterOpacity, 'important');
         } else {
-          displayBack.style.opacity = (state.textIndex === 0) ? (state.columnsOpacity * state.textOpacity) : 0;
+          const finalOpacity = (state.textIndex === 0) ? (state.columnsOpacity * state.textOpacity) : 0;
+          displayBack.style.setProperty('opacity', finalOpacity, 'important');
         }
       } else {
+        displayBack.style.display = 'block';
         displayBack.style.opacity = state.counterOpacity;
       }
       
@@ -721,19 +762,26 @@ export function init() {
         displayBack.style.color = '#ffffff';
       }
       
-      // Animate slide-up of the counter text (positioned relative to center with textY)
-      const slideY = (1 - state.counterOpacity) * 50;
-      const finalY = state.textY - slideY;
-      displayBack.style.transform = `translate3d(-50%, calc(-50% + ${finalY}px), 0)`;
-      
-      // Also update the position of the reel container
-      const cardTextMask = document.querySelector('.card-text-mask');
-      if (cardTextMask) {
-        cardTextMask.style.transform = `translate3d(-50%, calc(-50% + ${state.textY}px), 30px)`;
+      if (!isMobile) {
+        // Animate slide-up of the counter text (positioned relative to center with textY)
+        const slideY = (1 - state.counterOpacity) * 50;
+        const finalY = state.textY - slideY;
+        displayBack.style.transform = `translate3d(-50%, calc(-50% + ${finalY}px), 0)`;
+        
+        // Also update the position of the reel container
+        const cardTextMask = document.querySelector('.card-text-mask');
+        if (cardTextMask) {
+          cardTextMask.style.transform = `translate3d(-50%, calc(-50% + ${state.textY}px), 30px)`;
+        }
       }
     } else {
-      displayBack.style.display = 'none';
-      displayBack.style.opacity = 0;
+      if (isMobile) {
+        displayBack.style.setProperty('display', 'none', 'important');
+        displayBack.style.setProperty('opacity', '0', 'important');
+      } else {
+        displayBack.style.display = 'none';
+        displayBack.style.opacity = 0;
+      }
     }
 
     // Manage left/right columns opacity
@@ -961,11 +1009,22 @@ export function init() {
   }
 
   function triggerAutoscrollTo(targetPercent) {
+    const isMobile = window.innerWidth <= 900;
+    const scrollContainer = isMobile ? document.getElementById('intro') : null;
+    
     isAutoscrolling = true;
     autoscrollTargetProgress = targetPercent;
     autoscrollStartTime = null;
-    autoscrollStartScrollY = window.scrollY;
-    lockScroll();
+    autoscrollStartScrollY = scrollContainer ? scrollContainer.scrollTop : window.scrollY;
+    
+    if (isMobile && scrollContainer) {
+      // Disable native snap and lock overflow to prevent touch fights
+      scrollContainer.style.setProperty('scroll-snap-type', 'none', 'important');
+      scrollContainer.style.setProperty('overflow-y', 'hidden', 'important');
+    } else {
+      lockScroll();
+    }
+    
     requestAnimationFrame(performAutoscroll);
   }
 
@@ -974,29 +1033,43 @@ export function init() {
     if (!autoscrollStartTime) autoscrollStartTime = timestamp;
     
     const elapsed = timestamp - autoscrollStartTime;
-    const t = Math.min(elapsed / autoscrollDuration, 1);
+    const isMobile = window.innerWidth <= 900;
+    const duration = isMobile ? 800 : autoscrollDuration;
+    const t = Math.min(elapsed / duration, 1);
     
-    // Quartic ease-in-out curve for balanced, smooth deceleration (Idea C)
+    // Quartic ease-in-out curve
     const easeT = t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2;
     
-    const presentationScrollHeight = presentationMultiplier * window.innerHeight;
+    const scrollContainer = isMobile ? document.getElementById('intro') : null;
+    const presentationScrollHeight = isMobile ? (4 * window.innerHeight) : (presentationMultiplier * window.innerHeight);
     const scrollEnd = presentationScrollHeight * autoscrollTargetProgress;
     
-    const currentScrollY = lerp(autoscrollStartScrollY, scrollEnd, easeT);
-    window.scrollTo(0, currentScrollY);
+    const currentScroll = lerp(autoscrollStartScrollY, scrollEnd, easeT);
+    
+    if (isMobile && scrollContainer) {
+      scrollContainer.scrollTop = currentScroll;
+    } else {
+      window.scrollTo(0, currentScroll);
+    }
     
     if (t < 1) {
       requestAnimationFrame(performAutoscroll);
     } else {
       isAutoscrolling = false;
-      lastScrollY = window.scrollY;
       
-      cooldownActive = true;
-      setTimeout(() => {
-        cooldownActive = false;
-        unlockScroll();
+      if (isMobile && scrollContainer) {
+        scrollContainer.style.setProperty('scroll-snap-type', 'y mandatory', 'important');
+        scrollContainer.style.setProperty('overflow-y', 'scroll', 'important');
+        lastScrollY = scrollContainer.scrollTop;
+      } else {
         lastScrollY = window.scrollY;
-      }, 100); // Ridotto a 100ms per sbloccare quasi istantaneamente dopo lo snap
+        cooldownActive = true;
+        setTimeout(() => {
+          cooldownActive = false;
+          unlockScroll();
+          lastScrollY = window.scrollY;
+        }, 100);
+      }
     }
   }
 
@@ -1272,8 +1345,55 @@ export function init() {
     const handleIntroScroll = () => {
       const isMobile = window.innerWidth <= 900;
       if (isMobile) {
-        lastScrollY = introEl.scrollTop;
+        const scrollTop = introEl.scrollTop;
+        lastScrollY = scrollTop;
         updateTargetProgress();
+
+        if (!isAutoscrolling && !cooldownActive) {
+          const scrollHeight = 4 * window.innerHeight;
+          const y0_susp = 0.35 * scrollHeight; // fine sospensione
+          const y1 = COUNTER_SNAP_CONFIG.step1 * scrollHeight;
+          const y2 = COUNTER_SNAP_CONFIG.step2 * scrollHeight;
+          const y3 = COUNTER_SNAP_CONFIG.step3 * scrollHeight;
+          
+          const threshold = COUNTER_SNAP_CONFIG.threshold;
+
+          if (activeStep === 0) {
+            if (scrollTop > y0_susp) {
+              activeStep = 1;
+              triggerAutoscrollTo(COUNTER_SNAP_CONFIG.step1);
+            }
+          } else if (activeStep === 1) {
+            if (scrollTop > y1 + threshold) {
+              activeStep = 2;
+              triggerAutoscrollTo(COUNTER_SNAP_CONFIG.step2);
+            } else if (scrollTop < y1 - threshold) {
+              activeStep = 0;
+              triggerAutoscrollTo(COUNTER_SNAP_CONFIG.step0_end - 0.02);
+            }
+          } else if (activeStep === 2) {
+            if (scrollTop > y2 + threshold) {
+              activeStep = 3;
+              triggerAutoscrollTo(COUNTER_SNAP_CONFIG.step3);
+            } else if (scrollTop < y2 - threshold) {
+              activeStep = 1;
+              triggerAutoscrollTo(COUNTER_SNAP_CONFIG.step1);
+            }
+          } else if (activeStep === 3) {
+            if (scrollTop > y3 + threshold) {
+              activeStep = 4;
+              triggerAutoscrollTo(COUNTER_SNAP_CONFIG.step4);
+            } else if (scrollTop < y3 - threshold) {
+              activeStep = 2;
+              triggerAutoscrollTo(COUNTER_SNAP_CONFIG.step2);
+            }
+          } else if (activeStep === 4) {
+            if (scrollTop < y3 - threshold) {
+              activeStep = 3;
+              triggerAutoscrollTo(COUNTER_SNAP_CONFIG.step3);
+            }
+          }
+        }
       }
     };
     activeListeners.push({ target: introEl, type: 'scroll', listener: handleIntroScroll, options: { passive: true } });
@@ -1282,6 +1402,7 @@ export function init() {
 
   // Handle window resizing (e.g. rotating device)
   window.addEventListener('resize', () => {
+    cachedColumnCenterY = null;
     const presentationScrollHeight = presentationMultiplier * window.innerHeight;
     if (presentationScrollHeight > 0) {
       let targetP = 0;
