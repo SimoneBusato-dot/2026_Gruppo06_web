@@ -484,7 +484,7 @@ body.no-scroll-counter {
   color: #ffffff;
   text-transform: uppercase;
   margin-left: 0.2vw;
-  margin-top: 0.8vw; /* Push down slightly to align with the cap height of digits */
+  margin-top: 0.064em; /* Push down slightly to align with the cap height of digits */
   will-change: opacity, transform;
 }
 
