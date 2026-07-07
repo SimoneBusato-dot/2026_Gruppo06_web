@@ -26,7 +26,13 @@ let descSplit = null;
 export function cleanup() {
   isAppDestroyed = true;
   
-  isAppDestroyed = true;
+  if (typeof document !== 'undefined') {
+    document.body.className = document.body.className
+      .replace(/\bactive-slide-\d\b/g, '')
+      .replace(/\bslideshow-active\b/g, '')
+      .trim();
+  }
+  
   activeListeners.forEach(({ target, type, listener, options }) => {
     if (target && typeof target.removeEventListener === 'function') {
       target.removeEventListener(type, listener, options);
@@ -44,7 +50,8 @@ export function cleanup() {
   }
 }
 
-export function init() {
+export function init(options = {}) {
+  const goto = options.goto;
   isAppDestroyed = false;
   
   const oldWindowAdd = window.addEventListener;
@@ -62,6 +69,120 @@ export function init() {
   if ('scrollRestoration' in history) {
     history.scrollRestoration = 'manual';
   }
+
+  function updateBodySlideClass(step) {
+    if (typeof document !== 'undefined') {
+      document.body.className = document.body.className
+        .replace(/\bactive-slide-\d\b/g, '')
+        .replace(/\bslideshow-active\b/g, '')
+        .trim();
+      
+      document.body.classList.add(`active-slide-${step}`);
+      if (step >= 1) {
+        document.body.classList.add('slideshow-active');
+      }
+    }
+  }
+
+  function goToNextSlideMobile() {
+    if (activeStep >= 7) {
+      if (goto) {
+        goto('/Categorie');
+      }
+      return;
+    }
+    
+    activeStep++;
+    updateBodySlideClass(activeStep);
+    
+    if (activeStep <= 4) {
+      let targetP = COUNTER_SNAP_CONFIG.step1;
+      if (activeStep === 2) targetP = COUNTER_SNAP_CONFIG.step2;
+      else if (activeStep === 3) targetP = COUNTER_SNAP_CONFIG.step3;
+      else if (activeStep === 4) targetP = COUNTER_SNAP_CONFIG.step4;
+      
+      triggerAutoscrollTo(targetP);
+    }
+  }
+
+  function goToPrevSlideMobile() {
+    if (activeStep <= 1) {
+      activeStep = 0;
+      updateBodySlideClass(0);
+      
+      isTransitioningBackMobile = true;
+      targetProgress = COUNTER_SNAP_CONFIG.step0_end - 0.05;
+      
+      if (!isAnimating) {
+        isAnimating = true;
+        lastFrameTime = performance.now();
+        requestAnimationFrame(tickAnimation);
+      }
+      return;
+    }
+    
+    activeStep--;
+    updateBodySlideClass(activeStep);
+    
+    if (activeStep <= 4) {
+      let targetP = COUNTER_SNAP_CONFIG.step1;
+      if (activeStep === 2) targetP = COUNTER_SNAP_CONFIG.step2;
+      else if (activeStep === 3) targetP = COUNTER_SNAP_CONFIG.step3;
+      else if (activeStep === 4) targetP = COUNTER_SNAP_CONFIG.step4;
+      
+      triggerAutoscrollTo(targetP);
+    }
+  }
+
+  // Touch swipe variables
+  let startY = 0;
+  let isSwiping = false;
+  let isLoadCooldown = true;
+  let isSwipeBackCooldown = false;
+  let isTransitioningBackMobile = false;
+  setTimeout(() => {
+    isLoadCooldown = false;
+  }, 250);
+
+  const handleTouchStart = (e) => {
+    const isMobile = window.innerWidth <= 900;
+    if (!isMobile) return;
+    if (activeStep === 0) return;
+    startY = e.touches[0].clientY;
+    isSwiping = true;
+  };
+
+  const handleTouchMove = (e) => {
+    const isMobile = window.innerWidth <= 900;
+    if (!isMobile) return;
+    if (activeStep === 0) return;
+    
+    if (e.cancelable) {
+      e.preventDefault();
+    }
+  };
+
+  const handleTouchEnd = (e) => {
+    const isMobile = window.innerWidth <= 900;
+    if (!isMobile) return;
+    if (activeStep === 0 || !isSwiping) return;
+    
+    const endY = e.changedTouches[0].clientY;
+    const diffY = startY - endY;
+    isSwiping = false;
+    
+    if (Math.abs(diffY) > 50) {
+      if (diffY > 0) {
+        goToNextSlideMobile();
+      } else {
+        goToPrevSlideMobile();
+      }
+    }
+  };
+
+  window.addEventListener('touchstart', handleTouchStart, { passive: true });
+  window.addEventListener('touchmove', handleTouchMove, { passive: false });
+  window.addEventListener('touchend', handleTouchEnd, { passive: true });
   
   let backToCards = false;
   if (typeof window !== 'undefined') {
@@ -69,7 +190,10 @@ export function init() {
     backToCards = urlParams.has('back') || urlParams.has('from') || window.location.hash === '#Categorie';
   }
 
-  if (!backToCards) {
+  const isMobile = window.innerWidth <= 900;
+  if (isMobile) {
+    window.scrollTo(0, 0);
+  } else if (!backToCards) {
     window.scrollTo(0, 0);
   }
 
@@ -586,19 +710,27 @@ export function init() {
 
         // Inizializza e avvia le animazioni delle righe
         titleSplit = new SplitType(cardTitle, { types: "lines", tagName: "span" });
-        descSplit = new SplitType(cardDescription, { types: "lines", tagName: "span" });
 
         gsap.fromTo(titleSplit.lines,
           { x: -50, opacity: 0 },
           { x: 0, opacity: 1, stagger: 0.08, duration: 0.45, ease: "power2.out", overwrite: "auto" }
         );
 
-        gsap.fromTo(descSplit.lines,
-          { x: 50, opacity: 0 },
-          { x: 0, opacity: 1, stagger: 0.08, duration: 0.45, ease: "power2.out", overwrite: "auto" }
-        );
+        if (isMobile) {
+          descSplit = null;
+          gsap.fromTo(cardDescription,
+            { x: 50, opacity: 0 },
+            { x: 0, opacity: 1, duration: 0.45, ease: "power2.out", overwrite: "auto" }
+          );
+        } else {
+          descSplit = new SplitType(cardDescription, { types: "lines", tagName: "span" });
+          gsap.fromTo(descSplit.lines,
+            { x: 50, opacity: 0 },
+            { x: 0, opacity: 1, stagger: 0.08, duration: 0.45, ease: "power2.out", overwrite: "auto" }
+          );
+        }
 
-        if (isMobile && state.textIndex > 0) {
+        if (isMobile && state.textIndex >= 0) {
           const activeReelItem = reelItems[state.textIndex];
           if (activeReelItem) {
             const wrapper = activeReelItem.querySelector('.number-wrapper');
@@ -641,8 +773,8 @@ export function init() {
         
         let itemOpacity = style.opacity;
         if (isMobile) {
-          if (state.textIndex === 0) {
-            itemOpacity = 0; // Hide active reel item while rolling counter is visible
+          if (activeStep === 0 || state.progress < (totalPhase1Max - 0.01)) {
+            itemOpacity = 0; // Hide reel items during counter and transition phase
           } else {
             itemOpacity = (index === state.textIndex) ? (state.columnsOpacity * state.textOpacity) : 0;
           }
@@ -684,15 +816,12 @@ export function init() {
 
     // Mobile layout: calculate t, left, top, transform and apply to both elements every frame
     if (isMobile) {
-      if (cachedColumnCenterY === null) {
-        const columnCenter = document.querySelector('.column-center');
-        if (columnCenter) {
-          const rect = columnCenter.getBoundingClientRect();
-          cachedColumnCenterY = rect.top + rect.height / 2;
-        }
+      const columnCenter = document.querySelector('.column-center');
+      let targetTop = window.innerHeight * 0.5;
+      if (columnCenter) {
+        const rect = columnCenter.getBoundingClientRect();
+        targetTop = rect.top + rect.height / 2;
       }
-
-      const targetTop = cachedColumnCenterY || (window.innerHeight * 0.5);
 
       let t = 0;
       if (state.progress > suspensionEnd1 && state.progress < totalPhase1Max) {
@@ -719,7 +848,11 @@ export function init() {
       }
     }
 
-    if (state.counterOpacity > 0 || (isMobile && state.textIndex === 0)) {
+    const showDisplayBack = isMobile 
+      ? (activeStep === 0 || state.progress < (totalPhase1Max - 0.01)) 
+      : (state.counterOpacity > 0);
+
+    if (showDisplayBack) {
       if (isMobile) {
         displayBack.style.setProperty('display', 'flex', 'important');
         if (state.counterOpacity > 0.01 && state.columnsOpacity < 0.99) {
@@ -850,26 +983,32 @@ export function init() {
         // Calculate horizontal translation directly from vertical scroll progression
         const track = finalScreen.querySelector('.final-cards-track');
         if (track) {
-          const presentationScrollHeight = presentationMultiplier * window.innerHeight;
-          const scrollPosition = window.scrollY;
-          const carouselStart = 0.91 * presentationScrollHeight;
-          const carouselSpan = 4.0 * window.innerHeight;
-          
-          let progress = 0;
-          if (scrollPosition > carouselStart) {
-            progress = Math.min((scrollPosition - carouselStart) / carouselSpan, 1);
+          const isMobile = window.innerWidth <= 900;
+          const progress = state.progress;
+          if (isMobile) {
+            track.style.transform = '';
+          } else {
+            const presentationScrollHeight = presentationMultiplier * window.innerHeight;
+            const scrollPosition = window.scrollY;
+            const carouselStart = 0.91 * presentationScrollHeight;
+            const carouselSpan = 4.0 * window.innerHeight;
+            
+            let progressVal = 0;
+            if (scrollPosition > carouselStart) {
+              progressVal = Math.min((scrollPosition - carouselStart) / carouselSpan, 1);
+            }
+            
+            const trackWidth = track.scrollWidth;
+            const viewportWidth = window.innerWidth;
+            
+            // Map progressVal from 0 (off-screen right) to 1 (off-screen left)
+            const translation = viewportWidth - progressVal * (trackWidth + viewportWidth);
+            
+            // Add a gentle breathing oscillation (±20px)
+            const sway = Math.sin(state.autoScrollTime / 1500) * 20;
+            
+            track.style.transform = `translate3d(${translation + sway}px, 0, 0)`;
           }
-          
-          const trackWidth = track.scrollWidth;
-          const viewportWidth = window.innerWidth;
-          
-          // Map progress from 0 (off-screen right) to 1 (off-screen left)
-          const translation = viewportWidth - progress * (trackWidth + viewportWidth);
-          
-          // Add a gentle breathing oscillation (±20px)
-          const sway = Math.sin(state.autoScrollTime / 1500) * 20;
-          
-          track.style.transform = `translate3d(${translation + sway}px, 0, 0)`;
         }
       } else {
         finalScreen.style.transition = 'none';
@@ -1004,6 +1143,8 @@ export function init() {
   }
 
   function unlockScroll() {
+    const isMobile = window.innerWidth <= 900;
+    if (isMobile && activeStep >= 1) return;
     document.documentElement.style.overflow = '';
     document.body.style.overflow = '';
   }
@@ -1220,6 +1361,23 @@ export function init() {
       currentSlideProgress += (0 - currentSlideProgress) * 0.05;
     }
     
+    if (isTransitioningBackMobile && currentProgress <= 0.35) {
+      isTransitioningBackMobile = false;
+      isSwipeBackCooldown = true;
+      setTimeout(() => {
+        isSwipeBackCooldown = false;
+      }, 500);
+
+      if (typeof document !== 'undefined') {
+        document.body.classList.remove('slideshow-active');
+      }
+      unlockScroll();
+      
+      const scrollHeight = 4 * window.innerHeight;
+      const targetScrollY = (COUNTER_SNAP_CONFIG.step0_end - 0.05) * scrollHeight;
+      window.scrollTo(0, targetScrollY);
+    }
+
     // Check if everything has settled. Do not settle (keep loop running) if Step 4 is active.
     const targetSlide = isCardAnimationFinished ? slideProgressRaw : 0;
     const isStep4Active = currentProgress >= 0.91;
@@ -1248,6 +1406,24 @@ export function init() {
 
   function updateTargetProgress() {
     const isMobile = window.innerWidth <= 900;
+    
+    if (isMobile && activeStep >= 1) {
+      let targetP = COUNTER_SNAP_CONFIG.step1;
+      if (activeStep === 2) targetP = COUNTER_SNAP_CONFIG.step2;
+      else if (activeStep === 3) targetP = COUNTER_SNAP_CONFIG.step3;
+      else if (activeStep === 4) targetP = COUNTER_SNAP_CONFIG.step4;
+      else if (activeStep >= 5) targetP = 1.0;
+      
+      targetProgress = targetP;
+      
+      if (!isAnimating) {
+        isAnimating = true;
+        lastFrameTime = performance.now();
+        requestAnimationFrame(tickAnimation);
+      }
+      return;
+    }
+
     const scrollContainer = isMobile ? document.getElementById('intro') : null;
     const scrollPosition = scrollContainer ? scrollContainer.scrollTop : window.scrollY;
     
@@ -1267,6 +1443,18 @@ export function init() {
     const isMobile = window.innerWidth <= 900;
     const scrollPosition = window.scrollY;
     const deltaY = Math.abs(scrollPosition - lastScrollY);
+
+    if (isMobile) {
+      const scrollHeight = 4 * window.innerHeight;
+      const y0 = COUNTER_SNAP_CONFIG.step0_end * scrollHeight;
+      
+      if (!isLoadCooldown && !isSwipeBackCooldown && activeStep === 0 && scrollPosition > y0) {
+        activeStep = 1;
+        updateBodySlideClass(1);
+        triggerAutoscrollTo(COUNTER_SNAP_CONFIG.step1);
+        return;
+      }
+    }
 
     if (deltaY > 0 && !isMobile) {
       // Reduced intensity: base of 0.0022 spawns 1 reaction every ~450px scrolled from the start.
@@ -1288,7 +1476,7 @@ export function init() {
     }
 
     // Step snapping logic (Card 1 <-> Card 2 <-> Card 3)
-    if (!isAutoscrolling && !cooldownActive) {
+    if (!isMobile && !isAutoscrolling && !cooldownActive) {
       const presentationScrollHeight = presentationMultiplier * window.innerHeight;
       if (presentationScrollHeight > 0) {
         const threshold = COUNTER_SNAP_CONFIG.threshold;
@@ -1593,7 +1781,19 @@ export function init() {
   }
   drawFrame();
   
-  if (backToCards) {
+  if (isMobile && backToCards) {
+    activeStep = 7;
+    updateBodySlideClass(7);
+    currentProgress = 1.0;
+    currentProgressTop = 1.0;
+    currentProgressBottom = 1.0;
+    targetProgress = 1.0;
+    isAutonomousActive = true;
+    autonomousFillProgress = 1.0;
+    isCardAnimationFinished = true;
+    currentSlideProgress = 1.0;
+    drawFrame();
+  } else if (backToCards) {
     activeStep = 4;
     currentProgress = 1.0;
     currentProgressTop = 1.0;

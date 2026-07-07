@@ -559,7 +559,7 @@ body.no-scroll-counter {
     flex-direction: column !important;
     align-items: flex-start !important;
     justify-content: center !important;
-    gap: 3vh !important;
+    gap: 1.2vh !important;
     padding: 0 8vw !important;
     box-sizing: border-box !important;
     z-index: 2 !important;
@@ -576,11 +576,13 @@ body.no-scroll-counter {
     width: 100% !important;
     height: var(--reel-item-height) !important;
     min-height: var(--reel-item-height) !important;
+    margin-bottom: -1vh !important;
   }
   
   .column-left {
     order: 2 !important;
     width: 100% !important;
+    margin-bottom: 0.2vh !important;
   }
   
   .column-right {
@@ -626,9 +628,14 @@ body.no-scroll-counter {
   .numbers-reel {
     align-items: flex-start !important;
     width: 100% !important;
+    height: auto !important;
   }
 
   .reel-item {
+    height: var(--reel-item-height) !important;
+    min-height: var(--reel-item-height) !important;
+    max-height: var(--reel-item-height) !important;
+    flex-shrink: 0 !important;
     justify-content: flex-start !important;
   }
   
@@ -637,8 +644,8 @@ body.no-scroll-counter {
   }
 
   .section-title {
-    font-size: 10vw !important;
-    line-height: 1.1 !important;
+    font-size: 15vw !important;
+    line-height: 0.95 !important;
     margin: 0 !important;
     text-align: left !important;
     white-space: nowrap !important;
@@ -646,7 +653,7 @@ body.no-scroll-counter {
   
   .description-text {
     font-size: 4.8vw !important;
-    line-height: 1.5 !important;
+    line-height: 1.35 !important;
     text-align: left !important;
     margin: 0 !important;
   }
@@ -915,39 +922,113 @@ body.no-scroll-counter {
 
 @media (max-width: 900px) {
   .final-title {
-    font-size: 30vw; /* Reso 150% più grande */
-    line-height: 0.85;
-    top: 38%;
-    transform: translate3d(-50%, -50%, 0);
+    font-size: 22vw !important;
+    line-height: 0.85 !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate3d(-50%, -50%, 0) !important;
+    text-align: left !important;
+    width: 80% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
   }
   
   .final-cards-container {
-    top: 50%;
-    transform: translate3d(-50%, -30%, 40px);
-    padding: 40px 0;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    width: 90vw !important;
+    height: 65vh !important;
+    transform: translate3d(-50%, -45%, 40px) !important;
+    overflow: visible !important;
+    pointer-events: auto !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
   }
   
   .final-cards-track {
-    gap: 0.4vw; /* Mobile card gap */
-  }
-  
-  .final-screen.active .final-cards-container {
-    transform: translate3d(-50%, -50%, 40px);
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: block !important;
+    transform: none !important;
   }
   
   .carousel-card-item {
-    width: 30vw; /* Ridotte del 20% rispetto al valore precedente */
-    min-width: 109px; /* Ridotte del 20% rispetto al valore precedente */
-    margin: 0;
+    position: absolute !important;
+    width: 60vw !important;
+    max-width: 280px !important;
+    top: 50% !important;
+    left: 50% !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4) !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    opacity: 0;
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.8s ease-out !important;
+  }
+
+  .carousel-card-item video {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block !important;
+  }
+
+  /* Overlapping stack positions matching the photo, anchored at 50% 50% */
+  .carousel-card-item.card-1 {
+    z-index: 10 !important;
+    transform: translate3d(-60%, -50%, 0) scale(0.9) rotate(-7deg) !important;
+    -webkit-mask-image: url('/assets/mobile_cards/1.svg') !important;
+    mask-image: url('/assets/mobile_cards/1.svg') !important;
+    -webkit-mask-size: 100% 100% !important;
+    mask-size: 100% 100% !important;
+    -webkit-mask-repeat: no-repeat !important;
+    mask-repeat: no-repeat !important;
+  }
+
+  .carousel-card-item.card-2 {
+    z-index: 11 !important;
+    transform: translate3d(-35%, -30%, 0) scale(0.95) rotate(5deg) !important;
+    -webkit-mask-image: url('/assets/mobile_cards/2.svg') !important;
+    mask-image: url('/assets/mobile_cards/2.svg') !important;
+    -webkit-mask-size: 100% 100% !important;
+    mask-size: 100% 100% !important;
+    -webkit-mask-repeat: no-repeat !important;
+    mask-repeat: no-repeat !important;
+  }
+
+  .carousel-card-item.card-3 {
+    z-index: 12 !important;
+    transform: translate3d(-52%, -10%, 0) scale(1) rotate(-3deg) !important;
+    -webkit-mask-image: url('/assets/mobile_cards/3.svg') !important;
+    mask-image: url('/assets/mobile_cards/3.svg') !important;
+    -webkit-mask-size: 100% 100% !important;
+    mask-size: 100% 100% !important;
+    -webkit-mask-repeat: no-repeat !important;
+    mask-repeat: no-repeat !important;
   }
   
-  .card-number {
-    top: 8px;
-    left: 8px;
-    width: 26px;
-    height: 26px;
-    font-size: 0.75rem;
-    border-width: 1px;
+  /* When active, they animate in by fading in and returning to their tilted positions */
+  .final-screen.active .carousel-card-item.card-1 {
+    opacity: 1 !important;
+    transform: translate3d(-60%, -70%, 0) scale(0.9) rotate(-7deg) !important;
+  }
+
+  .final-screen.active .carousel-card-item.card-2 {
+    opacity: 1 !important;
+    transform: translate3d(-35%, -50%, 0) scale(0.95) rotate(5deg) !important;
+  }
+
+  .final-screen.active .carousel-card-item.card-3 {
+    opacity: 1 !important;
+    transform: translate3d(-52%, -30%, 0) scale(1) rotate(-3deg) !important;
+  }
+
+  .carousel-card-item.active-front {
+    z-index: 20 !important;
   }
 }
 
@@ -1579,6 +1660,108 @@ body.no-scroll-counter {
   .number-digits,
   .number-suffix {
     color: #ffffff !important;
+  }
+
+  /* Locks body scroll during mobile slideshow */
+  body.slideshow-active {
+    overflow: hidden !important;
+    touch-action: none !important;
+  }
+
+  /* Transition timings for elegant slideshow feel */
+  .main-layout-container,
+  .scrollable-content-section,
+  .video-slide,
+  .trend-intro-section {
+    transition: transform 0.8s cubic-bezier(0.85, 0, 0.15, 1), opacity 0.8s ease-in-out !important;
+  }
+
+  /* When slides 5-7 are active, the main fixed card layout slides up out of view */
+  body.active-slide-5 .main-layout-container,
+  body.active-slide-6 .main-layout-container,
+  body.active-slide-7 .main-layout-container {
+    transform: translateY(-100vh) !important;
+    opacity: 0 !important;
+  }
+
+  /* By default on mobile, hide the scrollable content section to prevent unwanted layout/position transitions */
+  .scrollable-content-section {
+    display: none !important;
+  }
+
+  /* Show and position it when Slide 5, 6 or 7 is active */
+  body.active-slide-5 .scrollable-content-section,
+  body.active-slide-6 .scrollable-content-section,
+  body.active-slide-7 .scrollable-content-section {
+    display: block !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    background-color: var(--neutral-50) !important;
+    z-index: 2500 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    transform: translateY(0) !important;
+  }
+
+  /* Fullscreen slideshow sub-slides */
+  .scrollable-content-section .video-slide,
+  .scrollable-content-section .trend-intro-section {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 0 8vw !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    opacity: 0 !important;
+    transform: translateY(100vh) !important;
+  }
+
+  /* Active Slide 5 (Video Slide 1: Blue) */
+  body.active-slide-5 .video-slide.slide-blue {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+  body.active-slide-5 .video-slide.slide-red,
+  body.active-slide-5 .trend-intro-section {
+    opacity: 0 !important;
+    transform: translateY(100vh) !important;
+  }
+
+  /* Active Slide 6 (Video Slide 2: Red) */
+  body.active-slide-6 .video-slide.slide-blue {
+    opacity: 0 !important;
+    transform: translateY(-100vh) !important;
+  }
+  body.active-slide-6 .video-slide.slide-red {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+  body.active-slide-6 .trend-intro-section {
+    opacity: 0 !important;
+    transform: translateY(100vh) !important;
+  }
+
+  /* Active Slide 7 (Trend Selection) */
+  body.active-slide-7 .video-slide.slide-blue,
+  body.active-slide-7 .video-slide.slide-red {
+    opacity: 0 !important;
+    transform: translateY(-100vh) !important;
+  }
+  body.active-slide-7 .trend-intro-section {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
   }
 }
 
