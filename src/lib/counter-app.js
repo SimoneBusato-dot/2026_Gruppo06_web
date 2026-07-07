@@ -1362,7 +1362,6 @@ export function init() {
     activeListeners.push({ target: introEl, type: 'scroll', listener: handleIntroScroll, options: { passive: true } });
     introEl.addEventListener('scroll', handleIntroScroll, { passive: true });
   }
-
   // Handle window resizing (e.g. rotating device)
   window.addEventListener('resize', () => {
     cachedColumnCenterY = null;
