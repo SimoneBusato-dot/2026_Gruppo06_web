@@ -11,25 +11,45 @@
     import VillaggioOlimpicoSection7 from "./Villaggio_Olimpico_Section7.svelte";
     import VillaggioOlimpicoSection8 from "./Villaggio_Olimpico_Section8.svelte";
 
+
+    // mobile
+    import VillaggioOlimpicoHeroMobile from "./mobile/Villaggio_Olimpico_Hero_Mobile.svelte";
+    import VillaggioOlimpicoSection2Mobile from "./mobile/Villaggio_Olimpico_Section2_Mobile.svelte";
+    import VillaggioOlimpicoSection3Mobile from "./mobile/Villaggio_Olimpico_Section3_Mobile.svelte";
+    import VillaggioOlimpicoSection4Mobile from "./mobile/Villaggio_Olimpico_Section4_Mobile.svelte";
+    import VillaggioOlimpicoSection5Mobile from "./mobile/Villaggio_Olimpico_Section5_Mobile.svelte";
+    import VillaggioOlimpicoSection6Mobile from "./mobile/Villaggio_Olimpico_Section6_Mobile.svelte";
+    import VillaggioOlimpicoSection7Mobile from "./mobile/Villaggio_Olimpico_Section7_Mobile.svelte";
+    
+
     let scrollTimeout;
     let isSnapping = false;
     let gestureStartY = null;
     let ready = false;
+
+    let mobile = $state(browser ? window.innerWidth <= 450 : false);
 
     const THRESHOLD = 0.9;
     const THRESHOLD_BACK = 0.1;
     const LANDING_OFFSET = 0.15;
     const MIN_MOVEMENT = 5;
     const EPS = 2;
-    const SNAP_STABLE_FRAMES = 4;   // frame consecutivi senza movimento = scroll finito
-    const SNAP_MAX_WAIT = 2000;    // sicurezza: mai aspettare più di 2s
-    const DEBUG = true; // metti a false quando hai finito di diagnosticare
+    const SNAP_STABLE_FRAMES = 4;   
+    const SNAP_MAX_WAIT = 2000;    
+    const DEBUG = true; 
+
+    function isMobile() {
+        if (!browser) return false;
+        return window.innerWidth <= 451;
+    }
 
     function getScrollY() {
         return Math.max(window.scrollY, 0);
     }
 
     function handleScroll() {
+        if (isMobile()) return; 
+        
         if (!ready || isSnapping) return;
 
         const currentY = getScrollY();
@@ -52,7 +72,7 @@
     }
 
     function checkSnap() {
-        if (!browser || gestureStartY === null) return;
+        if (!browser || isMobile() || gestureStartY === null) return;
 
         const endY = getScrollY();
         const delta = endY - gestureStartY;
@@ -107,9 +127,6 @@
         const current = triggers[currentIndex];
         const progress = current.progress;
 
-        // La Hero è sempre l'indice 0: da lì non si torna indietro.
-        // Guardia doppia: sia sull'indice sia sulla posizione reale, per
-        // essere robusti anche a eventuali sfasamenti di indice.
         const isHero = currentIndex === 0 || scrollY <= EPS;
 
         if (direction === "down" && progress >= THRESHOLD && triggers[currentIndex + 1]) {
@@ -118,7 +135,6 @@
             scrollToY(next.start + (next.end - next.start) * LANDING_OFFSET);
         } else if (isHero && direction === "up") {
             if (DEBUG) console.log(`[snap] siamo nella Hero (index 0), THRESHOLD_BACK ignorato -> resto fermo`);
-            // nessuno snap: la Hero non ha una sezione precedente su cui rimbalzare
         } else if (direction === "up" && progress <= THRESHOLD_BACK && triggers[currentIndex - 1]) {
             const prev = triggers[currentIndex - 1];
             if (DEBUG) console.log(`[snap] INDIETRO: progress=${progress.toFixed(3)} <= ${THRESHOLD_BACK} -> vado a index ${currentIndex - 1}`);
@@ -128,16 +144,9 @@
         }
     }
 
-    // FIX: invece di un timeout fisso (che con distanze lunghe scade PRIMA
-    // che l'animazione nativa "smooth" sia davvero finita), aspettiamo che
-    // scrollY smetta di muoversi per un certo numero di frame consecutivi.
-    // Questo evita che il tail dell'animazione venga scambiato per un nuovo
-    // gesto dell'utente, che era la causa del "sobbalzo in avanti".
     function scrollToY(y) {
         isSnapping = true;
 
-        // annulla eventuali timer di debounce residui, per non far scattare
-        // un checkSnap "vecchio" mentre iniziamo un nuovo snap
         clearTimeout(scrollTimeout);
         gestureStartY = null;
 
@@ -165,7 +174,7 @@
             if (settled || timedOut) {
                 if (DEBUG) console.log(`[snap] scrollTo completato (settled=${settled}, timedOut=${timedOut}, y=${now.toFixed(1)})`);
                 isSnapping = false;
-                gestureStartY = null; // ripulisce eventuale stato accumulato durante l'animazione
+                gestureStartY = null; 
                 return;
             }
 
@@ -176,9 +185,27 @@
     }
 
     onMount(async () => {
+        console.log('innerWidth:', window.innerWidth, 'outerWidth:', window.outerWidth);
+        const mediaQuery = window.matchMedia('(max-width: 450px)');
+    
+    // Imposta lo stato iniziale
+    mobile = mediaQuery.matches;
+
+    // Ascolta i cambi di breakpoint (es. ridimensionamento finestra o rotazione)
+    const handler = (e) => (mobile = e.matches);
+    mediaQuery.addEventListener('change', handler);
         if (!browser) return;
 
+        // Fix definitivo per lo scroll mobile che "perde sincronia" scrollando giù.
+        // Va chiamato UNA SOLA VOLTA all'avvio, non dentro isMobile()/handleScroll.
+    
+
         await tick();
+    if (document.fonts?.ready) await document.fonts.ready;
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+    ScrollTrigger.refresh();
+    ready = true;
 
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
@@ -197,7 +224,11 @@
             });
         });
 
+        
+
         window.addEventListener("scroll", handleScroll, { passive: true });
+        return () => mediaQuery.removeEventListener('change', handler);
+        
     });
 
     onDestroy(() => {
@@ -208,12 +239,23 @@
     });
 </script>
 
-<VillaggioOlimpicoHero />
-<VillaggioOlimpicoSection2 />
-<VillaggioOlimpicoSection3 />
-<VillaggioOlimpicoSection4 />
-<VillaggioOlimpicoSection5 />
-<VillaggioOlimpicoSection6 />
-<VillaggioOlimpicoSection7 />
-<VillaggioOlimpicoSection8 />
+{#if mobile}
+    <VillaggioOlimpicoHeroMobile />
+    <VillaggioOlimpicoSection2Mobile/>
+    <VillaggioOlimpicoSection3Mobile/>
+    <VillaggioOlimpicoSection4Mobile/>
+    <VillaggioOlimpicoSection5Mobile/>
+    <VillaggioOlimpicoSection6Mobile/>
+    <VillaggioOlimpicoSection7Mobile/>
 
+
+{:else}
+    <VillaggioOlimpicoHero />
+    <VillaggioOlimpicoSection2 />
+    <VillaggioOlimpicoSection3 />
+    <VillaggioOlimpicoSection4 />
+    <VillaggioOlimpicoSection5 />
+    <VillaggioOlimpicoSection6 />
+    <VillaggioOlimpicoSection7 />
+    <VillaggioOlimpicoSection8 />
+{/if}

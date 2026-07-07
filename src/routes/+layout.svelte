@@ -7,10 +7,14 @@
     import { onNavigate } from '$app/navigation';
     import { onMount, tick } from 'svelte';
     import { createReaction } from '$lib/reaction.js';
+    import gsap from 'gsap';
+    import { ScrollTrigger } from 'gsap/all';
 
     let { children } = $props();
     let isTransitioningSvg = $state(false);
     let isAnimatingClass = $state(false);
+
+    gsap.registerPlugin(ScrollTrigger)
 
     // Tiene traccia della view transition "standard" attualmente in corso,
     // per evitare sovrapposizioni che generano InvalidStateError
@@ -105,6 +109,9 @@
     });
 
     onMount(() => {
+        
+        
+        ScrollTrigger.normalizeScroll(true);
         const handleGlobalClick = (e) => {
             // Evita lo spawn se l'utente clicca su elementi interattivi come bottoni, link, ecc.
             if (
@@ -134,7 +141,7 @@
 
 {@render children()}
 
-<BouncyLoader />
+<!-- <BouncyLoader /> -->
 
 {#if isTransitioningSvg}
     <div class="transition-curtain {isAnimatingClass ? 'is-animating' : ''}">
@@ -160,6 +167,11 @@
 <style>
 :root{
     background-color: var(--neutral-900);
+}
+
+
+:global(html), :global(body) {
+    touch-action: pan-y;
 }
 
 :global(body){
