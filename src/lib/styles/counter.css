@@ -1868,7 +1868,11 @@ body.no-scroll-counter {
   .line-red-slide {
     left: calc(-430px - (100vw - 1440px) / 2);
   }
-  .card-front-blue, 
+  .card-front-blue {
+    left: calc(-160px - (100vw - 1440px) / 2);
+    transform: translate3d(-6px, 0, 0) rotate(-3deg);
+  }
+  
   .card-shadow-blue {
     left: calc(-296px - (100vw - 1440px) / 2);
   }
@@ -1878,7 +1882,8 @@ body.no-scroll-counter {
     left: calc(723px + (100vw - 1440px) / 2);
   }
   .card-front-red {
-    left: calc(50px + (100vw - 1440px) / 2);
+    left: calc(-80px + (100vw - 1440px) / 2);
+    transform: translate3d(6px, 0, 0) rotate(3deg);
   }
   .card-shadow-red {
     left: calc(12px + (100vw - 1440px) / 2);
