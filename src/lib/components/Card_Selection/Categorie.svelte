@@ -687,17 +687,7 @@
         }
 
 
-        #carousel-outer {
-        cursor: none;
-    }
-
-    #carousel-outer:active { cursor: none}
-
-
-    }
-
-    .slide {
-        cursor: none;
+      
     }
 
 
