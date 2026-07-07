@@ -26,7 +26,9 @@
                 pinSpacing: true,
                
                 onEnter: () => gsap.set(section8, { autoAlpha: 1 }),
-                onLeave: () =>  {goto('/Categorie')},
+                onLeave: () =>  {
+                        window.scrollTo(0, 0);
+                        goto('/Categorie');},
                 onEnterBack: () => gsap.set(section8, { autoAlpha: 1 }),
                 onLeaveBack: () => gsap.set(section8, { autoAlpha: 0 }),
                 

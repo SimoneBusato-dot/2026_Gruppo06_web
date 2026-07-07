@@ -476,9 +476,9 @@
                 },
                 onEnter: () => gsap.set(section, { autoAlpha: 1 }),
                 onLeave: () => {
-                    goto('/Categorie');
-                    console.log('onLeave triggered');
-                },
+                    window.scrollTo(0, 0);
+                        goto('/Categorie');},
+                
                 onEnterBack: () => gsap.set(section, { autoAlpha: 1 }),
                 onLeaveBack: () => gsap.set(section, { autoAlpha: 0 }),
                 onUpdate: (self) => {
