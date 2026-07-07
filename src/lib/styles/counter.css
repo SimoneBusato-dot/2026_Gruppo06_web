@@ -341,7 +341,7 @@ body.no-scroll-counter {
 .section-title {
   font-family: var(--font-family), sans-serif;
   font-weight: 900;
-  font-size: clamp(3rem, 6vw, 8.3rem); /* Allineato alle altre sezioni come Villaggio Olimpico */
+  font-size: clamp(2rem, 5vw, 6.3rem); /* Allineato alle altre sezioni come Villaggio Olimpico */
   letter-spacing: 0.02em;
   line-height: 1; /* Allineato alle altre sezioni */
   color: var(--neutral-900);

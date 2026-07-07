@@ -167,19 +167,19 @@ export function init() {
       path: parsePath("M83.4264 31.2829C87.2475 17.6812 99.5363 8.19496 113.662 7.94264L558.038 0.00519967C575.234 -0.301956 589.597 13.0383 590.559 30.2101L608.13 343.844C609.175 362.495 594.089 378.072 575.414 377.625L31.2516 364.587C10.3741 364.087 -4.43754 344.047 1.21056 323.942L83.4264 31.2829Z")
     },
     {
-      title: "UTENTI\nATTIVI",
+      title: "INTERAZIONI",
       number: "1.0",
       suffix: "MLD",
-      description: "<span style=\"color: rgb(220, 62, 65)\">Un'ondata di commenti, condivisioni e reazioni.</span><br>Il pubblico ha partecipato attivamente a ogni singolo istante dei Giochi.",
+      description: "<span style=\"color: rgb(220, 62, 65)\">Un'ondata di commenti, condivisioni e reazioni.</span> Il pubblico ha partecipato attivamente a ogni singolo istante dei Giochi.",
       color: [220, 62, 65],
       viewBox: [540, 382],
       path: parsePath("M0.0335474 33.4578C-0.820912 14.7085 14.5698 -0.747219 33.3225 0.0282694L500.709 19.3563C517.469 20.0493 530.849 33.5665 531.371 50.3324L539.964 326.123C540.508 343.582 526.95 358.252 509.502 359.083L47.9735 381.061C30.2949 381.903 15.2903 368.234 14.4845 350.554L0.0335474 33.4578Z")
     },
     {
-      title: "INTER-\nAZIONI",
+      title: "POST\nPUBBLICATI",
       number: "27",
       suffix: "MLN",
-      description: "<span style=\"color: rgb(220, 149, 62)\">La voglia di esserci</span> ha inondato i social, tra racconti in prima persona e un'infinita<br>produzione di meme.",
+      description: "<span style=\"color: rgb(220, 149, 62)\">La voglia di esserci</span> ha inondato i social, tra racconti in prima persona e un'infinita produzione di meme.",
       color: [220, 149, 62],
       viewBox: [526, 408],
       path: parsePath("M49.1307 27.1183C51.6293 10.931 65.9476 -0.756537 82.3074 0.0374486L468.481 18.7795C484.527 19.5583 497.509 32.1137 498.823 48.125L525.507 373.338C527.1 392.756 511.116 409.08 491.668 407.895L30.0603 379.775C11.2573 378.629 -2.49307 361.57 0.380597 342.953L49.1307 27.1183Z")
