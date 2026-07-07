@@ -500,6 +500,10 @@ body.no-scroll-counter {
   transform: translateY(20px) !important;
 }
 
+.snap-section {
+  display: none;
+}
+
 /* Mobile responsive styles */
 @media (max-width: 900px) {
   #intro {
@@ -515,6 +519,7 @@ body.no-scroll-counter {
   }
 
   .snap-section {
+    display: block !important;
     width: 100% !important;
     scroll-snap-align: start !important;
     scroll-snap-stop: always !important;
@@ -569,11 +574,8 @@ body.no-scroll-counter {
     order: 1 !important;
     position: relative !important;
     width: 100% !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    height: 56vh !important;
-    min-height: 56vh !important;
+    height: var(--reel-item-height) !important;
+    min-height: var(--reel-item-height) !important;
   }
   
   .column-left {
@@ -600,7 +602,7 @@ body.no-scroll-counter {
   
   #counter-display-back {
     position: absolute !important;
-    top: 48% !important;
+    top: 50% !important;
     left: 50% !important;
     transform: translate3d(-50%, -50%, 40px) !important;
     width: 100% !important;
@@ -611,23 +613,27 @@ body.no-scroll-counter {
 
   .card-text-mask {
     position: absolute !important;
-    top: 48% !important;
+    top: 50% !important;
     left: 50% !important;
     transform: translate3d(-50%, -50%, 30px) !important;
     width: 100% !important;
     height: var(--reel-item-height) !important;
     display: flex !important;
-    justify-content: center !important;
+    justify-content: flex-start !important;
     align-items: flex-start !important;
   }
 
   .numbers-reel {
-    align-items: center !important;
+    align-items: flex-start !important;
     width: 100% !important;
+  }
+
+  .reel-item {
+    justify-content: flex-start !important;
   }
   
   .number-wrapper {
-    justify-content: center !important;
+    justify-content: flex-start !important;
   }
 
   .section-title {
