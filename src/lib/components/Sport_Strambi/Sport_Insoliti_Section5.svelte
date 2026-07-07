@@ -338,4 +338,8 @@
         color: var(--brand-sport-insoliti-500);
         background-color: transparent;
     }
+
+    #memeTitle{
+        font-weight: 900;
+    }
 </style>
