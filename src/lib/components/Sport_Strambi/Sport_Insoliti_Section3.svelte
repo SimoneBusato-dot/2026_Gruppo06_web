@@ -59,7 +59,7 @@
 <main id="section3" >
     <div id="background">
         <section id="first">
-            <h2 id="firstText" bind:this={text1}>Primo fra tutti</h2>
+            <h2 id="firstText" bind:this={text1}>PRIMO FRA</h2>
         </section>
         <section id="second">
             <h1 id="secondText" bind:this={text2}>CURLING MANIA</h1>

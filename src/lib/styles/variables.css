@@ -120,9 +120,10 @@
   --spacing-11: 64px;
 
   /* ==================== FONT ==================== */
-  --font-family: "dharma-gothic-e", sans-serif;
+  --font-family: "dharma-gothic-e", sans-serif;
   --font-family-text: "gelica", sans-serif;
-  
+  /* --letter-spacing-dharma: -0.03em; */
+  --letter-spacing-gelica: normal;
 
   /* ==================== LINEA ==================== */
   --line-thickness: 51px;
@@ -160,3 +161,44 @@
   --radius-lg: var(--radius-l);
   --radius-circle: var(--radius-full);
 }
+
+/* ==================== GLOBAL TYPOGRAPHY UNIFICATION ==================== */
+/* Unify the kerning (crenatura / letter-spacing) globally for Dharma and Gelica fonts */
+
+/* .section-title,
+.title-animation,
+.gusto-dharma,
+.final-title,
+.trend-selection-title,
+.digit-span,
+.suffix-span,
+.char,
+.word,
+#snoopTitle,
+#titlePanel,
+#titleMain,
+#titleBlock,
+#title,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+[style*="var(--font-family)"],
+[style*="dharma-gothic-e"] {
+  letter-spacing: var(--letter-spacing-dharma) !important;
+} */
+
+.description-text,
+.slide-subtitle,
+.sub-title,
+.highlight-text,
+.sub-text,
+.para,
+p,
+[style*="var(--font-family-text)"],
+[style*="gelica"] {
+  letter-spacing: var(--letter-spacing-gelica) !important;
+}
+
