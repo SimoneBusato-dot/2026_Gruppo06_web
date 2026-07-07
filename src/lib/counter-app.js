@@ -140,6 +140,7 @@ export function init(options = {}) {
   let isLoadCooldown = true;
   let isSwipeBackCooldown = false;
   let isTransitioningBackMobile = false;
+  let isStep4EntranceComplete = false;
   setTimeout(() => {
     isLoadCooldown = false;
   }, 250);
@@ -166,6 +167,11 @@ export function init(options = {}) {
     const isMobile = window.innerWidth <= 900;
     if (!isMobile) return;
     if (activeStep === 0 || !isSwiping) return;
+    
+    if (activeStep === 4 && !isStep4EntranceComplete) {
+      isSwiping = false;
+      return;
+    }
     
     const endY = e.changedTouches[0].clientY;
     const diffY = startY - endY;
@@ -973,10 +979,12 @@ export function init(options = {}) {
         
         if (!finalScreen.classList.contains('active')) {
           finalScreen.classList.add('active');
+          isStep4EntranceComplete = false;
           // Start timeout for staggered entry completion to clear delays for hover
           if (entranceTimeoutId) clearTimeout(entranceTimeoutId);
           entranceTimeoutId = setTimeout(() => {
             finalScreen.classList.add('entrance-done');
+            isStep4EntranceComplete = true;
           }, 2500);
         }
         
@@ -1011,6 +1019,7 @@ export function init(options = {}) {
           }
         }
       } else {
+        isStep4EntranceComplete = false;
         finalScreen.style.transition = 'none';
         finalScreen.style.opacity = 0;
         finalScreen.style.pointerEvents = 'none';
