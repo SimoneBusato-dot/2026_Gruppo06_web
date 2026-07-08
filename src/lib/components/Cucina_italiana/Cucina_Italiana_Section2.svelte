@@ -1391,22 +1391,20 @@
         transform: translateX(-50%) !important;
         width: auto !important;
         display: flex;
-        gap: 8px;
         z-index: 15;
     }
 
     #swiperDeckContainer :global(.swiper-pagination-bullet) {
         pointer-events: auto !important;
         transition: all 0.3s ease;
-        background: var(--brand-cibo-500) !important;
-        opacity: 0.4 !important;
+        margin: 0 4px !important;
     }
 
     #swiperDeckContainer :global(.swiper-pagination-bullet-active) {
         background: var(--brand-cibo-500) !important;
         opacity: 1 !important;
-        width: 24px !important;
-        border-radius: 6px !important;
+        width: 16px !important;
+        border-radius: 4px !important;
     }
 
     /* Cinematic card overlay flyout grow element */
