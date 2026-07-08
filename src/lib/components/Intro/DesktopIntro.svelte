@@ -79,8 +79,9 @@
 					ease: "power2.out",
 					scrollTrigger: {
 						trigger: "#text-blue-slide",
-						start: "top 75%",
-						toggleActions: "play none none reverse",
+						start: "top 85%",
+						end: "bottom 15%",
+						toggleActions: "play reverse play reverse",
 					},
 				},
 			);
@@ -95,9 +96,10 @@
 					duration: 0.6,
 					ease: "power2.out",
 					scrollTrigger: {
-						trigger: "#text-blue-slide",
-						start: "top 75%",
-						toggleActions: "play none none reverse",
+						trigger: ".slide-blue .video-card-wrapper",
+						start: "top 85%",
+						end: "bottom 15%",
+						toggleActions: "play reverse play reverse",
 					},
 				},
 			);
@@ -116,8 +118,8 @@
 				ease: "none",
 				scrollTrigger: {
 					trigger: ".slide-blue",
-					start: "top 95%",
-					end: "top 15%",
+					start: "top 80%",
+					end: "bottom 20%",
 					scrub: 1.2,
 				},
 			});
@@ -140,8 +142,9 @@
 					ease: "power2.out",
 					scrollTrigger: {
 						trigger: "#text-red-slide",
-						start: "top 75%",
-						toggleActions: "play none none reverse",
+						start: "top 85%",
+						end: "bottom 15%",
+						toggleActions: "play reverse play reverse",
 					},
 				},
 			);
@@ -156,9 +159,10 @@
 					duration: 0.6,
 					ease: "power2.out",
 					scrollTrigger: {
-						trigger: "#text-red-slide",
-						start: "top 75%",
-						toggleActions: "play none none reverse",
+						trigger: ".slide-red .video-card-wrapper",
+						start: "top 85%",
+						end: "bottom 15%",
+						toggleActions: "play reverse play reverse",
 					},
 				},
 			);
@@ -185,8 +189,8 @@
 				ease: "none",
 				scrollTrigger: {
 					trigger: ".slide-red",
-					start: "top 95%",
-					end: "top 15%",
+					start: "top 80%",
+					end: "bottom 20%",
 					scrub: 1.2,
 				},
 			});

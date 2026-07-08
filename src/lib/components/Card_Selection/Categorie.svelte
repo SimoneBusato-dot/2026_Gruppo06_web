@@ -315,33 +315,12 @@
         window.addEventListener('pointerup',   onWindowPointerUp);
         window.addEventListener('pointercancel', onWindowPointerUp);
 
-        const loopAnim = gsap.to({}, {
-            duration: 2,
-            repeat: -1,
-            ease: "none",
-            onUpdate() {
-                const t = this.time() / this.duration() * Math.PI * 2;
-                const xPercent = Math.sin(t);
-                const yPercent = Math.sin(t * 0.5);
-
-                const activeSlide = getSlides()[activeIndex];
-                if (!activeSlide) return;
-
-                gsap.to(activeSlide, {
-                    duration: 0.1,
-                    rotateY: xPercent * 7,
-                    rotateX: -yPercent * 5,
-                    ease: "power2.out",
-                    overwrite: "auto"
-                });
-            }
-        });
 
         const titleSplit = new SplitText(title, { type: 'words', mask: 'words'});
         const subtitleSplit = new SplitText(subtitle, { type: 'lines', mask: 'lines'});
 
-        const titleEnter = gsap.fromTo(titleSplit.words, {y: "100%"}, {y: "0%", stagger: 0.1, duration: 0.6, ease:"elastic.out(0.5,0.4)", paused: true, delay: 0.5});
-        const subtitleEnter = gsap.fromTo(subtitleSplit.lines, {y: "100%"}, {y: "0%", duration: 0.6, ease:"power2.out", paused: true, delay: 1});
+        const titleEnter = gsap.fromTo(titleSplit.words, {y: "100%"}, {y: "0%", stagger: 0.1, duration: 0.6, ease:"elastic.out(0.5,0.4)", paused: true, delay: 1});
+        const subtitleEnter = gsap.fromTo(subtitleSplit.lines, {y: "100%"}, {y: "0%", duration: 0.6, ease:"power2.out", paused: true, delay: 0.5});
         const cardEnter = gsap.fromTo(trackEl, {y: "150%"}, {y: "0%", duration: 1, ease:"elastic.out(0.5,0.4)", paused: true, delay: 0.5});
 
         const clipMove = gsap.fromTo(ClipPath, {width: 0 } , {width: () => clipTargetWidth, duration: 1, ease: "power2.out", paused: true, delay: 0.3});
@@ -392,7 +371,6 @@
         return () => {
             cancelAnimationFrame(rafId);
             snapTween?.kill();
-            loopAnim.kill();
             st?.kill();
             window.removeEventListener('resize', onResize);
             window.removeEventListener('keydown', onKeyDown);

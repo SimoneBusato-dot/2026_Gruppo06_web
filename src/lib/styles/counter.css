@@ -813,6 +813,15 @@ body.no-scroll-counter {
 }
 
 /* Final Cards Carousel Container */
+@keyframes fadeInFrom50 {
+  from {
+    opacity: 0.5;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .final-cards-container {
   position: absolute;
   top: 50%;
@@ -836,11 +845,10 @@ body.no-scroll-counter {
 
 /* Animate card container upward on active final state */
 .final-screen.active .final-cards-container {
-  opacity: 1;
   transform: translate3d(-50%, -50%, 40px); /* Centered in the viewport */
   pointer-events: auto;
-  transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1), opacity 1s ease-out;
-  transition-delay: 1.30s; /* Start precisely after title is complete! */
+  transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: fadeInFrom50 1s ease-out 1.30s forwards;
 }
 
 /* Infinite Scroll Track */
@@ -864,7 +872,7 @@ body.no-scroll-counter {
   z-index: 21;
   
   /* Initial hidden state */
-  opacity: 0;
+  opacity: 0.5;
   transform: translate3d(0, 0, 0) scale(0.75); /* Senza rotazione */
   
   /* Smooth transitions */
@@ -971,7 +979,7 @@ body.no-scroll-counter {
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4) !important;
     border-radius: 12px !important;
     overflow: hidden !important;
-    opacity: 0;
+    opacity: 0.5;
     transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
                 opacity 0.8s ease-out !important;
   }
@@ -1414,6 +1422,7 @@ body.no-scroll-counter {
   border-radius: 24px;
   filter: drop-shadow(0 20px 45px rgba(0, 0, 0, 0.08));
   opacity: 1.00;
+  clip-path: url(#maschera1-clip);
 }
 
 .card-shadow-red {
@@ -1439,6 +1448,7 @@ body.no-scroll-counter {
   border-radius: 24px;
   filter: drop-shadow(0 20px 45px rgba(0, 0, 0, 0.08));
   opacity: 1.00;
+  clip-path: url(#maschera2-clip);
 }
 
 /* Text styles */
@@ -1491,7 +1501,7 @@ body.no-scroll-counter {
   font-family: var(--font-family), sans-serif;
   font-size: clamp(3rem, 6vw, 8.3rem); /* Allineato alle altre sezioni come Villaggio Olimpico */
   font-weight: 900;
-  line-height: 1; /* Allineato alle altre sezioni */
+  line-height: 0.8; /* Abbassato l'interlinea */
   letter-spacing: normal; /* Modificato da -0.15vw per allinearsi a Sport Insoliti */
   text-transform: uppercase;
   margin: 0;
@@ -1695,6 +1705,14 @@ body.no-scroll-counter {
     z-index: 2 !important;
     border-radius: 12px !important;
     transform: rotate(3deg) translate3d(6px, 0, 0) !important;
+  }
+
+  .card-front-blue {
+    clip-path: url(#maschera1-clip) !important;
+  }
+
+  .card-front-red {
+    clip-path: url(#maschera2-clip) !important;
   }
 
   .line-blue-slide {

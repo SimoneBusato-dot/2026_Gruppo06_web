@@ -163,6 +163,17 @@
         </svg>
     </div>
 {/if}
+<!-- Maschere SVG per i video delle slide (Blu e Rossa) -->
+<svg style="position: absolute; width: 0; height: 0; pointer-events: none;" aria-hidden="true">
+    <defs>
+        <clipPath id="maschera1-clip" clipPathUnits="objectBoundingBox">
+            <path transform="scale(0.0018018018018018018, 0.0010351966873706004)" d="M0.12072 34.96C-1.01647 25.6648 6.03683 17.3842 15.3945 17.0285L463.052 0.0118473C471.538 -0.310722 478.798 6.05226 479.59 14.5072L554.727 816.14C555.428 823.616 550.835 830.573 543.685 832.868L133.004 964.643C123.443 967.711 113.453 961.317 112.234 951.351L0.12072 34.96Z" />
+        </clipPath>
+        <clipPath id="maschera2-clip" clipPathUnits="objectBoundingBox">
+            <path transform="scale(0.0017699115044247787, 0.001017293997965412)" d="M564.49 35.2803C565.627 25.9852 558.574 17.7046 549.216 17.3488L93.1125 0.0111219C84.6267 -0.311448 77.367 6.05154 76.5745 14.5064L0.0704907 830.729C-0.630249 838.205 3.96232 845.163 11.1122 847.457L429.556 981.723C439.117 984.79 449.107 978.397 450.326 968.431L564.49 35.2803Z" />
+        </clipPath>
+    </defs>
+</svg>
 
 <style>
 :root{

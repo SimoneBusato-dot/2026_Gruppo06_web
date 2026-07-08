@@ -510,14 +510,9 @@ export function init(options = {}) {
         const targetFontSize = isMobile ? 26 : 12.5;
         fontSize = lerp(startFontSize, targetFontSize, easedT);
 
-        // Suffix typing effect: types "MLD" letter-by-letter in the remaining 30% of transition
-        if (easedT < 0.7) {
-          suffixText = "";
-        } else {
-          const suffixT = (easedT - 0.7) / 0.3;
-          const numSuffixChars = Math.round(lerp(0, 3, suffixT));
-          suffixText = "MLD".substring(0, numSuffixChars);
-        }
+        // Suffix typing effect: types "MLD" letter-by-letter automatically when counter reaches 22
+        const numSuffixChars = Math.round(lerp(0, 3, mldTypeProgress));
+        suffixText = "MLD".substring(0, numSuffixChars);
       }
     } else {
       // Phase 2: Morphing between cards and transition to Step 4 (Full Screen)
@@ -1164,6 +1159,17 @@ export function init(options = {}) {
   const autoscrollDuration = 1100; // Rallentato a 1100ms per una transizione molto più fluida ed elegante
   let isProgrammaticScroll = false;
   let scrollIdleTimeout = null;
+  let currentSnapIdx = 0;
+  let lastSnapScrollY = 0;
+  const snapPoints = [
+    { step: 0, p: 0.0 },
+    { step: 0, p: COUNTER_SNAP_CONFIG.step0_end - 0.02 },
+    { step: 1, p: COUNTER_SNAP_CONFIG.step1 },
+    { step: 2, p: COUNTER_SNAP_CONFIG.step2 },
+    { step: 3, p: COUNTER_SNAP_CONFIG.step3 },
+    { step: 4, p: COUNTER_SNAP_CONFIG.step4 }
+  ];
+  let mldTypeProgress = 0;
 
 
   // activeStep is initialized to 0 because we force scroll to top on page load.
@@ -1265,6 +1271,19 @@ export function init(options = {}) {
       } else {
         lastScrollY = window.scrollY;
         // Desktop: no cooldown, no scroll unlock needed
+        lastSnapScrollY = window.scrollY;
+        const presentationScrollHeight = presentationMultiplier * window.innerHeight;
+        const currentP = presentationScrollHeight > 0 ? lastSnapScrollY / presentationScrollHeight : 0;
+        let closestIdx = 0;
+        let minDistance = Math.abs(currentP - snapPoints[0].p);
+        for (let i = 1; i < snapPoints.length; i++) {
+          const dist = Math.abs(currentP - snapPoints[i].p);
+          if (dist < minDistance) {
+            minDistance = dist;
+            closestIdx = i;
+          }
+        }
+        currentSnapIdx = closestIdx;
       }
     }
   }
@@ -1407,6 +1426,13 @@ export function init(options = {}) {
       autoScrollTime = 0;
     }
 
+    // Increment time-based typing progress for "MLD" when card transition starts (past suspensionEnd1)
+    if (currentProgress >= suspensionEnd1) {
+      mldTypeProgress = Math.min(mldTypeProgress + deltaTime / 600, 1); // Types "MLD" over 600ms
+    } else {
+      mldTypeProgress = 0;
+    }
+
     // Check if we should trigger the autonomous final expansion (referencing Phase 1)
     if (targetProgress >= fillPhaseStart1) {
       isAutonomousActive = true;
@@ -1454,6 +1480,7 @@ export function init(options = {}) {
                       Math.abs(targetProgress - currentProgressTop) < 0.00005 &&
                       Math.abs(targetProgress - currentProgressBottom) < 0.00005 &&
                       (!isAutonomousActive || autonomousFillProgress === 1) &&
+                      (currentProgress < suspensionEnd1 || mldTypeProgress === 1) && // Keep animating until MLD is typed
                       Math.abs(currentSlideProgress - targetSlide) < 0.00005 &&
                       Math.abs(targetScrollYSmooth - currentScrollYSmooth) < 0.5 &&
                       !isStep4Active;
@@ -1588,31 +1615,44 @@ export function init(options = {}) {
         if (scrollPosition <= step4Pos + 50) {
           scrollIdleTimeout = setTimeout(() => {
             if (!isAutoscrolling) {
-              const snapPoints = [
-                { step: 0, p: 0.0 }, // Snap all'inizio
-                { step: 0, p: COUNTER_SNAP_CONFIG.step0_end - 0.02 },
-                { step: 1, p: COUNTER_SNAP_CONFIG.step1 },
-                { step: 2, p: COUNTER_SNAP_CONFIG.step2 },
-                { step: 3, p: COUNTER_SNAP_CONFIG.step3 },
-                { step: 4, p: COUNTER_SNAP_CONFIG.step4 }
-              ];
+              const deltaScroll = scrollPosition - lastSnapScrollY;
               
-              let closestSnap = snapPoints[0];
-              let minDistance = Math.abs(currentP - closestSnap.p);
+              let closestIdx = 0;
+              let minDistance = Math.abs(currentP - snapPoints[0].p);
               
               for (let i = 1; i < snapPoints.length; i++) {
                 const dist = Math.abs(currentP - snapPoints[i].p);
                 if (dist < minDistance) {
                   minDistance = dist;
-                  closestSnap = snapPoints[i];
+                  closestIdx = i;
                 }
               }
               
-              // Calamita solo se c'è un disallineamento visivo significativo
-              if (minDistance > 0.005) {
-                activeStep = closestSnap.step;
+              let targetSnapIdx = currentSnapIdx;
+              
+              // Se l'utente ha scrollato in modo significativo (più di 80px), forziamo il cambio di slide nella direzione dello scroll
+              if (Math.abs(deltaScroll) > 80) {
+                if (deltaScroll > 0) {
+                  targetSnapIdx = Math.min(Math.max(currentSnapIdx + 1, closestIdx), snapPoints.length - 1);
+                } else {
+                  targetSnapIdx = Math.max(Math.min(currentSnapIdx - 1, closestIdx), 0);
+                }
+              } else {
+                // Altrimenti torniamo allo snap point più vicino
+                targetSnapIdx = closestIdx;
+              }
+              
+              const targetPercent = snapPoints[targetSnapIdx].p;
+              
+              // Calamita solo se c'è un effettivo scostamento dal target
+              if (Math.abs(currentP - targetPercent) > 0.005) {
+                activeStep = snapPoints[targetSnapIdx].step;
                 updateBodySlideClass(activeStep);
-                triggerAutoscrollTo(closestSnap.p);
+                triggerAutoscrollTo(targetPercent);
+              } else {
+                // Se siamo già sul target, aggiorniamo comunque gli indici per sicurezza
+                currentSnapIdx = targetSnapIdx;
+                lastSnapScrollY = scrollPosition;
               }
             }
           }, 150); // 150ms di inattività per avviare lo snap morbido
@@ -1860,20 +1900,38 @@ export function init(options = {}) {
 
   // Initial draw and target computation
   updateTargetProgress();
+  
+  // Initialize snap index and last scroll position dynamically
+  lastSnapScrollY = typeof window !== 'undefined' ? window.scrollY : 0;
+  if (typeof window !== 'undefined') {
+    const initP = (presentationMultiplier * window.innerHeight) > 0 ? lastSnapScrollY / (presentationMultiplier * window.innerHeight) : 0;
+    let initSnapIdx = 0;
+    let minInitDist = Math.abs(initP - snapPoints[0].p);
+    for (let i = 1; i < snapPoints.length; i++) {
+      const dist = Math.abs(initP - snapPoints[i].p);
+      if (dist < minInitDist) {
+        minInitDist = dist;
+        initSnapIdx = i;
+      }
+    }
+    currentSnapIdx = initSnapIdx;
+  }
   // Ensure starts in sync immediately
   currentProgress = targetProgress;
   currentProgressTop = targetProgress;
   currentProgressBottom = targetProgress;
-  if (targetProgress >= fillPhaseStart1) {
+  if (targetProgress >= suspensionEnd1) {
     isAutonomousActive = true;
     autonomousFillProgress = 1.0;
     isCardAnimationFinished = true;
     currentSlideProgress = targetProgress > fillPhaseStart1 ? Math.min((targetProgress - fillPhaseStart1) / (totalPhase1Max - fillPhaseStart1), 1) : 0;
+    mldTypeProgress = 1.0;
   } else {
     isAutonomousActive = false;
     autonomousFillProgress = 0;
     isCardAnimationFinished = false;
     currentSlideProgress = 0;
+    mldTypeProgress = 0;
   }
   drawFrame();
   
@@ -1888,6 +1946,7 @@ export function init(options = {}) {
     autonomousFillProgress = 1.0;
     isCardAnimationFinished = true;
     currentSlideProgress = 1.0;
+    mldTypeProgress = 1.0;
     drawFrame();
   } else if (backToCards) {
     activeStep = 4;
@@ -1899,6 +1958,7 @@ export function init(options = {}) {
     autonomousFillProgress = 1.0;
     isCardAnimationFinished = true;
     currentSlideProgress = 1.0;
+    mldTypeProgress = 1.0;
     
     // Instantly scroll way past the presentation layers to avoid flash of the top page
     const estOffset = 22 * window.innerHeight;
