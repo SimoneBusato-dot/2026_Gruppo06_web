@@ -21,7 +21,7 @@ export const COUNTER_SNAP_CONFIG = {
 let activeListeners = [];
 let isAppDestroyed = false;
 let titleSplit = null;
-let descSplit = null;
+let descSplit = null;f
 
 export function cleanup() {
   isAppDestroyed = true;

@@ -24,43 +24,45 @@
         const upper2Chars = upper2Split.chars ??[]
 
         
-        const text61Enter = gsap.fromTo(text61Lines, {x: "30%", opacity: 0}, {x:0, opacity:1, stagger: 0.1, duration: 0.6, ease:"elastic.out(0.5,0.4)", paused: true})
-        const text61Exit = gsap.fromTo(text61Lines, {x: 0, opacity: 1}, {x:"30%", opacity:0, stagger: 0.1, duration: 0.6, ease:"elastic.out(0.5,0.4)", paused: true})
-        const text62Enter = gsap.fromTo(text62Lines, {x: "30%", opacity: 0}, {x:0, opacity:1, stagger: 0.1, duration: 0.6, ease:"elastic.out(0.5,0.4)", paused: true})
-        const text62Exit = gsap.fromTo(text62Lines, {x: 0, opacity: 1}, {x:"30%", opacity:0, stagger: 0.1, duration: 0.6, ease:"elastic.out(0.5,0.4)", paused: true})
-        const upper1Enter = gsap.fromTo(upper1Lines, {x: "30%", opacity: 0}, {x:0, opacity:1, stagger: 0.1, duration: 0.6, ease:"elastic.out(0.5,0.4)", paused: true})
-        const upper1Exit = gsap.fromTo(upper1Lines, {x: 0, opacity: 1}, {x:"30%", opacity:0, stagger: 0.1, duration: 0.6, ease:"elastic.out(0.5,0.4)", paused: true})
-        const upper2Enter = gsap.fromTo(upper2Chars, {x: "30%", opacity: 0}, {x:0, opacity:1, stagger: 0.1, duration: 0.6, ease:"elastic.out(0.5,0.4)", paused: true})
-        const upper2Exit = gsap.fromTo(upper2Chars, {x: 0, opacity: 1}, {x:"30%", opacity:0, stagger: 0.1, duration: 0.6, ease:"elastic.out(0.5,0.4)", paused: true})
-        // gsap.set("#textContainer61", {opacity: 0})
-        // gsap.set("#textContainer62", {opacity: 0})
-    const tl = gsap.timeline({
-        scrollTrigger: {
-            trigger: villSection6,
-            scroller: window,
-            start: "top top",
-            end: "+=201%",
-            scrub: 1,
-            pin: true,
-            pinSpacing: false,
-            markers:false,
-            onEnter: () => {gsap.set(villSection6, { autoAlpha: 1 }); // Forza subito lo stato "from" su tutti gli elementi
-        gsap.set([...text61Lines, ...text62Lines, ...upper1Lines, ...upper2Chars], {
-            x: "30%",
-            opacity: 0
-        })},
-            onLeave: () => gsap.set(villSection6, { autoAlpha: 0 }),
-            onEnterBack: () => gsap.set(villSection6, { autoAlpha: 1 }),
-            onLeaveBack: () => gsap.set(villSection6, { autoAlpha: 0 }),
-            onUpdate(self) {
-                if(self.progress>=0.1){text61Enter.play(); upper1Enter.play();} else {text61Enter.reverse(); upper1Enter.reverse()}
-                // if(self.progress>=0.1){gsap.set("#textContainer61", {opacity: 1, duration: 0.1, ease:"power2.out"});}
-                if(self.progress>=0.55){text62Enter.play(); upper2Enter.play()} else {text62Enter.reverse(); upper2Enter.reverse()}
-                // if(self.progress>=0.55){gsap.set("#textContainer62", {opacity: 1, duration: 0.1, ease:"power2.out"})}
-                if(self.progress>=0.8){text61Exit.play(); text62Exit.play(); upper1Exit.play(); upper2Exit.play()} else {text61Exit.reverse(); text62Exit.reverse(); upper1Exit.reverse(); upper2Exit.reverse()}
+        // Initial hidden state set via timeline onEnter
+        const tl = gsap.timeline({
+            scrollTrigger: {
+                trigger: villSection6,
+                scroller: window,
+                start: "top top",
+                end: "+=201%",
+                scrub: 1,
+                pin: true,
+                pinSpacing: false,
+                markers:false,
+                onEnter: () => {
+                    gsap.set(villSection6, { autoAlpha: 1 });
+                    gsap.set([...text61Lines, ...text62Lines, ...upper1Lines, ...upper2Chars], {
+                        x: "30%",
+                        opacity: 0
+                    });
+                },
+                onLeave: () => gsap.set(villSection6, { autoAlpha: 0 }),
+                onEnterBack: () => gsap.set(villSection6, { autoAlpha: 1 }),
+                onLeaveBack: () => gsap.set(villSection6, { autoAlpha: 0 }),
+                onUpdate(self) {
+                    const p = self.progress;
+                    if (p < 0.1) {
+                        gsap.to([text61Lines, upper1Lines], { x: "30%", opacity: 0, duration: 0.4, ease: "power2.out", overwrite: "auto" });
+                        gsap.to([text62Lines, upper2Chars], { x: "30%", opacity: 0, duration: 0.4, ease: "power2.out", overwrite: "auto" });
+                    } else if (p >= 0.1 && p < 0.55) {
+                        gsap.to([text61Lines, upper1Lines], { x: 0, opacity: 1, stagger: 0.05, duration: 0.6, ease: "power2.out", overwrite: "auto" });
+                        gsap.to([text62Lines, upper2Chars], { x: "30%", opacity: 0, duration: 0.4, ease: "power2.out", overwrite: "auto" });
+                    } else if (p >= 0.55 && p < 0.8) {
+                        gsap.to([text61Lines, upper1Lines], { x: 0, opacity: 1, stagger: 0.05, duration: 0.6, ease: "power2.out", overwrite: "auto" });
+                        gsap.to([text62Lines, upper2Chars], { x: 0, opacity: 1, stagger: 0.05, duration: 0.6, ease: "power2.out", overwrite: "auto" });
+                    } else {
+                        gsap.to([text61Lines, upper1Lines], { x: "30%", opacity: 0, duration: 0.4, ease: "power2.out", overwrite: "auto" });
+                        gsap.to([text62Lines, upper2Chars], { x: "30%", opacity: 0, duration: 0.4, ease: "power2.out", overwrite: "auto" });
+                    }
+                }
             }
-        }
-    })
+        })
 
     tl.to(path6, {strokeDashoffset: -length6, duration: 2, ease: "none"})
 

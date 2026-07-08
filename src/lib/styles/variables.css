@@ -167,6 +167,7 @@
 
 /* -------------------- DHARMA (Headings / Titles) -------------------- */
 /* Large/Huge Dharma headings */
+/* Large/Huge Dharma headings */
 h1,
 .final-title,
 #snoopTitle,
@@ -177,6 +178,7 @@ h1,
 .slide-title {
   letter-spacing: var(--letter-spacing-dharma) !important;
   line-height: 0.8 !important; /* Extremely tight stack for huge displays */
+  margin: 0 !important; /* Prevent default browser margins from creating huge spacing gaps */
 }
 
 /* Medium/Standard Dharma headings */
@@ -197,10 +199,13 @@ h6,
 #title,
 #Upper,
 #Upper2,
+#upper,
+.upper,
 [style*="var(--font-family)"],
 [style*="dharma-gothic-e"] {
   letter-spacing: var(--letter-spacing-dharma) !important;
   line-height: 0.85 !important; /* Unified tight line-height for headings */
+  margin: 0 !important; /* Prevent default browser margins from creating huge spacing gaps */
 }
 
 /* Scoped SplitType char/word rules to prevent affecting Gelica text splits */
@@ -226,10 +231,14 @@ h6,
 #Upper .word,
 #Upper2 .char,
 #Upper2 .word,
+#upper .char,
+#upper .word,
+.upper .char,
+.upper .word,
 .slide-title .char,
 .slide-title .word {
   letter-spacing: var(--letter-spacing-dharma) !important;
-  line-height: 0.85 !important;
+  /* line-height is inherited from the parent block container for correct vertical scaling */
 }
 
 /* -------------------- GELICA (Body / Descriptions / UI) -------------------- */
@@ -267,5 +276,27 @@ p,
 #Upper2 {
   letter-spacing: var(--letter-spacing-dharma) !important;
   line-height: 0.72 !important;
+}
+
+/* Prevent SplitType generated line, word, and character spans from wrapping or balancing inside their boxes */
+.line,
+.word,
+.char {
+  text-wrap: nowrap !important;
+}
+
+/* Collapse line-height between lines containing Dharma headings inside Gelica containers to match the standard Dharma line-height */
+.line:has([style*="var(--font-family)"]),
+.line:has([style*="dharma-gothic-e"]),
+.line:has(.section-title),
+.line:has(.gusto-dharma),
+.line:has(.trend-selection-title),
+.line:has(#snoopTitle),
+.line:has(#pastaTitle),
+.line:has(#Upper),
+.line:has(#Upper2),
+.line:has(#upper),
+.line:has(.upper) {
+  line-height: 0.85 !important;
 }
 

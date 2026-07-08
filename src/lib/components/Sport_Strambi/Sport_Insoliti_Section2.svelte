@@ -6,7 +6,7 @@
     import SplitType from "split-type";
 
     gsap.registerPlugin(ScrollTrigger);
-    let section, path, p1, p2, transitionElement, line;
+    let section, path, p1, p2, p3, transitionElement, line;
     let sliderElement = $state(null);
 
     onMount(() => {
@@ -16,6 +16,8 @@
         const p1Lines = p1SplitText.lines;
         const p2SplitText = new SplitType(p2, { types: "lines", tagName: "span" });
         const p2Lines = p2SplitText.lines;
+        const p3SplitText = new SplitType(p3, { types: "lines", tagName: "span" });
+        const p3Lines = p3SplitText.lines;
 
         const moveElements = (e) => {
             const xPercent = (e.clientX / window.innerWidth - 0.5) * 2;
@@ -35,7 +37,7 @@
             { x: 100, opacity: 0 },
             { x: 0, opacity: 1, paused: true, overwrite: "auto", duration: 0.6, ease: "power2.out" }
         );
-        const p2Enter = gsap.fromTo(p2Lines,
+        const p2Enter = gsap.fromTo([...p2Lines, ...p3Lines],
             { x: 300, opacity: 0 },
             { x: 0, opacity: 1, stagger: 0.1, overwrite: "auto", duration: 0.5, paused: true, ease: "power2.out"}
         );
@@ -103,7 +105,8 @@
     <div id="content">
         <div id="text2">
             <p bind:this={p1}>I feed su Milano Cortina si sono riempiti di discipline invernali insolite.</p>
-            <p bind:this={p2}>Tra le discese folli dello <mark class="highlight">skeleton</mark> o il mix sci-carabina del <mark class="highlight">biathlon,</mark> le persone hanno scoperto una passione improvvisa per gli sport più <mark id="Upper">PECULIARI E STRAMBI</mark></p>
+            <p bind:this={p2}>Tra le discese folli dello <mark class="highlight">skeleton</mark> o il mix sci-carabina del <mark class="highlight">biathlon,</mark> le persone hanno scoperto una passione improvvisa per gli sport più</p>
+            <p id="UpperStrambi" bind:this={p3}>PECULIARI <br> E STRAMBI</p>
         </div>
         <SportSlider bind:el={sliderElement} />
     </div>
@@ -179,19 +182,23 @@
         flex-shrink: 0;
     }
 
+    #text2 p {
+        margin: 0;
+    }
+
     .highlight{
         color: var(--brand-sport-insoliti-500);
         background-color: transparent;
     }
 
-    #Upper{
+    #UpperStrambi{
         color: var(--brand-sport-insoliti-500);
         font-weight: 900;
         font-size: clamp(3rem, 6vw, 8.3rem);
         font-family: var(--font-family);
         background-color: transparent;
         display: block;
-        line-height: 1;
+        line-height: 0.88 !important;
     }
 
     #transition {
