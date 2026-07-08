@@ -13,9 +13,9 @@ export const COUNTER_SNAP_CONFIG = {
   // Posizioni di snap (percentuale di scroll totale della pagina)
   step0_end: 0.40,  // Fine scorrimento iniziale contatore (corrisponde a fillPhaseStart1)
   step1: 0.50,       // Snap Card 1 (Visualizzazioni)
-  step2: 0.68,       // Snap Card 2 (Utenti Attivi)
-  step3: 0.84,       // Snap Card 3 (Interazioni)
-  step4: 0.91,       // Snap Fine Carosello / Inizio sezioni sottostanti
+  step2: 0.57,       // Snap Card 2 (Utenti Attivi)
+  step3: 0.64,       // Snap Card 3 (Interazioni)
+  step4: 0.71,       // Snap Fine Carosello / Inizio sezioni sottostanti
 };
 
 let activeListeners = [];
@@ -252,6 +252,22 @@ export function init(options = {}) {
   const finalCardsContainer = document.querySelector('.final-cards-container');
   const finalScreen = document.getElementById('final-screen');
   const scrollableSection = document.getElementById('scrollable-content-section');
+  
+  function updateScrollableSectionTop() {
+    if (scrollableSection) {
+      const isMobile = window.innerWidth <= 900;
+      if (isMobile) {
+        scrollableSection.style.top = '';
+      } else {
+        const presentationScrollHeight = presentationMultiplier * window.innerHeight;
+        const carouselStart = COUNTER_SNAP_CONFIG.step4 * presentationScrollHeight;
+        const carouselSpan = 4.0 * window.innerHeight;
+        const carouselEnd = carouselStart + carouselSpan;
+        scrollableSection.style.top = `${carouselEnd + window.innerHeight}px`;
+      }
+    }
+  }
+  updateScrollableSectionTop();
   
   // Decorative lines initialization
   const primaLinea = document.getElementById('prima-linea');
@@ -516,7 +532,10 @@ export function init(options = {}) {
       }
     } else {
       // Phase 2: Morphing between cards and transition to Step 4 (Full Screen)
-      const progress2 = Math.min(Math.max((progress - totalPhase1Max) / (1 - totalPhase1Max), 0), 1);
+      const step1 = COUNTER_SNAP_CONFIG.step1;
+      const step2 = COUNTER_SNAP_CONFIG.step2;
+      const step3 = COUNTER_SNAP_CONFIG.step3;
+      const step4 = COUNTER_SNAP_CONFIG.step4;
       
       counterOpacity = 0;
       cardTextOpacity = 1;
@@ -525,9 +544,9 @@ export function init(options = {}) {
       numChars = 2;
       fontSize = isMobile ? 26 : 12.5;
       
-      if (progress2 <= 0.36) {
-        // Transition 1 -> 2 (Card 1 to Card 2, mapped completely between scroll progress 0.50 and 0.68)
-        const t = progress2 / 0.36;
+      if (progress <= step2) {
+        // Transition 1 -> 2 (Card 1 to Card 2, mapped completely between step1 and step2)
+        const t = Math.min(Math.max((progress - step1) / (step2 - step1), 0), 1);
         path = lerpArray(cards[0].path, cards[1].path, t);
         color = lerpArray(cards[0].color, cards[1].color, t);
         width = lerp(cards[0].viewBox[0], cards[1].viewBox[0], t);
@@ -549,9 +568,9 @@ export function init(options = {}) {
           textOpacity = fadeT;
           textTranslateY = 30 * (1 - fadeT);
         }
-      } else if (progress2 <= 0.68) {
-        // Transition 2 -> 3 (Card 2 to Card 3, mapped completely between scroll progress 0.68 and 0.84)
-        const t = (progress2 - 0.36) / 0.32;
+      } else if (progress <= step3) {
+        // Transition 2 -> 3 (Card 2 to Card 3, mapped completely between step2 and step3)
+        const t = Math.min(Math.max((progress - step2) / (step3 - step2), 0), 1);
         path = lerpArray(cards[1].path, cards[2].path, t);
         color = lerpArray(cards[1].color, cards[2].color, t);
         width = lerp(cards[1].viewBox[0], cards[2].viewBox[0], t);
@@ -573,9 +592,9 @@ export function init(options = {}) {
           textOpacity = fadeT;
           textTranslateY = 30 * (1 - fadeT);
         }
-      } else if (progress2 < 0.82) {
-        // Transition 3 -> 4 (Card 3 to Full Screen, mapped completely between scroll progress 0.84 and 0.91)
-        const t = (progress2 - 0.68) / 0.14;
+      } else if (progress < step4) {
+        // Transition 3 -> 4 (Card 3 to Full Screen, mapped completely between step3 and step4)
+        const t = Math.min(Math.max((progress - step3) / (step4 - step3), 0), 1);
         const easedT = bezierEase(t);
         
         // Piecewise corner morphing (Rounded rectangle first, then slowly sharpening at the end)
@@ -612,11 +631,11 @@ export function init(options = {}) {
         finalScreenOpacity = 1;
       }
       
-      if (progress2 <= 0.68) {
+      if (progress <= step3) {
         cardWidth = width * scale;
         cardHeight = height * scale;
-      } else if (progress2 < 0.82) {
-        const t = (progress2 - 0.68) / 0.14;
+      } else if (progress < step4) {
+        const t = Math.min(Math.max((progress - step3) / (step4 - step3), 0), 1);
         const easedT = bezierEase(t);
         cardWidth = lerp(cards[2].viewBox[0] * scale, startWidth * 1.1, easedT);
         cardHeight = lerp(cards[2].viewBox[1] * scale, startHeight * 1.1, easedT);
@@ -822,10 +841,10 @@ export function init(options = {}) {
         if (index === 2) {
           const digitsSpan = item.querySelector('.number-digits');
           const suffixSpan = item.querySelector('.number-suffix');
-          if (digitsSpan && suffixSpan) {
-            const progress2 = Math.min(Math.max((state.progress - totalPhase1Max) / (1 - totalPhase1Max), 0), 1);
-            if (progress2 >= 0.68 && progress2 < 0.82) {
-              const t = (progress2 - 0.68) / 0.14; // da 0 a 1
+            const step3 = COUNTER_SNAP_CONFIG.step3;
+            const step4 = COUNTER_SNAP_CONFIG.step4;
+            if (state.progress >= step3 && state.progress < step4) {
+              const t = (state.progress - step3) / (step4 - step3); // da 0 a 1
               const fullString = "27MLN";
               const charCount = fullString.length;
               const currentLength = Math.max(0, Math.ceil((1 - t) * charCount));
@@ -836,14 +855,13 @@ export function init(options = {}) {
               
               digitsSpan.textContent = digitsMatch ? digitsMatch[0] : "";
               suffixSpan.textContent = suffixMatch ? suffixMatch[0] : "";
-            } else if (progress2 >= 0.82) {
+            } else if (state.progress >= step4) {
               digitsSpan.textContent = "";
               suffixSpan.textContent = "";
             } else {
               digitsSpan.textContent = "27";
               suffixSpan.textContent = "MLN";
             }
-          }
         }
 
         // Apply color to both digits and suffix inside this item
@@ -1266,8 +1284,10 @@ export function init(options = {}) {
     if (!autoscrollStartTime) autoscrollStartTime = timestamp;
     
     const elapsed = timestamp - autoscrollStartTime;
-    const isMobile = window.innerWidth <= 900;
-    const duration = isMobile ? 800 : 550; // Desktop snap duration reduced to 550ms for snappy response
+    let duration = isMobile ? 800 : 350; // Desktop snap duration reduced to 350ms for snappy response
+    if (!isMobile && autoscrollTargetProgress === COUNTER_SNAP_CONFIG.step1) {
+      duration = 240; // Calamita ancora più rapida/forte per la Card 1 (Blu)
+    }
     const t = Math.min(elapsed / duration, 1);
     
     // Quartic ease-in-out curve
@@ -1648,26 +1668,19 @@ export function init(options = {}) {
               let minDistance = Math.abs(currentP - snapPoints[0].p);
               
               for (let i = 1; i < snapPoints.length; i++) {
-                const dist = Math.abs(currentP - snapPoints[i].p);
+                let dist = Math.abs(currentP - snapPoints[i].p);
+                // Calamita più forte per Card 1: riduciamo artificialmente la distanza percepita
+                if (snapPoints[i].step === 1) {
+                  dist *= 0.6;
+                }
                 if (dist < minDistance) {
                   minDistance = dist;
                   closestIdx = i;
                 }
               }
               
-              let targetSnapIdx = currentSnapIdx;
-              
-              // Se l'utente ha scrollato in modo significativo (più di 80px), forziamo il cambio di slide nella direzione dello scroll
-              if (Math.abs(deltaScroll) > 80) {
-                if (deltaScroll > 0) {
-                  targetSnapIdx = Math.min(Math.max(currentSnapIdx + 1, closestIdx), snapPoints.length - 1);
-                } else {
-                  targetSnapIdx = Math.max(Math.min(currentSnapIdx - 1, closestIdx), 0);
-                }
-              } else {
-                // Altrimenti torniamo allo snap point più vicino
-                targetSnapIdx = closestIdx;
-              }
+              // La destinazione è sempre lo snap point matematicamente più vicino (scroll-driven fluido)
+              let targetSnapIdx = closestIdx;
               
               const targetSnap = snapPoints[targetSnapIdx];
               
@@ -1676,7 +1689,7 @@ export function init(options = {}) {
                 const targetPercent = targetSnap.p;
                 
                 // Calamita solo se c'è un effettivo scostamento dal target
-                if (Math.abs(currentP - targetPercent) > 0.005) {
+                if (Math.abs(currentP - targetPercent) > 0.0005) {
                   activeStep = targetSnap.step;
                   updateBodySlideClass(activeStep);
                   triggerAutoscrollTo(targetPercent);
@@ -1690,7 +1703,7 @@ export function init(options = {}) {
                 lastSnapScrollY = scrollPosition;
               }
             }
-          }, 150); // 150ms di inattività per avviare lo snap morbido
+          }, 300); // 300ms di inattività per avviare lo snap morbido
         }
       }
     }
@@ -1762,6 +1775,7 @@ export function init(options = {}) {
   // Handle window resizing (e.g. rotating device)
   window.addEventListener('resize', () => {
     cachedColumnCenterY = null;
+    updateScrollableSectionTop();
     const presentationScrollHeight = presentationMultiplier * window.innerHeight;
     if (presentationScrollHeight > 0) {
       let targetP = 0;

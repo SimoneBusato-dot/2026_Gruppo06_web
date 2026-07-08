@@ -141,7 +141,7 @@
 
 {@render children()}
 
-<!-- <BouncyLoader /> -->
+<BouncyLoader />
 
 {#if isTransitioningSvg}
     <div class="transition-curtain {isAnimatingClass ? 'is-animating' : ''}">

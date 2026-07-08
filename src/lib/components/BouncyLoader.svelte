@@ -3,11 +3,11 @@
     import gsap from 'gsap';
 
     // Props / Callbacks if any
-    let { onComplete } = $props();
+    let { onComplete = undefined } = $props();
 
     let progress = $state(0);
     let activePhase = $state(0); // 0: Blue, 1: Pink, 2: Orange, 3: Red
-    let isVisible = $state(false);
+    let isVisible = $state(true);
     let isLoaded = $state(false);
 
     let barEl = $state(null);
@@ -23,8 +23,6 @@
 
 
     onMount(() => {
-        if (onComplete) onComplete();
-        return;
 
         // Cache DOM elements
         const navbar = document.querySelector('.navbar-header');
