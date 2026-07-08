@@ -147,7 +147,7 @@
 </script>
 
 <svelte:head>
-	<title>Scroll Counter | 22MLD</title>
+	<title>22MLD</title>
 	<meta name="description" content="Contatore interattivo legato direttamente allo scroll, con design grafico split-color da 0 a 22 miliardi." />
 </svelte:head>
 
