@@ -795,7 +795,7 @@ body.no-scroll-counter {
   display: block;
   transform: translate3d(0, 125%, 0); /* Shift down further to hide high letter glyph tops */
   opacity: 0; /* Dual fade-in for total invisibility at start */
-  transition: transform 0s, opacity 0s; /* Resets instantly when active class is removed */
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease-in; /* Smooth exit transition */
   will-change: transform, opacity;
 }
 
