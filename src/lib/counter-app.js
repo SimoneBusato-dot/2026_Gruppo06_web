@@ -22,15 +22,9 @@ let activeListeners = [];
 let isAppDestroyed = false;
 let titleSplit = null;
 let descSplit = null;
-let globalUnlockScroll = null;
 
 export function cleanup() {
   isAppDestroyed = true;
-  
-  if (globalUnlockScroll) {
-    globalUnlockScroll();
-    globalUnlockScroll = null;
-  }
   
   if (typeof document !== 'undefined') {
     document.body.className = document.body.className
@@ -149,7 +143,6 @@ export function init(options = {}) {
   let isSwipeBackCooldown = false;
   let isTransitioningBackMobile = false;
   let isStep4EntranceComplete = false;
-  let hasStep4EntrancePlayed = false;
   setTimeout(() => {
     isLoadCooldown = false;
   }, 250);
@@ -622,7 +615,7 @@ export function init(options = {}) {
         textTranslateY = -30 * easedT;
         activeIndex = 2;
         columnsOpacity = 1 - easedT;
-        finalScreenOpacity = 0; // Keep text hidden during transition to show it only when fully expanded
+        finalScreenOpacity = easedT > 0.3 ? (easedT - 0.3) / 0.7 : 0; // Fade in final screen in the last part of the transition
       } else {
         // Card 4 Static (Full Screen)
         path = rectCardSharp.path;
@@ -1048,35 +1041,28 @@ export function init(options = {}) {
 
     // Manage final screen opacity
     if (finalScreen) {
-      if (activeStep === 4 && state.finalScreenOpacity > 0) {
+      if (state.finalScreenOpacity > 0) {
         finalScreen.style.visibility = 'visible';
+        finalScreen.style.transition = 'opacity 0.4s ease';
         finalScreen.style.opacity = state.finalScreenOpacity;
         finalScreen.style.pointerEvents = 'auto';
         
         if (!finalScreen.classList.contains('active')) {
           finalScreen.classList.add('active');
-          
-          if (!hasStep4EntrancePlayed) {
-            isStep4EntranceComplete = false;
-            lockScroll(); // Blocco dello scroll temporaneo per la prima entrata
-            
-            if (entranceTimeoutId) clearTimeout(entranceTimeoutId);
-            entranceTimeoutId = setTimeout(() => {
-              finalScreen.classList.add('entrance-done');
-              isStep4EntranceComplete = true;
-              hasStep4EntrancePlayed = true;
-              unlockScroll(); // Rilascio dello scroll al termine
-            }, 2200); // 2200ms per completare sia titolo che comparsa delle card
-          } else {
+          isStep4EntranceComplete = false;
+          // Start timeout for staggered entry completion to clear delays for hover
+          if (entranceTimeoutId) clearTimeout(entranceTimeoutId);
+          entranceTimeoutId = setTimeout(() => {
             finalScreen.classList.add('entrance-done');
             isStep4EntranceComplete = true;
-          }
+          }, 2500);
         }
         
         // Calculate horizontal translation directly from vertical scroll progression
         const track = finalScreen.querySelector('.final-cards-track');
         if (track) {
           const isMobile = window.innerWidth <= 900;
+          const progress = state.progress;
           if (isMobile) {
             track.style.transform = '';
           } else {
@@ -1085,24 +1071,16 @@ export function init(options = {}) {
             const carouselStart = COUNTER_SNAP_CONFIG.step4 * presentationScrollHeight;
             const carouselSpan = 4.0 * window.innerHeight;
             
-            const trackWidth = track.scrollWidth;
-            const viewportWidth = window.innerWidth;
-            
-            // Trova la larghezza del singolo elemento card
-            const firstCard = track.querySelector('.carousel-card-item');
-            const cardWidth = firstCard ? firstCard.offsetWidth : 300;
-            
-            // Allineamenti di inizio e fine corsa (Card 1 al centro -> Uscita completa a sinistra)
-            const startTranslation = (viewportWidth - cardWidth) / 2;
-            const endTranslation = -trackWidth;
-            
             let progressVal = 0;
             if (scrollPosition > carouselStart) {
               progressVal = Math.min((scrollPosition - carouselStart) / carouselSpan, 1);
             }
             
-            // LERP fluido tra la posizione iniziale centrata e quella finale
-            const translation = lerp(startTranslation, endTranslation, progressVal);
+            const trackWidth = track.scrollWidth;
+            const viewportWidth = window.innerWidth;
+            
+            // Map progressVal from 0 (off-screen right) to 1 (off-screen left)
+            const translation = viewportWidth - progressVal * (trackWidth + viewportWidth);
             
             // Add a gentle breathing oscillation (±20px)
             const sway = Math.sin(state.autoScrollTime / 1500) * 20;
@@ -1112,6 +1090,7 @@ export function init(options = {}) {
         }
       } else {
         isStep4EntranceComplete = false;
+        finalScreen.style.transition = 'none';
         finalScreen.style.opacity = 0;
         finalScreen.style.pointerEvents = 'none';
         finalScreen.style.visibility = 'hidden';
@@ -1119,7 +1098,6 @@ export function init(options = {}) {
         if (finalScreen.classList.contains('active')) {
           finalScreen.classList.remove('active');
           finalScreen.classList.remove('entrance-done');
-          unlockScroll(); // Rilascio di sicurezza dello scroll
           if (entranceTimeoutId) {
             clearTimeout(entranceTimeoutId);
             entranceTimeoutId = null;
@@ -1243,31 +1221,10 @@ export function init(options = {}) {
 
   const preventDefaultScroll = (e) => {
     if (e.type === 'keydown') {
-      const keys = ['ArrowDown', 'PageDown', 'End', ' '];
+      const keys = ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '];
       if (keys.includes(e.key)) {
         e.preventDefault();
         return;
-      }
-    } else if (e.type === 'wheel') {
-      if (e.deltaY > 0) {
-        e.preventDefault(); // Block downward scrolling during transition
-      } else {
-        // Scrolling up: release the lock immediately and snap back to Card 3
-        unlockScroll();
-        if (entranceTimeoutId) {
-          clearTimeout(entranceTimeoutId);
-          entranceTimeoutId = null;
-        }
-        const finalScreen = document.getElementById('final-screen');
-        if (finalScreen) {
-          finalScreen.classList.remove('active');
-          finalScreen.classList.remove('entrance-done');
-        }
-        isStep4EntranceComplete = false;
-        
-        activeStep = 3;
-        updateBodySlideClass(3);
-        triggerAutoscrollTo(COUNTER_SNAP_CONFIG.step3);
       }
     } else {
       e.preventDefault();
@@ -1276,7 +1233,6 @@ export function init(options = {}) {
   
   function lockScroll() {
     const isMobile = window.innerWidth <= 900;
-    globalUnlockScroll = unlockScroll;
     if (isMobile) {
       document.documentElement.style.overflow = 'hidden';
       document.body.style.overflow = 'hidden';
@@ -1288,7 +1244,6 @@ export function init(options = {}) {
   }
 
   function unlockScroll() {
-    globalUnlockScroll = null;
     const isMobile = window.innerWidth <= 900;
     if (isMobile) {
       if (activeStep >= 1) return;
@@ -1614,15 +1569,7 @@ export function init(options = {}) {
     }
 
     const scrollContainer = isMobile ? document.getElementById('intro') : null;
-    let scrollPosition = scrollContainer ? scrollContainer.scrollTop : window.scrollY;
-    
-    if (!isMobile && activeStep === 4 && !isStep4EntranceComplete && !hasStep4EntrancePlayed) {
-      const presentationScrollHeight = presentationMultiplier * window.innerHeight;
-      const carouselStart = COUNTER_SNAP_CONFIG.step4 * presentationScrollHeight;
-      if (scrollPosition > carouselStart) {
-        scrollPosition = carouselStart;
-      }
-    }
+    const scrollPosition = scrollContainer ? scrollContainer.scrollTop : window.scrollY;
     
     targetScrollYSmooth = scrollPosition;
     
@@ -1641,17 +1588,6 @@ export function init(options = {}) {
   window.addEventListener('scroll', () => {
     const isMobile = window.innerWidth <= 900;
     const scrollPosition = window.scrollY;
-    
-    // Forza la posizione dello scroll all'inizio del carosello finché l'animazione d'entrata non è completata
-    if (!isMobile && activeStep === 4 && !isStep4EntranceComplete && !hasStep4EntrancePlayed && !isAutoscrolling && !isProgrammaticScroll) {
-      const presentationScrollHeight = presentationMultiplier * window.innerHeight;
-      const carouselStart = COUNTER_SNAP_CONFIG.step4 * presentationScrollHeight;
-      if (scrollPosition > carouselStart + 2) {
-        window.scrollTo(0, carouselStart);
-        return;
-      }
-    }
-    
     const deltaY = Math.abs(scrollPosition - lastScrollY);
 
     if (isMobile) {
