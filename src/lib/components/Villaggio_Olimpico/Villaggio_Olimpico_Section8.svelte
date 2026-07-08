@@ -64,6 +64,7 @@
         background-color: var(--neutral-50);
         overflow: hidden;
         margin: 0;
+        margin-block-start: 200dvh;
     }
 
     #svgContainer8 {
