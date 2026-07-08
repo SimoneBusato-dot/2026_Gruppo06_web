@@ -13,7 +13,7 @@
     // Modifica questi valori per cambiare i punti di calamita (snapping) e i
     // range di scroll libero in questa sezione.
     // =========================================================================
-    const totalD = 23.6; // Durata temporale logica della timeline GSAP
+    const totalD = 22.24; // Durata temporale logica della timeline GSAP
     const SECTION_SNAP_CONFIG = {
         // Punti di Snap per i Testi Iniziali (Slide 1)
         slide1Text1: 1.4 / totalD,   // Snap al primo testo ("Non c'è creator...")
@@ -639,11 +639,11 @@
           .to(commentsPath, { strokeDashoffset: 0, ease: "none", duration: 2.0 }, 19.5)
 
           // 12. PHASE 12: Transition to Slide 9 (Redirect section)
-          .to(redirectPath, { strokeDashoffset: 0, ease: "none", duration: 1.0 }, 21.5)
-          .to(commentsPath, { strokeDashoffset: -lenComments - 500, ease: "power2.inOut", duration: 0.8 }, 21.1)
-          .set(commentsLine, { opacity: 0 }, 21.9)
-          .to(redirectTextWords, { opacity: 1, y: 0, stagger: 0.08, duration: 0.8, ease: "power2.out" }, 22.0)
-          .to({}, { duration: 23.6 - 22.6 }, 22.6);
+          .to(redirectPath, { strokeDashoffset: 0, ease: "none", duration: 0.4 }, 21.5)
+          .to(commentsPath, { strokeDashoffset: -lenComments - 500, ease: "power2.inOut", duration: 0.4 }, 21.1)
+          .set(commentsLine, { opacity: 0 }, 21.5)
+          .to(redirectTextWords, { opacity: 1, y: 0, stagger: 0.03, duration: 0.3, ease: "power2.out" }, 21.6)
+          .to({}, { duration: 22.24 - 22.14 }, 22.14);
 
         const preventDefaultScroll = (e) => {
             if (isSwipingSwiper) {
