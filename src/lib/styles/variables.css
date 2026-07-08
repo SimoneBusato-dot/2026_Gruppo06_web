@@ -163,43 +163,71 @@
 }
 
 /* ==================== GLOBAL TYPOGRAPHY UNIFICATION ==================== */
-/* Unify the kerning (crenatura / letter-spacing) globally for Dharma and Gelica fonts */
+/* Unify the kerning (crenatura / letter-spacing) and line-height globally for Dharma and Gelica fonts */
 
-.section-title,
-.title-animation,
-.gusto-dharma,
-.final-title,
-.trend-selection-title,
-.digit-span,
-.suffix-span,
-.char,
-.word,
-#snoopTitle,
-#titlePanel,
-#titleMain,
-#titleBlock,
-#title,
+/* -------------------- DHARMA (Headings / Titles) -------------------- */
+/* Large/Huge Dharma headings */
 h1,
+.final-title,
+#snoopTitle,
+#pastaTitle,
+.hero-title {
+  letter-spacing: var(--letter-spacing-dharma) !important;
+  line-height: 0.8 !important; /* Extremely tight stack for huge displays */
+}
+
+/* Medium/Standard Dharma headings */
 h2,
 h3,
 h4,
 h5,
 h6,
+.section-title,
+.title-animation,
+.gusto-dharma,
+.trend-selection-title,
+.digit-span,
+.suffix-span,
+.char,
+.word,
+#titlePanel,
+#titleMain,
+#titleBlock,
+#title,
+#Upper,
 [style*="var(--font-family)"],
 [style*="dharma-gothic-e"] {
   letter-spacing: var(--letter-spacing-dharma) !important;
+  line-height: 0.85 !important; /* Unified tight line-height for headings */
 }
 
+/* -------------------- GELICA (Body / Descriptions / UI) -------------------- */
+/* Standard Body / Description text */
 .description-text,
-.slide-subtitle,
-.sub-title,
 .highlight-text,
-.sub-text,
 .para,
+.para-olympic,
+#textDesc,
+#text5,
+#text6,
+#pastaDesc,
 p,
 [style*="var(--font-family-text)"],
 [style*="gelica"] {
   letter-spacing: var(--letter-spacing-gelica) !important;
   text-wrap: balance !important;
+  line-height: 1.45 !important; /* High readability leading for body paragraphs */
+}
+
+/* Small UI labels, metadata, captions, subtitles */
+.slide-subtitle,
+.sub-title,
+.sub-text,
+.card-number,
+.btn-icon,
+.inspector-field label {
+  letter-spacing: var(--letter-spacing-gelica) !important;
+  text-wrap: balance !important;
+  line-height: 1.35 !important; /* Balanced leading for compact labels and subtitles */
 }
 
