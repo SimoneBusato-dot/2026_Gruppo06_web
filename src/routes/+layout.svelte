@@ -1,5 +1,4 @@
 <script>
-    import favicon from '$lib/assets/favicon.svg';
     import '$lib/styles/variables.css';
     import '$lib/styles/reactions.css';
     import Navbar from '$lib/components/Navbar.svelte';
@@ -133,9 +132,6 @@
     });
 </script>
 
-<svelte:head>
-    <link rel="icon" href={favicon} />
-</svelte:head>
 
 <Navbar />
 

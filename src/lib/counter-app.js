@@ -1643,7 +1643,7 @@ export function init(options = {}) {
     if (!isMobile && activeStep === 4 && !isStep4EntranceComplete && !hasStep4EntrancePlayed) {
       const presentationScrollHeight = presentationMultiplier * window.innerHeight;
       const carouselStart = COUNTER_SNAP_CONFIG.step4 * presentationScrollHeight;
-      if (Math.abs(scrollPosition - carouselStart) > 2) {
+      if (scrollPosition > carouselStart + 2) {
         window.scrollTo(0, carouselStart);
         return;
       }
