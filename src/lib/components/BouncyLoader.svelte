@@ -9,6 +9,8 @@
     let activePhase = $state(0); // 0: Blue, 1: Pink, 2: Orange, 3: Red
     let isVisible = $state(true);
     let isLoaded = $state(false);
+    let isCounterPage = $state(false);
+    let resolvedBg = $state('var(--neutral-50)');
 
     let barEl = $state(null);
     let tl;
@@ -23,6 +25,22 @@
 
 
     onMount(() => {
+        isCounterPage = typeof window !== 'undefined' && window.location.pathname === '/';
+
+        // Risolvi dinamicamente lo sfondo del sito per evitare disallineamenti di bianco
+        if (typeof window !== 'undefined') {
+            const bodyBg = window.getComputedStyle(document.body).backgroundColor;
+            const docBg = window.getComputedStyle(document.documentElement).backgroundColor;
+            const darkColors = ['rgb(21, 21, 21)', 'rgb(29, 29, 29)', 'rgb(0, 0, 0)', '#151515', '#1d1d1d', '#000000'];
+            
+            if (bodyBg && bodyBg !== 'transparent' && bodyBg !== 'rgba(0, 0, 0, 0)' && !darkColors.includes(bodyBg)) {
+                resolvedBg = bodyBg;
+            } else if (docBg && docBg !== 'transparent' && docBg !== 'rgba(0, 0, 0, 0)' && !darkColors.includes(docBg)) {
+                resolvedBg = docBg;
+            } else {
+                resolvedBg = 'var(--neutral-50)';
+            }
+        }
 
         // Cache DOM elements
         const navbar = document.querySelector('.navbar-header');
@@ -33,8 +51,9 @@
         if (counterZero) gsap.set(counterZero, { scale: 0.5, opacity: 0 });
         if (scrollIndicator) gsap.set(scrollIndicator, { y: 60, opacity: 0 });
 
-        // Blocco lo scroll della pagina durante il caricamento
+        // Blocco lo scroll della pagina durante il caricamento (sia body che html)
         if (typeof document !== 'undefined') {
+            document.documentElement.style.overflow = 'hidden';
             document.body.style.overflow = 'hidden';
         }
 
@@ -62,6 +81,7 @@
             onComplete: () => {
                 // Riapri lo scroll
                 if (typeof document !== 'undefined') {
+                    document.documentElement.style.overflow = '';
                     document.body.style.overflow = '';
                 }
                 isVisible = false;
@@ -206,19 +226,20 @@
     onDestroy(() => {
         if (tl) tl.kill();
         if (typeof document !== 'undefined') {
+            document.documentElement.style.overflow = '';
             document.body.style.overflow = '';
         }
     });
 </script>
 
 {#if isVisible}
-    <div class="loader-overlay" style="--loader-color: {colors[activePhase]}">
+    <div class="loader-overlay" style="--loader-color: {colors[activePhase]}; --loader-bg: {resolvedBg}">
         <!-- Tenda con foro in box-shadow che si allarga per rivelare il sito -->
         <div class="loader-curtain-hole"></div>
 
         <!-- Contenuto sopra la tenda (barra e percentuale) -->
         <div class="loader-content">
-            <div class="loader-track">
+            <div class="loader-track" class:is-counter={isCounterPage}>
                 <div class="loader-bar" bind:this={barEl}></div>
             </div>
             
@@ -252,7 +273,7 @@
         height: 48px;
         border-radius: 24px;
         background-color: transparent; /* Il foro è trasparente per far vedere il sito */
-        box-shadow: 0 0 0 9999px var(--neutral-50, #f3f3f3); /* Crea lo sfondo coprente intorno */
+        box-shadow: 0 0 0 9999px var(--loader-bg); /* Crea lo sfondo coprente intorno con lo stesso bianco */
         z-index: 1;
         pointer-events: none;
         will-change: width, height, border-radius;
@@ -261,10 +282,6 @@
     .loader-content {
         position: relative;
         z-index: 2; /* Sopra la tenda coprente */
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: var(--spacing-md, 16px);
         width: 90%;
         max-width: 450px;
         pointer-events: none;
@@ -275,12 +292,16 @@
         height: 48px;
         border: 6px solid var(--loader-color);
         border-radius: var(--radius-full, 9999px);
-        background-color: transparent; /* Trasparente così si vede il sito sotto */
+        background-color: var(--loader-bg); /* Stesso colore di sfondo della tenda */
         padding: 4px;
         box-sizing: border-box;
         position: relative;
         transition: border-color 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+    }
+
+    .loader-track.is-counter {
+        background-color: transparent; /* Trasparente solo per la sezione counter */
     }
 
     .loader-bar {
@@ -293,12 +314,15 @@
     }
 
     .loader-percentage {
+        position: absolute;
+        top: calc(100% + 12px);
+        left: 0;
+        right: 0;
         color: var(--loader-color);
         font-family: var(--font-family-text, "gelica", sans-serif);
         font-size: 24px;
         font-weight: 700;
         transition: color 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
         text-align: center;
-        margin-top: 8px;
     }
 </style>
