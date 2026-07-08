@@ -1,6 +1,9 @@
 <script>
     import { onMount, onDestroy } from 'svelte';
     import gsap from 'gsap';
+    import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+    gsap.registerPlugin(ScrollTrigger);
 
     // Props / Callbacks if any
     let { onComplete = undefined } = $props();
@@ -14,6 +17,26 @@
 
     let barEl = $state(null);
     let tl;
+
+    const preventScroll = (e) => {
+        e.preventDefault();
+    };
+
+    const keys = { 32: 1, 33: 1, 34: 1, 35: 1, 36: 1, 37: 1, 38: 1, 39: 1, 40: 1 };
+    const preventKeys = (e) => {
+        if (keys[e.keyCode]) {
+            e.preventDefault();
+            return false;
+        }
+    };
+
+    const cleanupScrollBlock = () => {
+        if (typeof window !== 'undefined') {
+            window.removeEventListener('wheel', preventScroll, { passive: false });
+            window.removeEventListener('touchmove', preventScroll, { passive: false });
+            window.removeEventListener('keydown', preventKeys, { passive: false });
+        }
+    };
 
     const colors = [
         'var(--brand-sport-insoliti-500)', // Blue
@@ -56,6 +79,18 @@
             document.documentElement.style.overflow = 'hidden';
             document.body.style.overflow = 'hidden';
         }
+        if (typeof window !== 'undefined') {
+            window.addEventListener('wheel', preventScroll, { passive: false });
+            window.addEventListener('touchmove', preventScroll, { passive: false });
+            window.addEventListener('keydown', preventKeys, { passive: false });
+
+            // Disabilita normalizeScroll di GSAP se attivo (con piccolo delay per superare il layout)
+            setTimeout(() => {
+                if (typeof ScrollTrigger !== 'undefined') {
+                    ScrollTrigger.normalizeScroll(false);
+                }
+            }, 100);
+        }
 
         // Verifica se la pagina è già caricata
         if (typeof window !== 'undefined') {
@@ -79,6 +114,12 @@
 
         tl = gsap.timeline({
             onComplete: () => {
+                cleanupScrollBlock();
+                if (typeof window !== 'undefined') {
+                    if (typeof ScrollTrigger !== 'undefined') {
+                        ScrollTrigger.normalizeScroll(true);
+                    }
+                }
                 // Riapri lo scroll
                 if (typeof document !== 'undefined') {
                     document.documentElement.style.overflow = '';
@@ -225,6 +266,12 @@
 
     onDestroy(() => {
         if (tl) tl.kill();
+        cleanupScrollBlock();
+        if (typeof window !== 'undefined') {
+            if (typeof ScrollTrigger !== 'undefined') {
+                ScrollTrigger.normalizeScroll(true);
+            }
+        }
         if (typeof document !== 'undefined') {
             document.documentElement.style.overflow = '';
             document.body.style.overflow = '';
@@ -262,6 +309,7 @@
         user-select: none;
         background-color: transparent;
         overflow: hidden; /* Nasconde il box-shadow enorme quando si espande */
+        pointer-events: auto; /* Blocca tutti i click e interazioni sul sito sottostante */
     }
 
     .loader-curtain-hole {
@@ -275,7 +323,6 @@
         background-color: transparent; /* Il foro è trasparente per far vedere il sito */
         box-shadow: 0 0 0 9999px var(--loader-bg); /* Crea lo sfondo coprente intorno con lo stesso bianco */
         z-index: 1;
-        pointer-events: none;
         will-change: width, height, border-radius;
     }
 
@@ -284,7 +331,6 @@
         z-index: 2; /* Sopra la tenda coprente */
         width: 90%;
         max-width: 450px;
-        pointer-events: none;
     }
 
     .loader-track {

@@ -1050,7 +1050,6 @@ export function init(options = {}) {
     if (finalScreen) {
       if (activeStep === 4 && state.finalScreenOpacity > 0) {
         finalScreen.style.visibility = 'visible';
-        finalScreen.style.transition = 'opacity 0.4s ease';
         finalScreen.style.opacity = state.finalScreenOpacity;
         finalScreen.style.pointerEvents = 'auto';
         
@@ -1059,18 +1058,16 @@ export function init(options = {}) {
           
           if (!hasStep4EntrancePlayed) {
             isStep4EntranceComplete = false;
-            lockScroll(); // Blocco temporaneo dello scroll SOLO la prima volta
+            lockScroll(); // Blocco dello scroll temporaneo per la prima entrata
             
-            // Start timeout for staggered entry completion to clear delays for hover
             if (entranceTimeoutId) clearTimeout(entranceTimeoutId);
             entranceTimeoutId = setTimeout(() => {
               finalScreen.classList.add('entrance-done');
               isStep4EntranceComplete = true;
-              hasStep4EntrancePlayed = true; // Segna come già riprodotta
-              unlockScroll(); // Rilascio dello scroll al termine dell'animazione
-            }, 2500);
+              hasStep4EntrancePlayed = true;
+              unlockScroll(); // Rilascio dello scroll al termine
+            }, 2200); // 2200ms per completare sia titolo che comparsa delle card
           } else {
-            // Se è già stata riprodotta, salta il blocco e imposta direttamente entrance-done
             finalScreen.classList.add('entrance-done');
             isStep4EntranceComplete = true;
           }
@@ -1080,7 +1077,6 @@ export function init(options = {}) {
         const track = finalScreen.querySelector('.final-cards-track');
         if (track) {
           const isMobile = window.innerWidth <= 900;
-          const progress = state.progress;
           if (isMobile) {
             track.style.transform = '';
           } else {
@@ -1116,7 +1112,6 @@ export function init(options = {}) {
         }
       } else {
         isStep4EntranceComplete = false;
-        finalScreen.style.transition = 'none';
         finalScreen.style.opacity = 0;
         finalScreen.style.pointerEvents = 'none';
         finalScreen.style.visibility = 'hidden';
@@ -1619,7 +1614,15 @@ export function init(options = {}) {
     }
 
     const scrollContainer = isMobile ? document.getElementById('intro') : null;
-    const scrollPosition = scrollContainer ? scrollContainer.scrollTop : window.scrollY;
+    let scrollPosition = scrollContainer ? scrollContainer.scrollTop : window.scrollY;
+    
+    if (!isMobile && activeStep === 4 && !isStep4EntranceComplete && !hasStep4EntrancePlayed) {
+      const presentationScrollHeight = presentationMultiplier * window.innerHeight;
+      const carouselStart = COUNTER_SNAP_CONFIG.step4 * presentationScrollHeight;
+      if (scrollPosition > carouselStart) {
+        scrollPosition = carouselStart;
+      }
+    }
     
     targetScrollYSmooth = scrollPosition;
     
@@ -1640,7 +1643,7 @@ export function init(options = {}) {
     const scrollPosition = window.scrollY;
     
     // Forza la posizione dello scroll all'inizio del carosello finché l'animazione d'entrata non è completata
-    if (!isMobile && activeStep === 4 && !isStep4EntranceComplete && !hasStep4EntrancePlayed) {
+    if (!isMobile && activeStep === 4 && !isStep4EntranceComplete && !hasStep4EntrancePlayed && !isAutoscrolling && !isProgrammaticScroll) {
       const presentationScrollHeight = presentationMultiplier * window.innerHeight;
       const carouselStart = COUNTER_SNAP_CONFIG.step4 * presentationScrollHeight;
       if (scrollPosition > carouselStart + 2) {
