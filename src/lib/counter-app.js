@@ -1162,6 +1162,8 @@ export function init(options = {}) {
   let autoscrollStartTime = null;
   let autoscrollStartScrollY = 0;
   const autoscrollDuration = 1100; // Rallentato a 1100ms per una transizione molto più fluida ed elegante
+  let isProgrammaticScroll = false;
+  let scrollIdleTimeout = null;
 
 
   // activeStep is initialized to 0 because we force scroll to top on page load.
@@ -1219,7 +1221,8 @@ export function init(options = {}) {
       scrollContainer.style.setProperty('scroll-snap-type', 'none', 'important');
       scrollContainer.style.setProperty('overflow-y', 'hidden', 'important');
     } else {
-      lockScroll();
+      // Desktop: do not lock native scroll
+      isProgrammaticScroll = true;
     }
     
     requestAnimationFrame(performAutoscroll);
@@ -1231,7 +1234,7 @@ export function init(options = {}) {
     
     const elapsed = timestamp - autoscrollStartTime;
     const isMobile = window.innerWidth <= 900;
-    const duration = isMobile ? 800 : autoscrollDuration;
+    const duration = isMobile ? 800 : 550; // Desktop snap duration reduced to 550ms for snappy response
     const t = Math.min(elapsed / duration, 1);
     
     // Quartic ease-in-out curve
@@ -1246,6 +1249,7 @@ export function init(options = {}) {
     if (isMobile && scrollContainer) {
       scrollContainer.scrollTop = currentScroll;
     } else {
+      isProgrammaticScroll = true;
       window.scrollTo(0, currentScroll);
     }
     
@@ -1260,12 +1264,7 @@ export function init(options = {}) {
         lastScrollY = scrollContainer.scrollTop;
       } else {
         lastScrollY = window.scrollY;
-        cooldownActive = true;
-        setTimeout(() => {
-          cooldownActive = false;
-          unlockScroll();
-          lastScrollY = window.scrollY;
-        }, 400);
+        // Desktop: no cooldown, no scroll unlock needed
       }
     }
   }
@@ -1548,51 +1547,75 @@ export function init(options = {}) {
       }
     }
 
-    // Step snapping logic (Card 1 <-> Card 2 <-> Card 3)
-    if (!isMobile && !isAutoscrolling && !cooldownActive) {
+    // Step snapping logic under Option A: Snap Magnetico Inerziale
+    if (!isMobile) {
+      if (isProgrammaticScroll) {
+        isProgrammaticScroll = false;
+      } else {
+        if (isAutoscrolling) {
+          isAutoscrolling = false; // Interrompi immediatamente l'autoscroll se l'utente scorrera manualmente
+        }
+      }
+
       const presentationScrollHeight = presentationMultiplier * window.innerHeight;
       if (presentationScrollHeight > 0) {
-        const threshold = COUNTER_SNAP_CONFIG.threshold;
-        const y0 = COUNTER_SNAP_CONFIG.step0_end * presentationScrollHeight;
-        const y1 = COUNTER_SNAP_CONFIG.step1 * presentationScrollHeight;
-        const y2 = COUNTER_SNAP_CONFIG.step2 * presentationScrollHeight;
-        const y3 = COUNTER_SNAP_CONFIG.step3 * presentationScrollHeight;
+        const currentP = scrollPosition / presentationScrollHeight;
+        
+        // Calcola dinamicamente lo step corretto per aggiornare le classi e i reels in tempo reale
+        let newStep = 0;
+        if (currentP <= (COUNTER_SNAP_CONFIG.step0_end)) {
+          newStep = 0;
+        } else if (currentP <= (COUNTER_SNAP_CONFIG.step1 + COUNTER_SNAP_CONFIG.step2) / 2) {
+          newStep = 1;
+        } else if (currentP <= (COUNTER_SNAP_CONFIG.step2 + COUNTER_SNAP_CONFIG.step3) / 2) {
+          newStep = 2;
+        } else if (currentP <= (COUNTER_SNAP_CONFIG.step3 + COUNTER_SNAP_CONFIG.step4) / 2) {
+          newStep = 3;
+        } else {
+          newStep = 4;
+        }
+        
+        if (activeStep !== newStep) {
+          activeStep = newStep;
+          updateBodySlideClass(activeStep);
+        }
 
-        if (activeStep === 0) {
-          if (scrollPosition > y0) {
-            activeStep = 1;
-            triggerAutoscrollTo(COUNTER_SNAP_CONFIG.step1);
-          }
-        } else if (activeStep === 1) {
-          if (scrollPosition > y1 + threshold) {
-            activeStep = 2;
-            triggerAutoscrollTo(COUNTER_SNAP_CONFIG.step2);
-          } else if (scrollPosition < y1 - threshold) {
-            activeStep = 0;
-            triggerAutoscrollTo(COUNTER_SNAP_CONFIG.step0_end - 0.02);
-          }
-        } else if (activeStep === 2) {
-          if (scrollPosition > y2 + threshold) {
-            activeStep = 3;
-            triggerAutoscrollTo(COUNTER_SNAP_CONFIG.step3);
-          } else if (scrollPosition < y2 - threshold) {
-            activeStep = 1;
-            triggerAutoscrollTo(COUNTER_SNAP_CONFIG.step1);
-          }
-        } else if (activeStep === 3) {
-          if (scrollPosition > y3 + threshold) {
-            activeStep = 4;
-            triggerAutoscrollTo(COUNTER_SNAP_CONFIG.step4); // Auto scroll to the START of Step 4
-          } else if (scrollPosition < y3 - threshold) {
-            activeStep = 2;
-            triggerAutoscrollTo(COUNTER_SNAP_CONFIG.step2);
-          }
-        } else if (activeStep === 4) {
-          // Only snap back to Step 3 if scrollPosition falls below the entry threshold of Step 4 (y3 - threshold)
-          if (scrollPosition < y3 - threshold) {
-            activeStep = 3;
-            triggerAutoscrollTo(COUNTER_SNAP_CONFIG.step3);
-          }
+        // Calamita Magnetica (Scroll Idle / Debounce)
+        clearTimeout(scrollIdleTimeout);
+        
+        // Attiva lo snap solo se siamo nella zona delle card intro (fino a step 4 + margine di 50px)
+        const step4Pos = COUNTER_SNAP_CONFIG.step4 * presentationScrollHeight;
+        if (scrollPosition <= step4Pos + 50) {
+          scrollIdleTimeout = setTimeout(() => {
+            if (!isAutoscrolling) {
+              const snapPoints = [
+                { step: 0, p: 0.0 }, // Snap all'inizio
+                { step: 0, p: COUNTER_SNAP_CONFIG.step0_end - 0.02 },
+                { step: 1, p: COUNTER_SNAP_CONFIG.step1 },
+                { step: 2, p: COUNTER_SNAP_CONFIG.step2 },
+                { step: 3, p: COUNTER_SNAP_CONFIG.step3 },
+                { step: 4, p: COUNTER_SNAP_CONFIG.step4 }
+              ];
+              
+              let closestSnap = snapPoints[0];
+              let minDistance = Math.abs(currentP - closestSnap.p);
+              
+              for (let i = 1; i < snapPoints.length; i++) {
+                const dist = Math.abs(currentP - snapPoints[i].p);
+                if (dist < minDistance) {
+                  minDistance = dist;
+                  closestSnap = snapPoints[i];
+                }
+              }
+              
+              // Calamita solo se c'è un disallineamento visivo significativo
+              if (minDistance > 0.005) {
+                activeStep = closestSnap.step;
+                updateBodySlideClass(activeStep);
+                triggerAutoscrollTo(closestSnap.p);
+              }
+            }
+          }, 150); // 150ms di inattività per avviare lo snap morbido
         }
       }
     }
