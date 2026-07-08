@@ -1035,15 +1035,10 @@
     .intro-wrapper-center,
     .inter-wrapper-center {
         position: absolute;
-        top: 50%;
+        top: 28%; /* Posizione verticale di partenza (prima riga di testo) rispetto al bordo superiore dello schermo */
         left: 35vw;
-        transform: translateY(-50%);
         width: 60%;
         max-width: 800px;
-        height: 400px;
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
         z-index: 10;
         pointer-events: none;
     }
@@ -1052,15 +1047,19 @@
     .inter-text-block {
         position: absolute;
         left: 0;
-        top: 50%;
-        transform: translateY(-50%);
+        top: 0;
         width: 100%;
         text-align: left;
         opacity: 0;
         display: flex;
         flex-direction: column;
-        justify-content: center;
+        justify-content: flex-start;
         align-items: flex-start;
+    }
+
+    .intro-text-block.text-1,
+    .intro-text-block.text-2 {
+        top: 14vh;
     }
 
     .para {

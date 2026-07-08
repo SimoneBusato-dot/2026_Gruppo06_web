@@ -21,7 +21,7 @@
 
             const splitUpper = new SplitText(upperEnding, { type: "lines", mask: "lines", linesClass: "split-line" });
             const upperEnter = gsap.fromTo(splitUpper.lines, { y: "120%"}, { y: "0%", duration: 0.6, stagger:0.1, ease:"elastic.out(0.5,0.4)", paused: true});
-            const splitUpper2 = new SplitText(upperEnding2, { type: "lines", mask: "lines" });
+            const splitUpper2 = new SplitText(upperEnding2, { type: "lines", mask: "lines", linesClass: "split-line" });
             const upperEnter2 = gsap.fromTo(splitUpper2.lines, { y: "120%"}, { y: "0%", duration: 0.6, stagger:0.1, ease:"elastic.out(0.5,0.4)", paused: true});
             const splitSubtitle = new SplitText(subtitle1, { type: "lines", mask: "lines" });
             const subtitleEnter = gsap.fromTo(splitSubtitle.lines, { y: "120%"}, { y: "0%", duration: 0.6,ease:"power2.out", paused: true, delay: 0.5});

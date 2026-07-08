@@ -356,7 +356,7 @@ export function init(options = {}) {
       title: "POST PUBBLICATI",
       number: "27",
       suffix: "MLN",
-      description: "<span style=\"color: rgb(220, 149, 62)\">La voglia di esserci</span> ha inondato i social, tra racconti in prima persona e un'infinita produzione di meme.",
+      description: "<span style=\"color: rgb(220, 149, 62)\">La voglia di esserci ha</span> inondato i social, tra racconti in prima persona e un'infinita produzione di meme.",
       color: [220, 149, 62],
       viewBox: [526, 408],
       path: parsePath("M49.1307 27.1183C51.6293 10.931 65.9476 -0.756537 82.3074 0.0374486L468.481 18.7795C484.527 19.5583 497.509 32.1137 498.823 48.125L525.507 373.338C527.1 392.756 511.116 409.08 491.668 407.895L30.0603 379.775C11.2573 378.629 -2.49307 361.57 0.380597 342.953L49.1307 27.1183Z")

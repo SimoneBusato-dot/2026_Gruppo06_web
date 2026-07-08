@@ -171,7 +171,10 @@ h1,
 .final-title,
 #snoopTitle,
 #pastaTitle,
-.hero-title {
+.hero-title,
+#Upper,
+#Upper2,
+.slide-title {
   letter-spacing: var(--letter-spacing-dharma) !important;
   line-height: 0.8 !important; /* Extremely tight stack for huge displays */
 }
@@ -188,17 +191,45 @@ h6,
 .trend-selection-title,
 .digit-span,
 .suffix-span,
-.char,
-.word,
 #titlePanel,
 #titleMain,
 #titleBlock,
 #title,
 #Upper,
+#Upper2,
 [style*="var(--font-family)"],
 [style*="dharma-gothic-e"] {
   letter-spacing: var(--letter-spacing-dharma) !important;
   line-height: 0.85 !important; /* Unified tight line-height for headings */
+}
+
+/* Scoped SplitType char/word rules to prevent affecting Gelica text splits */
+[style*="var(--font-family)"] .char,
+[style*="var(--font-family)"] .word,
+[style*="dharma-gothic-e"] .char,
+[style*="dharma-gothic-e"] .word,
+.section-title .char,
+.section-title .word,
+.title-animation .char,
+.title-animation .word,
+.gusto-dharma .char,
+.gusto-dharma .word,
+.trend-selection-title .char,
+.trend-selection-title .word,
+#snoopTitle .char,
+#snoopTitle .word,
+#pastaTitle .char,
+#pastaTitle .word,
+#titleMain .char,
+#titleMain .word,
+#Upper .char,
+#Upper .word,
+#Upper2 .char,
+#Upper2 .word,
+.slide-title .char,
+.slide-title .word {
+  letter-spacing: var(--letter-spacing-dharma) !important;
+  line-height: 0.85 !important;
 }
 
 /* -------------------- GELICA (Body / Descriptions / UI) -------------------- */
@@ -229,5 +260,12 @@ p,
   letter-spacing: var(--letter-spacing-gelica) !important;
   text-wrap: balance !important;
   line-height: 1.35 !important; /* Balanced leading for compact labels and subtitles */
+}
+
+/* Custom tighter line-height for considerations Dharma titles to compensate for split-line padding */
+#Upper,
+#Upper2 {
+  letter-spacing: var(--letter-spacing-dharma) !important;
+  line-height: 0.72 !important;
 }
 

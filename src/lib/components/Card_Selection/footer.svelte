@@ -71,10 +71,11 @@
         height: 40vh;
         display: flex;
         flex-direction: column;
-        justify-content: flex-start;
+        justify-content: center;
         align-items: center;
         background-color: var(--neutral-900);
         transform-origin: bottom center;
+        gap: 1.5rem;
     }
 
     #footerTitle {
@@ -143,6 +144,6 @@
         font-family: var(--font-family-text);
         font-weight: 300;
         color: var(--neutral-50);
-        margin-top: 2rem;
+        margin-top: 0;
     }
 </style>
