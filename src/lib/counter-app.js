@@ -11,7 +11,7 @@ export const COUNTER_SNAP_CONFIG = {
   threshold: 100,
   
   // Posizioni di snap (percentuale di scroll totale della pagina)
-  step0_end: 0.325,  // Fine scorrimento iniziale contatore (corrisponde a fillPhaseStart1)
+  step0_end: 0.40,  // Fine scorrimento iniziale contatore (corrisponde a fillPhaseStart1)
   step1: 0.50,       // Snap Card 1 (Visualizzazioni)
   step2: 0.68,       // Snap Card 2 (Utenti Attivi)
   step3: 0.84,       // Snap Card 3 (Interazioni)
@@ -232,7 +232,7 @@ export function init(options = {}) {
     window.scrollTo(0, 0);
   }
 
-  const presentationMultiplier = 18;
+  const presentationMultiplier = 26;
 
   const displayBack = document.getElementById('counter-display-back');
   const displayBackDigits = displayBack.querySelector('.digits-span');
@@ -819,6 +819,33 @@ export function init(options = {}) {
         }
         item.style.opacity = itemOpacity;
         
+        if (index === 2) {
+          const digitsSpan = item.querySelector('.number-digits');
+          const suffixSpan = item.querySelector('.number-suffix');
+          if (digitsSpan && suffixSpan) {
+            const progress2 = Math.min(Math.max((state.progress - totalPhase1Max) / (1 - totalPhase1Max), 0), 1);
+            if (progress2 >= 0.68 && progress2 < 0.82) {
+              const t = (progress2 - 0.68) / 0.14; // da 0 a 1
+              const fullString = "27MLN";
+              const charCount = fullString.length;
+              const currentLength = Math.max(0, Math.ceil((1 - t) * charCount));
+              
+              const currentStr = fullString.substring(0, currentLength);
+              const digitsMatch = currentStr.match(/^\d+/);
+              const suffixMatch = currentStr.match(/[a-zA-Z]+/);
+              
+              digitsSpan.textContent = digitsMatch ? digitsMatch[0] : "";
+              suffixSpan.textContent = suffixMatch ? suffixMatch[0] : "";
+            } else if (progress2 >= 0.82) {
+              digitsSpan.textContent = "";
+              suffixSpan.textContent = "";
+            } else {
+              digitsSpan.textContent = "27";
+              suffixSpan.textContent = "MLN";
+            }
+          }
+        }
+
         // Apply color to both digits and suffix inside this item
         const digits = item.querySelector('.number-digits');
         const suffix = item.querySelector('.number-suffix');
@@ -1023,7 +1050,7 @@ export function init(options = {}) {
           } else {
             const presentationScrollHeight = presentationMultiplier * window.innerHeight;
             const scrollPosition = currentScrollYSmooth;
-            const carouselStart = 0.91 * presentationScrollHeight;
+            const carouselStart = COUNTER_SNAP_CONFIG.step4 * presentationScrollHeight;
             const carouselSpan = 4.0 * window.innerHeight;
             
             let progressVal = 0;
@@ -1070,10 +1097,10 @@ export function init(options = {}) {
 
   const targetValue = 22000000000; // 22 Billion
   const totalPhase1Max = 0.5; // End of Macro Phase 1 scroll progress (0.0 to 0.5)
-  const fillPhaseStart = 0.65; // Relative fill start (65% of Phase 1)
-  const fillPhaseStart1 = fillPhaseStart * totalPhase1Max; // = 0.325
-  const suspensionEnd = 0.70; // Suspension phase ends (70% of Phase 1)
-  const suspensionEnd1 = suspensionEnd * totalPhase1Max; // = 0.35
+  const fillPhaseStart = 0.80; // Relative fill start (80% of Phase 1 -> 0.80 * 0.5 = 0.40)
+  const fillPhaseStart1 = fillPhaseStart * totalPhase1Max; // = 0.40
+  const suspensionEnd = 0.84; // Suspension phase ends (84% of Phase 1 -> 0.84 * 0.5 = 0.42)
+  const suspensionEnd1 = suspensionEnd * totalPhase1Max; // = 0.42
   
   const formatNumber = (num) => {
     return new Intl.NumberFormat('it-IT').format(num);
@@ -1295,7 +1322,7 @@ export function init(options = {}) {
     
     // Slide up all fixed viewport elements if scrolling down to the white text section
     let exitOffset = 0;
-    const carouselStart = 0.91 * presentationScrollHeight;
+    const carouselStart = COUNTER_SNAP_CONFIG.step4 * presentationScrollHeight;
     const carouselSpan = 4.0 * window.innerHeight;
     const carouselEnd = carouselStart + carouselSpan;
     if (scrollPosition > carouselEnd) {
@@ -1475,7 +1502,7 @@ export function init(options = {}) {
 
     // Check if everything has settled. Do not settle (keep loop running) if Step 4 is active.
     const targetSlide = isCardAnimationFinished ? slideProgressRaw : 0;
-    const isStep4Active = currentProgress >= 0.91;
+    const isStep4Active = currentProgress >= COUNTER_SNAP_CONFIG.step4;
     const isSettled = Math.abs(targetProgress - currentProgress) < 0.00005 &&
                       Math.abs(targetProgress - currentProgressTop) < 0.00005 &&
                       Math.abs(targetProgress - currentProgressBottom) < 0.00005 &&
@@ -1642,15 +1669,23 @@ export function init(options = {}) {
                 targetSnapIdx = closestIdx;
               }
               
-              const targetPercent = snapPoints[targetSnapIdx].p;
+              const targetSnap = snapPoints[targetSnapIdx];
               
-              // Calamita solo se c'è un effettivo scostamento dal target
-              if (Math.abs(currentP - targetPercent) > 0.005) {
-                activeStep = snapPoints[targetSnapIdx].step;
-                updateBodySlideClass(activeStep);
-                triggerAutoscrollTo(targetPercent);
+              // Calamita SOLO se il target è Card 1 (blu), Card 2 (rossa) o Card 3 (gialla)
+              if (targetSnap.step >= 1 && targetSnap.step <= 3) {
+                const targetPercent = targetSnap.p;
+                
+                // Calamita solo se c'è un effettivo scostamento dal target
+                if (Math.abs(currentP - targetPercent) > 0.005) {
+                  activeStep = targetSnap.step;
+                  updateBodySlideClass(activeStep);
+                  triggerAutoscrollTo(targetPercent);
+                } else {
+                  currentSnapIdx = targetSnapIdx;
+                  lastSnapScrollY = scrollPosition;
+                }
               } else {
-                // Se siamo già sul target, aggiorniamo comunque gli indici per sicurezza
+                // Altrimenti (prima o dopo), aggiorniamo semplicemente l'indice per lo scorrimento libero
                 currentSnapIdx = targetSnapIdx;
                 lastSnapScrollY = scrollPosition;
               }
@@ -1961,7 +1996,7 @@ export function init(options = {}) {
     mldTypeProgress = 1.0;
     
     // Instantly scroll way past the presentation layers to avoid flash of the top page
-    const estOffset = 22 * window.innerHeight;
+    const estOffset = (presentationMultiplier + 4) * window.innerHeight;
     window.scrollTo(0, estOffset);
     
     // Fine-tune the scroll position to target once the layout height calculations are finished
@@ -1981,7 +2016,7 @@ export function init(options = {}) {
   }
 
   // Kick off the continuous animation loop if loaded directly at Step 4
-  if (targetProgress >= 0.91) {
+  if (targetProgress >= COUNTER_SNAP_CONFIG.step4) {
     isAnimating = true;
     lastFrameTime = performance.now();
     requestAnimationFrame(tickAnimation);

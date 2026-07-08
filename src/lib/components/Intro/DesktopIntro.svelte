@@ -38,6 +38,22 @@
 			// La pagina deve finire esattamente quando il carosello occupa tutto lo schermo
 			const targetBodyHeight = offsetTop + window.innerHeight;
 			document.body.style.minHeight = `${targetBodyHeight}px`;
+			ScrollTrigger.refresh();
+		} else {
+			// Fallback per la homepage desktop: l'altezza deve coprire l'intera sezione scrollabile
+			const trendSection = document.querySelector(".trend-intro-section");
+			if (trendSection) {
+				let offsetTop = 0;
+				let el = trendSection;
+				while (el) {
+					offsetTop += el.offsetTop;
+					el = el.offsetParent;
+				}
+				// La homepage deve finire circa 1.5 viewport height dopo l'inizio di trendSection per permettere l'animazione completa
+				const targetBodyHeight = offsetTop + window.innerHeight * 1.5;
+				document.body.style.minHeight = `${targetBodyHeight}px`;
+				ScrollTrigger.refresh();
+			}
 		}
 	}
 
@@ -291,11 +307,6 @@
 		document.addEventListener("mouseenter", onMouseEnter);
 
 		const tickHomeCards = () => {
-			const timeSec = performance.now() * 0.001;
-			const tSway = (timeSec / 2.5) * Math.PI * 2;
-			const swayY = Math.sin(tSway) * 2.2;
-			const swayX = -Math.sin(tSway * 0.5) * 1.5;
-
 			const mouseActive =
 				hasMoved && mouseInWindow && mouseX >= 0 && mouseY >= 0;
 
@@ -312,9 +323,8 @@
 				mouseTiltY = normalizedX * 4.5;
 			}
 
-			// Additive combination of mouse tilt and idle sway
-			const targetTiltX = mouseTiltX + swayX;
-			const targetTiltY = mouseTiltY + swayY;
+			const targetTiltX = mouseTiltX;
+			const targetTiltY = mouseTiltY;
 
 			// LERP interpolation for smooth movements
 			currentBlueX += (targetTiltX - currentBlueX) * 0.1;
