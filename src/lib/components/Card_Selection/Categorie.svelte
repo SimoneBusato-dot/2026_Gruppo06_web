@@ -291,6 +291,23 @@
     ───────────────────────────────────────────────── */
     onMount(() => {
 
+        const moveBackground = (e) => {
+    const xPercent = (e.clientX / window.innerWidth - 0.5) * 2;
+    const yPercent = (e.clientY / window.innerHeight - 0.5) * 2;
+
+    const slides = getSlides();
+    const activeSlide = slides[activeIndex];
+    if (!activeSlide) return;
+
+    gsap.to(activeSlide, {
+        duration: 1.2,
+        rotateY: xPercent * 15,
+        rotateX: -yPercent * 13,
+        ease: "power2.out",
+        overwrite: "auto"
+    });
+}
+
         computeCardW();
         computeClipWidth();
 
@@ -368,10 +385,14 @@
             },
         });
 
+        window.addEventListener('mousemove', moveBackground);
+
+
         return () => {
             cancelAnimationFrame(rafId);
             snapTween?.kill();
             st?.kill();
+            window.removeEventListener('mousemove', moveBackground);
             window.removeEventListener('resize', onResize);
             window.removeEventListener('keydown', onKeyDown);
             window.removeEventListener('pointermove', onWindowPointerMove);
@@ -558,6 +579,7 @@
         position: absolute;
         inset: 0;
         pointer-events: none;
+        perspective: 1000px;
     }
 
     .slide {

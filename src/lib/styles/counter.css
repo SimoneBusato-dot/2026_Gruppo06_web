@@ -366,6 +366,8 @@ body.no-scroll-counter {
   margin: 0;
   /* Transition handled frame-by-frame by JS LERP for maximum smoothness */
   will-change: opacity, transform;
+  
+
 }
 
 /* Morphing Card Styles */
