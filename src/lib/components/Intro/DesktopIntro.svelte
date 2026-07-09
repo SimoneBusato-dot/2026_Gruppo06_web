@@ -638,8 +638,7 @@
 					<div class="slide-text-container" id="text-red-slide">
 						<div class="slide-subtitle">
 							<span style="display: inline-block; margin-bottom: 0.5rem;">
-								<span class="highlight-red">Persino chi non segue</span> queste discipline
-								si è sentito chiamato in causa&nbsp;a
+								<span class="highlight-red">Persino chi non segue</span> queste discipline si è sentito chiamato in causa.
 							</span>
 
 							<span class="slide-title red-text"

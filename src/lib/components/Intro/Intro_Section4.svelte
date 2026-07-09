@@ -46,7 +46,7 @@
 		gsap.registerPlugin(ScrollTrigger);
 
 		// Slide 1 (Blue)
-		const blueText = document.querySelector('#text-blue-slide .slide-subtitle');
+		const blueText = document.querySelector('#text-blue-slide .slide-subtitle .mobile-only') || document.querySelector('#text-blue-slide .slide-subtitle');
 		const blueCard = document.querySelector('.slide-blue .video-card-wrapper');
 		if (blueText) {
 			blueSplit = new SplitType(blueText, { types: "lines", tagName: "span" });
@@ -85,7 +85,7 @@
 		}
 
 		// Slide 2 (Red)
-		const redText = document.querySelector('#text-red-slide .slide-subtitle');
+		const redText = document.querySelector('#text-red-slide .slide-subtitle .mobile-only') || document.querySelector('#text-red-slide .slide-subtitle');
 		const redCard = document.querySelector('.slide-red .video-card-wrapper');
 		if (redText) {
 			redSplit = new SplitType(redText, { types: "lines", tagName: "span" });
